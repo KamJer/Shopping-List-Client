@@ -74,9 +74,8 @@ public class ShoppingRepository {
     }
 
     public LiveData<User> loadUser(@NonNull String userName) {
-        User defaultUser = User.builder().userName("").password("").build();
 //        loading user data from database based on what was passed from caller
-        if (!userName.equals(Optional.ofNullable(userLiveData.getValue()).orElse(defaultUser).getUserName())) {
+        if (userLiveData.getValue() == null || !userName.equals(userLiveData.getValue().getUserName())) {
             LiveData<User> userRoomLifeData = userDao.findUserByUserName(userName);
 //        creating observer, if found user is the same as one logged (saved in userLifeData) don't load user from database,
 //        if new user was passed set new user to be logged
@@ -106,12 +105,13 @@ public class ShoppingRepository {
     }
 
     //    ShoppingItem
-    public LiveData<List<ShoppingItemWithAmountTypeAndCategory>> loadAllShoppingItemsWithAmountTypeAndCategory() {
-        return shoppingItemDao.findAllShoppingItemsWithAmountTypeAndCategory();
+    public LiveData<List<ShoppingItemWithAmountTypeAndCategory>> loadAllShoppingItemsWithAmountTypeAndCategory(User user) {
+        return shoppingItemDao.findAllShoppingItemsWithAmountTypeAndCategory(user.getUserName());
     }
 
-    public void insertShoppingItem(ShoppingItem shoppingItem, LoadToServerAction action) {
+    public void insertShoppingItem(User user, ShoppingItem shoppingItem, LoadToServerAction action) {
         ShoppingDatabase.EXECUTOR_SERVICE.execute(() -> {
+            shoppingItem.setUserName(user.getUserName());
             shoppingItem.setLocalShoppingItemId(shoppingItemDao.insertShoppingItem(shoppingItem));
             action.action();
         });
@@ -147,12 +147,13 @@ public class ShoppingRepository {
     }
 
     //    category
-    public LiveData<List<Category>> loadAllCategory() {
-        return categoryDao.findAllCategory();
+    public LiveData<List<Category>> loadAllCategory(User user) {
+        return categoryDao.findAllCategory(user.getUserName());
     }
 
-    public void insertCategory(Category category, LoadToServerAction action) {
+    public void insertCategory(User user, Category category, LoadToServerAction action) {
         ShoppingDatabase.EXECUTOR_SERVICE.execute(() -> {
+            category.setUserName(user.getUserName());
             category.setLocalCategoryId(categoryDao.insertCategory(category));
             action.action();
         });
@@ -185,12 +186,13 @@ public class ShoppingRepository {
     }
 
     //    amountType
-    public LiveData<List<AmountType>> loadAllAmountType() {
-        return amountTypeDao.findAllAmountType();
+    public LiveData<List<AmountType>> loadAllAmountType(User user) {
+        return amountTypeDao.findAllAmountType(user.getUserName());
     }
 
-    public void insertAmountType(AmountType amountType, LoadToServerAction action) {
+    public void insertAmountType(User user, AmountType amountType, LoadToServerAction action) {
         ShoppingDatabase.EXECUTOR_SERVICE.execute(() -> {
+            amountType.setUserName(user.getUserName());
             amountType.setLocalAmountTypeId(amountTypeDao.insertAmountType(amountType));
             action.action();
         });
@@ -225,9 +227,9 @@ public class ShoppingRepository {
     public void getAllDataAndAct(User user, PostNewElements action) {
         ShoppingDatabase.EXECUTOR_SERVICE.execute(() ->
                 action.action(
-                        amountTypeDao.findAllAmountTypeForUser(),
-                        categoryDao.findAllCategoryForUser(),
-                        shoppingItemDao.findAllShoppingItemsForUser()));
+                        amountTypeDao.findAllAmountTypeForUser(user.getUserName()),
+                        categoryDao.findAllCategoryForUser(user.getUserName()),
+                        shoppingItemDao.findAllShoppingItemsForUser(user.getUserName())));
     }
 
     public void synchronizeData(Map<ModifyState, List<AmountType>> amountTypes,

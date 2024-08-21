@@ -65,7 +65,7 @@ public class AmountTypeViewModel extends ViewModel {
     }
 
     public void insertAmountType(AmountType amountType, OnFailureAction action) {
-        shoppingRepository.insertAmountType(amountType, () ->
+        shoppingRepository.insertAmountType(getUserValue(), amountType, () ->
                 shoppingServiceRepository.insertAmountType(amountType, new Callback<AddDto>() {
                     @Override
                     public void onResponse(@NonNull Call<AddDto> call, @NonNull Response<AddDto> response) {

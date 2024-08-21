@@ -54,7 +54,8 @@ public class ShoppingListViewModel extends ViewModel {
                     SharedRepository.getSharedRepository()));
 
     public void loadAllShoppingItemWithAmountTypeAndCategory() {
-        allShoppingItemWithAmountTypeAndCategoryLiveData = shoppingRepository.loadAllShoppingItemsWithAmountTypeAndCategory();
+        allShoppingItemWithAmountTypeAndCategoryLiveData = shoppingRepository
+                .loadAllShoppingItemsWithAmountTypeAndCategory(getUserValue());
     }
 
     public void setShoppingItemWithAmountTypeAndCategoryLiveDataObserver(LifecycleOwner owner, Observer<List<ShoppingItemWithAmountTypeAndCategory>> observer) {
@@ -66,7 +67,7 @@ public class ShoppingListViewModel extends ViewModel {
     }
 
     public void insertShoppingItem(ShoppingItem shoppingItem, OnFailureAction action) {
-        shoppingRepository.insertShoppingItem(shoppingItem, () ->
+        shoppingRepository.insertShoppingItem(getUserValue(), shoppingItem, () ->
                 shoppingServiceRepository.insertShoppingItem(shoppingItem, new Callback<AddDto>() {
                     @Override
                     public void onResponse(@NonNull Call<AddDto> call, @NonNull Response<AddDto> response) {
@@ -141,7 +142,7 @@ public class ShoppingListViewModel extends ViewModel {
     }
 
     public void loadAllCategory() {
-        allCategoryLiveData = shoppingRepository.loadAllCategory();
+        allCategoryLiveData = shoppingRepository.loadAllCategory(getUserValue());
     }
 
     public ArrayList<Category> getAllCategoryValue() {
@@ -175,7 +176,7 @@ public class ShoppingListViewModel extends ViewModel {
     }
 
     public void insertCategory(Category category, OnFailureAction action) {
-        shoppingRepository.insertCategory(category, () ->
+        shoppingRepository.insertCategory(getUserValue(), category, () ->
                 shoppingServiceRepository.insertCategory(category, new Callback<AddDto>() {
                     @Override
                     public void onResponse(@NonNull Call<AddDto> call, @NonNull Response<AddDto> response) {
@@ -223,7 +224,7 @@ public class ShoppingListViewModel extends ViewModel {
     }
 
     public void loadAllAmountTypes() {
-        allAmountTypeLiveData = shoppingRepository.loadAllAmountType();
+        allAmountTypeLiveData = shoppingRepository.loadAllAmountType(getUserValue());
     }
 
     public void setAllAmountTypeLiveDataObserver(LifecycleOwner owner, Observer<List<AmountType>> observer) {
@@ -240,9 +241,5 @@ public class ShoppingListViewModel extends ViewModel {
 
     public User getUserValue() throws NoUserFoundException {
         return Optional.ofNullable(userLiveData.getValue()).orElseThrow(() -> new NoUserFoundException("No user is logged"));
-    }
-
-    public void setUserLiveDataObserver(LifecycleOwner owner, Observer<User> observer) {
-        userLiveData.observe(owner, observer);
     }
 }

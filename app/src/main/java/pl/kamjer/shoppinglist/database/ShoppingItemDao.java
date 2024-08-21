@@ -41,9 +41,9 @@ public interface ShoppingItemDao {
     }
 
     @Transaction
-    @Query("SELECT * FROM SHOPPING_ITEM WHERE deleted=0")
-    LiveData<List<ShoppingItemWithAmountTypeAndCategory>> findAllShoppingItemsWithAmountTypeAndCategory();
+    @Query("SELECT * FROM SHOPPING_ITEM WHERE deleted=0 AND user_name=:userName")
+    LiveData<List<ShoppingItemWithAmountTypeAndCategory>> findAllShoppingItemsWithAmountTypeAndCategory(String userName);
 
-    @Query("SELECT * FROM SHOPPING_ITEM")
-    List<ShoppingItem> findAllShoppingItemsForUser();
+    @Query("SELECT * FROM SHOPPING_ITEM WHERE user_name=:userName")
+    List<ShoppingItem> findAllShoppingItemsForUser(String userName);
 }

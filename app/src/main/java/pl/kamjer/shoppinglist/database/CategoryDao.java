@@ -39,14 +39,14 @@ public interface CategoryDao {
     void updateCategory(Category category);
 
     @Transaction
-    @Query("SELECT * FROM CATEGORY WHERE deleted=0")
-    LiveData<List<Category>> findAllCategory();
+    @Query("SELECT * FROM CATEGORY WHERE deleted=0 AND user_name=:userName")
+    LiveData<List<Category>> findAllCategory(String userName);
 
     @Transaction
     @Insert
     long[] insertCategories(List<Category> categories);
 
     @Transaction
-    @Query("SELECT * FROM CATEGORY")
-    List<Category> findAllCategoryForUser();
+    @Query("SELECT * FROM CATEGORY WHERE user_name=:userName")
+    List<Category> findAllCategoryForUser(String userName);
 }

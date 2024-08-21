@@ -34,8 +34,8 @@ public class ShoppingServiceRepository {
 
     public static final String CONNECTION_FAILED_MESSAGE = "Connection failed: Http code:";
 
-//    private static final String BASE_URL = "https://35.212.210.42:8080";
-    private static final String BASE_URL = "https://10.0.2.2:8080";
+//    private static final String BASE_URL = "https://35.212.210.42";
+    private static final String BASE_URL = "https://10.0.2.2:8443";
     private static ShoppingServiceRepository shoppingServiceRepository;
 
     private UserService userService;

@@ -8,15 +8,12 @@ import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.viewmodel.ViewModelInitializer;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
-import pl.kamjer.shoppinglist.database.AmountTypeDao;
 import pl.kamjer.shoppinglist.model.AmountType;
 import pl.kamjer.shoppinglist.model.Category;
 import pl.kamjer.shoppinglist.model.ModifyState;
@@ -30,7 +27,6 @@ import pl.kamjer.shoppinglist.repository.SharedRepository;
 import pl.kamjer.shoppinglist.repository.ShoppingRepository;
 import pl.kamjer.shoppinglist.repository.ShoppingServiceRepository;
 import pl.kamjer.shoppinglist.util.ServiceUtil;
-import pl.kamjer.shoppinglist.util.exception.InvalidServerResponseBodyException;
 import pl.kamjer.shoppinglist.util.exception.NoUserFoundException;
 import pl.kamjer.shoppinglist.util.exception.NotOkHttpResponseException;
 import pl.kamjer.shoppinglist.util.funcinterface.OnFailureAction;
@@ -130,7 +126,7 @@ public class InitializerViewModel extends ViewModel {
                                                 case INSERT:
                                                 case UPDATE:
                                                 case DELETE: {
-                                                    return ServiceUtil.amountTypeDtoToAmountType(dto);
+                                                    return ServiceUtil.amountTypeDtoToAmountType(getUserValue(), dto);
                                                 }
                                                 default:
                                                     throw new IllegalArgumentException("Unknown ModifyState: " + dto.getModifyState());
@@ -147,7 +143,7 @@ public class InitializerViewModel extends ViewModel {
                                                 case INSERT:
                                                 case UPDATE:
                                                 case DELETE: {
-                                                    return ServiceUtil.categoryDtoToCategory(dto);
+                                                    return ServiceUtil.categoryDtoToCategory(getUserValue(), dto);
                                                 }
                                                 default:
                                                     throw new IllegalArgumentException("Unknown ModifyState: " + dto.getModifyState());
@@ -164,7 +160,7 @@ public class InitializerViewModel extends ViewModel {
                                                 case INSERT:
                                                 case UPDATE:
                                                 case DELETE: {
-                                                    return ServiceUtil.shoppingItemDtoToShoppingItem(dto);
+                                                    return ServiceUtil.shoppingItemDtoToShoppingItem(getUserValue(), dto);
                                                 }
                                                 default:
                                                     throw new IllegalArgumentException("Unknown ModifyState: " + dto.getModifyState());

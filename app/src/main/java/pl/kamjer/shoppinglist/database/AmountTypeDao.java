@@ -37,14 +37,10 @@ public interface AmountTypeDao {
     void updateAmountType(AmountType amountType);
 
     @Transaction
-    @Query("SELECT * FROM AMOUNT_TYPE WHERE deleted=0")
-    LiveData<List<AmountType>> findAllAmountType();
+    @Query("SELECT * FROM AMOUNT_TYPE WHERE deleted=0 AND user_name=:userName")
+    LiveData<List<AmountType>> findAllAmountType(String userName);
 
     @Transaction
-    @Insert
-    long[] insertAmountTypes(List<AmountType> amountTypes);
-
-    @Transaction
-    @Query("SELECT * FROM AMOUNT_TYPE")
-    List<AmountType> findAllAmountTypeForUser();
+    @Query("SELECT * FROM AMOUNT_TYPE WHERE user_name=:userName")
+    List<AmountType> findAllAmountTypeForUser(String userName);
 }

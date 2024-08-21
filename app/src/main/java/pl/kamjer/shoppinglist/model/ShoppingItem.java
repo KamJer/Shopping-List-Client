@@ -24,12 +24,16 @@ import lombok.Setter;
                         entity = AmountType.class,
                         parentColumns = "local_amount_type_id",
                         childColumns = "local_item_amount_type_id",
-                        onDelete = ForeignKey.CASCADE
-                ),
+                        onDelete = ForeignKey.CASCADE),
                 @ForeignKey(
                         entity = Category.class,
                         parentColumns = "local_category_id",
                         childColumns = "local_item_category_id",
+                        onDelete = ForeignKey.CASCADE),
+                @ForeignKey(
+                        entity = User.class,
+                        parentColumns = "user_name",
+                        childColumns = "user_name",
                         onDelete = ForeignKey.CASCADE)
         }
 )

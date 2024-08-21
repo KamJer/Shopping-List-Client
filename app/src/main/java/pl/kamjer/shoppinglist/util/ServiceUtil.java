@@ -25,7 +25,6 @@ public class ServiceUtil {
         return AmountTypeDto.builder()
                 .typeName(amountType.getTypeName())
                 .amountTypeId(amountType.getAmountTypeId())
-                .localAmountTypeId(amountType.getLocalAmountTypeId())
                 .deleted(amountType.isDeleted())
                 .build();
     }
@@ -34,18 +33,17 @@ public class ServiceUtil {
         return amountTypes.stream().map(ServiceUtil::amountTypeToAmountTypeDto).collect(Collectors.toList());
     }
 
-    public static AmountType amountTypeDtoToAmountType(AmountTypeDto amountType) {
+    public static AmountType amountTypeDtoToAmountType(User user, AmountTypeDto amountType) {
         return AmountType.builder()
                 .typeName(amountType.getTypeName())
                 .amountTypeId(amountType.getAmountTypeId())
-                .localAmountTypeId(amountType.getLocalAmountTypeId())
+                .userName(user.getUserName())
                 .build();
     }
 
     public static CategoryDto categoryToCategoryDto(Category category) {
         return CategoryDto.builder()
                 .categoryId(category.getCategoryId())
-                .localCategoryId(category.getLocalCategoryId())
                 .categoryName(category.getCategoryName())
                 .deleted(category.isDeleted())
                 .build();
@@ -55,22 +53,19 @@ public class ServiceUtil {
         return categories.stream().map(ServiceUtil::categoryToCategoryDto).collect(Collectors.toList());
     }
 
-    public static Category categoryDtoToCategory(CategoryDto category) {
+    public static Category categoryDtoToCategory(User user, CategoryDto category) {
         return Category.builder()
                 .categoryId(category.getCategoryId())
                 .categoryName(category.getCategoryName())
-                .localCategoryId(category.getLocalCategoryId())
+                .userName(user.getUserName())
                 .build();
     }
 
     public static ShoppingItemDto shoppingItemToShoppingItemDto(ShoppingItem shoppingItem) {
         return ShoppingItemDto.builder()
                 .shoppingItemId(shoppingItem.getShoppingItemId())
-                .localShoppingItemId(shoppingItem.getLocalShoppingItemId())
                 .itemAmountTypeId(shoppingItem.getItemAmountTypeId())
-                .localAmountTypeId(shoppingItem.getLocalItemAmountTypeId())
                 .itemCategoryId(shoppingItem.getItemCategoryId())
-                .localCategoryId(shoppingItem.getLocalItemCategoryId())
                 .itemName(shoppingItem.getItemName())
                 .amount(shoppingItem.getAmount())
                 .bought(shoppingItem.isBought())
@@ -78,17 +73,15 @@ public class ServiceUtil {
                 .build();
     }
 
-    public static ShoppingItem shoppingItemDtoToShoppingItem(ShoppingItemDto shoppingItem) {
+    public static ShoppingItem shoppingItemDtoToShoppingItem(User user, ShoppingItemDto shoppingItem) {
         return ShoppingItem.builder()
                 .shoppingItemId(shoppingItem.getShoppingItemId())
-                .localShoppingItemId(shoppingItem.getLocalShoppingItemId())
-                .localItemAmountTypeId(shoppingItem.getLocalAmountTypeId())
                 .itemAmountTypeId(shoppingItem.getItemAmountTypeId())
                 .itemCategoryId(shoppingItem.getItemCategoryId())
-                .localItemCategoryId(shoppingItem.getLocalCategoryId())
                 .itemName(shoppingItem.getItemName())
                 .amount(shoppingItem.getAmount())
                 .bought(shoppingItem.isBought())
+                .userName(user.getUserName())
                 .build();
     }
 

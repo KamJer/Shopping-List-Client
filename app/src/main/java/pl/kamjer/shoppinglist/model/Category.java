@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.ForeignKey;
 import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
@@ -18,7 +19,14 @@ import lombok.Setter;
 @Builder
 @Getter
 @Setter
-@Entity(tableName = "CATEGORY")
+@Entity(tableName = "CATEGORY",
+        foreignKeys = {
+                @ForeignKey(
+                        entity = User.class,
+                        parentColumns = "user_name",
+                        childColumns = "user_name",
+                        onDelete = ForeignKey.CASCADE)
+        })
 public class Category implements Serializable {
 
     @ColumnInfo(name = "local_category_id")

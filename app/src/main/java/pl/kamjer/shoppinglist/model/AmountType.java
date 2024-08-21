@@ -4,6 +4,7 @@ package pl.kamjer.shoppinglist.model;
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.ForeignKey;
 import androidx.room.Ignore;
 import androidx.room.Index;
 import androidx.room.OnConflictStrategy;
@@ -20,7 +21,14 @@ import lombok.Setter;
 @Builder
 @Setter
 @Getter
-@Entity(tableName = "AMOUNT_TYPE")
+@Entity(tableName = "AMOUNT_TYPE",
+        foreignKeys = {
+                @ForeignKey(
+                        entity = User.class,
+                        parentColumns = "user_name",
+                        childColumns = "user_name",
+                        onDelete = ForeignKey.CASCADE)
+        })
 public class AmountType implements Serializable {
 
     @ColumnInfo(name = "local_amount_type_id")
