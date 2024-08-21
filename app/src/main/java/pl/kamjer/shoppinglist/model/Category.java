@@ -1,0 +1,53 @@
+package pl.kamjer.shoppinglist.model;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.Index;
+import androidx.room.PrimaryKey;
+
+import java.io.Serializable;
+import java.time.LocalDateTime;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
+@AllArgsConstructor
+@Builder
+@Getter
+@Setter
+@Entity(tableName = "CATEGORY")
+public class Category implements Serializable {
+
+    @ColumnInfo(name = "local_category_id")
+    @PrimaryKey(autoGenerate = true)
+    private long localCategoryId;
+    @ColumnInfo(name = "category_id")
+    private long categoryId;
+    @ColumnInfo(name = "category_name")
+    private String categoryName;
+    @ColumnInfo(name = "user_name")
+    private String userName;
+    @ColumnInfo(name = "updated")
+    private boolean updated;
+    @ColumnInfo(name = "deleted")
+    private boolean deleted;
+
+    @Override
+    public int hashCode() {
+        return (int) localCategoryId;
+    }
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        return obj instanceof Category && obj.hashCode() == this.hashCode();
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return categoryName;
+    }
+}

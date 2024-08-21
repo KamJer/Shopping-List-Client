@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">ShoppingList</string>
+    <string name="new_category_name_label">Nazwa nowej kategorii</string>
+    <string name="todo">TODO</string>
+    <string name="adding_category_desc">Adding category</string>
+    <string name="sending_bought_items_to_boght_list_button_desc">sending bought items to bought list</string>
+    <string name="preference_file_key">pl.kamjer.shoppinglist.SharedPreferences</string>
+    <string name="could_not_create_user_massage">Nie udało się zapisać użytkownika, sprawdz swoje połączenie internetowe lub nastąpił problem z serwerem, aplikacja będzie funkcjonować poprawnie ograniczając się tylko do funkcjonowania lokalnie do czasu ustanowania połączenia do serwera</string>
+    <string name="loginTextLabel">Nazwa użytkownika</string>
+    <string name="passwordTextLabel">Hasło</string>
+    <string name="loginButtonText">Logowanie</string>
+    <string name="registerButtonText">Rejestracja</string>
+    <string name="user_logged_message">Użytkownik zalogowany</string>
+    <string name="shopping_item_error_massege">Nazwa przedmiotu nie może byc pusta</string>
+    <string name="amount_type_name_label">Nazwa typu</string>
+</resources>

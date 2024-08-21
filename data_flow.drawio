@@ -1,0 +1,54 @@
+<mxfile host="app.diagrams.net" modified="2024-06-23T13:13:41.548Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36" etag="qwQShDvbT8s-1O7YewTs" version="24.6.2" type="device">
+  <diagram name="Strona-1" id="jOOoWnpXvxsLNQOdSbXZ">
+    <mxGraphModel dx="1434" dy="1915" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="6rCGiMeirLhRPlrqq7Db-3" value="&lt;div style=&quot;line-height: 120%;&quot;&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;ViewModel&lt;/span&gt;&lt;/div&gt;" style="html=1;whiteSpace=wrap;align=center;" parent="1" vertex="1">
+          <mxGeometry x="320" y="160" width="240" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="6rCGiMeirLhRPlrqq7Db-4" value="&lt;div style=&quot;line-height: 120%;&quot;&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;Database&lt;/span&gt;&lt;/div&gt;" style="html=1;whiteSpace=wrap;align=center;" parent="1" vertex="1">
+          <mxGeometry x="320" y="-160" width="240" height="280" as="geometry" />
+        </mxCell>
+        <mxCell id="6rCGiMeirLhRPlrqq7Db-5" value="&lt;div style=&quot;line-height: 120%;&quot;&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;Avtivity&lt;/span&gt;&lt;/div&gt;" style="html=1;whiteSpace=wrap;align=center;" parent="1" vertex="1">
+          <mxGeometry x="320" y="360" width="240" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="6rCGiMeirLhRPlrqq7Db-9" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="6rCGiMeirLhRPlrqq7Db-6" target="6rCGiMeirLhRPlrqq7Db-7" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="6rCGiMeirLhRPlrqq7Db-6" value="ShoppingDatabase" style="html=1;whiteSpace=wrap;" parent="1" vertex="1">
+          <mxGeometry x="600" y="-160" width="400" height="150" as="geometry" />
+        </mxCell>
+        <mxCell id="6rCGiMeirLhRPlrqq7Db-18" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="6rCGiMeirLhRPlrqq7Db-7" target="6rCGiMeirLhRPlrqq7Db-17" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="6rCGiMeirLhRPlrqq7Db-7" value="ShoppingRepository" style="html=1;whiteSpace=wrap;" parent="1" vertex="1">
+          <mxGeometry x="600" y="35" width="400" height="85" as="geometry" />
+        </mxCell>
+        <mxCell id="6rCGiMeirLhRPlrqq7Db-10" value="ShoppingList" style="html=1;whiteSpace=wrap;" parent="1" vertex="1">
+          <mxGeometry x="600" y="-160" width="110" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="6rCGiMeirLhRPlrqq7Db-11" value="ShoppingItem" style="html=1;whiteSpace=wrap;" parent="1" vertex="1">
+          <mxGeometry x="745" y="-160" width="110" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="6rCGiMeirLhRPlrqq7Db-21" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="6rCGiMeirLhRPlrqq7Db-17" target="6rCGiMeirLhRPlrqq7Db-19" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="795" y="345" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="6rCGiMeirLhRPlrqq7Db-17" value="&lt;div&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;ShoppingViewModel&lt;/span&gt;&lt;br&gt;&lt;/div&gt;" style="html=1;whiteSpace=wrap;" parent="1" vertex="1">
+          <mxGeometry x="740" y="215" width="120" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="6rCGiMeirLhRPlrqq7Db-19" value="&lt;div&gt;ShoppingActivity&lt;/div&gt;" style="html=1;whiteSpace=wrap;" parent="1" vertex="1">
+          <mxGeometry x="740" y="415" width="120" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="6rCGiMeirLhRPlrqq7Db-25" value="ShoppingDAO" style="html=1;whiteSpace=wrap;" parent="1" vertex="1">
+          <mxGeometry x="600" y="-60" width="400" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="bx8ax3VX5WwzucUk9RJE-1" value="amountType" style="html=1;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="890" y="-160" width="110" height="50" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
