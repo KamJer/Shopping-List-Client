@@ -6,12 +6,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageButton;
-import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -19,29 +18,29 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 import lombok.extern.java.Log;
 import pl.kamjer.shoppinglist.R;
+import pl.kamjer.shoppinglist.activity.GenericActivity;
 import pl.kamjer.shoppinglist.activity.ShoppingListActionBar;
 import pl.kamjer.shoppinglist.activity.shoppinglistactiviti.newcategorydialog.NewCategoryDialog;
+import pl.kamjer.shoppinglist.activity.shoppinglistactiviti.newcategorydialog.UpdateCategoryDialog;
 import pl.kamjer.shoppinglist.activity.shoppinglistactiviti.newshoppingitemdialog.NewShoppingItemDialog;
-import pl.kamjer.shoppinglist.activity.shoppinglistactiviti.shoppingcategoryrecyclerview.AddShoppingItemAction;
-import pl.kamjer.shoppinglist.activity.shoppinglistactiviti.shoppingcategoryrecyclerview.RemoveCategoryAction;
+import pl.kamjer.shoppinglist.activity.shoppinglistactiviti.newshoppingitemdialog.UpdateShoppingItemDialog;
 import pl.kamjer.shoppinglist.activity.shoppinglistactiviti.shoppingcategoryrecyclerview.ShoppingCategoryRecyclerViewAdapter;
-import pl.kamjer.shoppinglist.activity.shoppinglistactiviti.shoppingitemrecyclerview.DeleteShoppingItemAction;
-import pl.kamjer.shoppinglist.activity.shoppinglistactiviti.shoppingitemrecyclerview.UpdateShoppingItemActonCheckBox;
-import pl.kamjer.shoppinglist.model.AmountType;
 import pl.kamjer.shoppinglist.model.Category;
 import pl.kamjer.shoppinglist.model.ShoppingItem;
 import pl.kamjer.shoppinglist.model.ShoppingItemWithAmountTypeAndCategory;
-import pl.kamjer.shoppinglist.util.exception.handler.ShoppingListExceptionHandler;
-import pl.kamjer.shoppinglist.util.funcinterface.OnFailureAction;
+import pl.kamjer.shoppinglist.util.exception.NoResourceFoundException;
+import pl.kamjer.shoppinglist.util.funcinterface.AddShoppingItemAction;
+import pl.kamjer.shoppinglist.util.funcinterface.ModifyShoppingItemAction;
+import pl.kamjer.shoppinglist.util.funcinterface.RemoveCategoryAction;
+import pl.kamjer.shoppinglist.util.funcinterface.UpdateShoppingItemActonCheckBox;
 import pl.kamjer.shoppinglist.viewmodel.ShoppingListViewModel;
 
 @Log
-public class ShoppingListActivity extends AppCompatActivity {
+public class ShoppingListActivity extends GenericActivity {
 
     private ShoppingListViewModel shoppingListViewModel;
     private ShoppingCategoryRecyclerViewAdapter shoppingCategoryRecyclerViewAdapter;
@@ -51,32 +50,23 @@ public class ShoppingListActivity extends AppCompatActivity {
     private List<ShoppingItemWithAmountTypeAndCategory> shoppingItemWithAmountTypeAndCategoriesList;
 
     private ActivityResultLauncher<Intent> createNewCategoryDialogLauncher;
-    private ActivityResultLauncher<Intent> createNewShoppingItemDialogLauncher;
-
-    private final OnFailureAction connectionFailedAction =
-            (t) -> {
-                log.log(Level.WARNING, Optional.ofNullable(t).map(Throwable::getMessage).orElse("could not found reason for error"));
-                createToast(Optional.ofNullable(t).map(Throwable::getMessage).orElse("could not found reason for error"));
-            };
-
+    private ActivityResultLauncher<Intent> updateCategoryDialogLauncher;
 
     private final AddShoppingItemAction addShoppingItemAction = category -> {
         Intent createNewShoppingItemIntent = new Intent(this, NewShoppingItemDialog.class);
         createNewShoppingItemIntent.putExtra(NewShoppingItemDialog.CATEGORY_FIELD_NAME, category);
-        createNewShoppingItemIntent.putExtra(NewShoppingItemDialog.CATEGORY_LIST_FIELD_NAME, shoppingListViewModel.getAllCategoryValue());
-        createNewShoppingItemIntent.putExtra(NewShoppingItemDialog.AMOUNT_TYPE_LIST_FIELD_NAME, shoppingListViewModel.getAmountTypesValue());
-        createNewShoppingItemDialogLauncher.launch(createNewShoppingItemIntent);
+        startActivity(createNewShoppingItemIntent);
     };
 
     private final RemoveCategoryAction deleteCategoryAction =
             category -> shoppingListViewModel.deleteCategory(category,
                     connectionFailedAction);
 
-    private final RemoveCategoryAction updateCategoryAction =
-//            TODO: place holder, some dialog needs to be added here so that the changes can be made to the category
-            category -> shoppingListViewModel.updateCategory(
-                    category,
-                    connectionFailedAction);
+    private final RemoveCategoryAction updateCategoryAction = (category) -> {
+        Intent updatedCategoryIntent = new Intent(this, UpdateCategoryDialog.class);
+        updatedCategoryIntent.putExtra(UpdateCategoryDialog.CATEGORY_FIELD_NAME, category);
+        updateCategoryDialogLauncher.launch(updatedCategoryIntent);
+    };
 
     private final View.OnClickListener onClickListener = v -> {
         Intent createNewCategoryIntent = new Intent(this, NewCategoryDialog.class);
@@ -101,27 +91,38 @@ public class ShoppingListActivity extends AppCompatActivity {
                 connectionFailedAction);
     };
 
-    private final DeleteShoppingItemAction deleteShoppingItemAction = shoppingItemWithAmountTypeAndCategory -> {
+    private final ModifyShoppingItemAction deleteShoppingItemAction = shoppingItemWithAmountTypeAndCategory -> {
         shoppingListViewModel.deleteShoppingItem(shoppingItemWithAmountTypeAndCategory.getShoppingItem(),
                 connectionFailedAction);
+    };
+    private final ModifyShoppingItemAction modifyShoppingItemAction = shoppingItemWithAmountTypeAndCategory -> {
+        Intent updateShoppingItemIntent = new Intent(this, UpdateShoppingItemDialog.class);
+        updateShoppingItemIntent.putExtra(NewShoppingItemDialog.CATEGORY_FIELD_NAME, shoppingItemWithAmountTypeAndCategory.getCategory());
+        updateShoppingItemIntent.putExtra(UpdateShoppingItemDialog.SELECTED_SHOPPING_ITEM, shoppingItemWithAmountTypeAndCategory.getShoppingItem());
+        startActivity(updateShoppingItemIntent);
+    };
+
+    protected OnBackPressedCallback onBack = new OnBackPressedCallback(true) {
+        @Override
+        public void handleOnBackPressed() {
+            moveTaskToBack(true);
+        }
     };
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.shopping_list_activity_layout);
-        Thread.setDefaultUncaughtExceptionHandler(new ShoppingListExceptionHandler(this));
-
+        getOnBackPressedDispatcher().addCallback(this, onBack);
         shoppingListViewModel = new ViewModelProvider(
                 this,
                 ViewModelProvider.Factory.from(ShoppingListViewModel.initializer)
         ).get(ShoppingListViewModel.class);
 
 //        loading data
+        shoppingListViewModel.loadUser();
         shoppingListViewModel.loadAllCategory();
         shoppingListViewModel.loadAllShoppingItemWithAmountTypeAndCategory();
-        shoppingListViewModel.loadAllAmountTypes();
-        shoppingListViewModel.loadUser();
 
         categoryList = new ArrayList<>();
         shoppingItemWithAmountTypeAndCategoriesList = new ArrayList<>();
@@ -138,9 +139,6 @@ public class ShoppingListActivity extends AppCompatActivity {
         ImageButton moveToBoughtImageButton = findViewById(R.id.moveToBoughtImageButton);
         moveToBoughtImageButton.setOnClickListener(moveToBoughtImageButtonAction);
 
-//        setting observers
-        shoppingListViewModel.setAllAmountTypeLiveDataObserver(this, amountTypes -> {});
-
         shoppingListViewModel.setAllCategoryObserver(this, categories -> {
             categoryList = categories;
             shoppingCategoryRecyclerViewAdapter = new ShoppingCategoryRecyclerViewAdapter(categoryList,
@@ -149,7 +147,8 @@ public class ShoppingListActivity extends AppCompatActivity {
                     updateCategoryAction,
                     addShoppingItemAction,
                     checkBoxListener,
-                    deleteShoppingItemAction);
+                    deleteShoppingItemAction,
+                    modifyShoppingItemAction);
             categoryRecyclerView.setAdapter(shoppingCategoryRecyclerViewAdapter);
         });
 
@@ -161,7 +160,8 @@ public class ShoppingListActivity extends AppCompatActivity {
                     updateCategoryAction,
                     addShoppingItemAction,
                     checkBoxListener,
-                    deleteShoppingItemAction);
+                    deleteShoppingItemAction,
+                    modifyShoppingItemAction);
             categoryRecyclerView.setLayoutManager(new LinearLayoutManager(this));
             categoryRecyclerView.setAdapter(shoppingCategoryRecyclerViewAdapter);
         });
@@ -179,32 +179,19 @@ public class ShoppingListActivity extends AppCompatActivity {
             }
         });
 
-        createNewShoppingItemDialogLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+        updateCategoryDialogLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
             if (result.getResultCode() == Activity.RESULT_OK) {
                 Intent data = result.getData();
                 if (data != null) {
-                    Category category = (Category) data.getSerializableExtra(NewShoppingItemDialog.CATEGORY_FIELD_NAME);
-                    AmountType amountType = (AmountType) data.getSerializableExtra(NewShoppingItemDialog.AMOUNT_TYPE_FIELD_NAME);
-                    String shoppingItemName = data.getStringExtra(NewShoppingItemDialog.SHOPPING_ITEM_FIELD_NAME);
-                    double amount = data.getDoubleExtra(NewShoppingItemDialog.AMOUNT_FIELD_NAME, 0);
-                    if (category != null && amountType != null) {
-                        shoppingListViewModel
-                                .insertShoppingItem(ShoppingItem.builder()
-                                        .localItemCategoryId(category.getLocalCategoryId())
-                                        .localItemAmountTypeId(amountType.getLocalAmountTypeId())
-                                        .itemCategoryId(category.getCategoryId())
-                                        .itemAmountTypeId(amountType.getAmountTypeId())
-                                        .itemName(shoppingItemName)
-                                        .amount(amount)
-                                        .build(), connectionFailedAction);
+                    try {
+                        Category category = Optional.ofNullable((Category) data.getSerializableExtra(UpdateCategoryDialog.CATEGORY_FIELD_NAME)).orElseThrow(() -> new NoResourceFoundException(getString(R.string.no_category_found_massage)));
+                        shoppingListViewModel.updateCategory(category,
+                                connectionFailedAction);
+                    } catch (NoResourceFoundException e) {
+                        createToast(e.getMessage());
                     }
                 }
             }
         });
     }
-
-    private void createToast(String s) {
-        Toast.makeText(this, s, Toast.LENGTH_LONG).show();
-    }
-
 }

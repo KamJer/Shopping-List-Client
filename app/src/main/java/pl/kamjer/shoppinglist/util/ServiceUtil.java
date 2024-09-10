@@ -9,6 +9,7 @@ import pl.kamjer.shoppinglist.model.ShoppingItem;
 import pl.kamjer.shoppinglist.model.User;
 import pl.kamjer.shoppinglist.model.dto.AmountTypeDto;
 import pl.kamjer.shoppinglist.model.dto.CategoryDto;
+import pl.kamjer.shoppinglist.model.dto.ExceptionDto;
 import pl.kamjer.shoppinglist.model.dto.ShoppingItemDto;
 import pl.kamjer.shoppinglist.model.dto.UserDto;
 
@@ -26,6 +27,7 @@ public class ServiceUtil {
                 .typeName(amountType.getTypeName())
                 .amountTypeId(amountType.getAmountTypeId())
                 .deleted(amountType.isDeleted())
+                .localId(amountType.getLocalAmountTypeId())
                 .build();
     }
 
@@ -38,6 +40,7 @@ public class ServiceUtil {
                 .typeName(amountType.getTypeName())
                 .amountTypeId(amountType.getAmountTypeId())
                 .userName(user.getUserName())
+                .localAmountTypeId(amountType.getLocalId())
                 .build();
     }
 
@@ -46,6 +49,7 @@ public class ServiceUtil {
                 .categoryId(category.getCategoryId())
                 .categoryName(category.getCategoryName())
                 .deleted(category.isDeleted())
+                .localId(category.getLocalCategoryId())
                 .build();
     }
 
@@ -58,6 +62,7 @@ public class ServiceUtil {
                 .categoryId(category.getCategoryId())
                 .categoryName(category.getCategoryName())
                 .userName(user.getUserName())
+                .localCategoryId(category.getLocalId())
                 .build();
     }
 
@@ -70,6 +75,9 @@ public class ServiceUtil {
                 .amount(shoppingItem.getAmount())
                 .bought(shoppingItem.isBought())
                 .deleted(shoppingItem.isDeleted())
+                .localId(shoppingItem.getLocalShoppingItemId())
+                .localAmountTypeId(shoppingItem.getLocalItemAmountTypeId())
+                .localCategoryId(shoppingItem.getLocalItemCategoryId())
                 .build();
     }
 
@@ -82,6 +90,9 @@ public class ServiceUtil {
                 .amount(shoppingItem.getAmount())
                 .bought(shoppingItem.isBought())
                 .userName(user.getUserName())
+                .localShoppingItemId(shoppingItem.getLocalId())
+                .localItemAmountTypeId(shoppingItem.getLocalAmountTypeId())
+                .localItemCategoryId(shoppingItem.getLocalCategoryId())
                 .build();
     }
 
@@ -89,6 +100,7 @@ public class ServiceUtil {
         return shoppingItems.stream().map(ServiceUtil::shoppingItemToShoppingItemDto).collect(Collectors.toList());
     }
 
-
-
+    public static ExceptionDto toExceptionDto(Throwable e) {
+        return ExceptionDto.builder().massage(e.getMessage()).stackTrace(e.getStackTrace()).build();
+    }
 }

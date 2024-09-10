@@ -3,7 +3,6 @@ package pl.kamjer.shoppinglist.activity.shoppinglistactiviti.shoppingcategoryrec
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CompoundButton;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -18,8 +17,10 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import pl.kamjer.shoppinglist.R;
-import pl.kamjer.shoppinglist.activity.shoppinglistactiviti.shoppingitemrecyclerview.DeleteShoppingItemAction;
-import pl.kamjer.shoppinglist.activity.shoppinglistactiviti.shoppingitemrecyclerview.UpdateShoppingItemActonCheckBox;
+import pl.kamjer.shoppinglist.util.funcinterface.AddShoppingItemAction;
+import pl.kamjer.shoppinglist.util.funcinterface.ModifyShoppingItemAction;
+import pl.kamjer.shoppinglist.util.funcinterface.RemoveCategoryAction;
+import pl.kamjer.shoppinglist.util.funcinterface.UpdateShoppingItemActonCheckBox;
 import pl.kamjer.shoppinglist.model.Category;
 import pl.kamjer.shoppinglist.model.ShoppingItemWithAmountTypeAndCategory;
 
@@ -35,7 +36,8 @@ public class ShoppingCategoryRecyclerViewAdapter extends RecyclerView.Adapter<Ca
     private RemoveCategoryAction updateCategoryAction;
     private AddShoppingItemAction addShoppingItemAction;
     private UpdateShoppingItemActonCheckBox checkBoxListener;
-    private DeleteShoppingItemAction deleteShoppingItemAction;
+    private ModifyShoppingItemAction deleteShoppingItemAction;
+    private ModifyShoppingItemAction modifyShoppingItemAction;
 
     @NonNull
     @Override
@@ -51,7 +53,14 @@ public class ShoppingCategoryRecyclerViewAdapter extends RecyclerView.Adapter<Ca
                 .filter(shoppingItemWithAmountTypeAndCategory -> shoppingItemWithAmountTypeAndCategory.getCategory().equals(categoryList.get(position)))
                 .filter(shoppingItemWithAmountTypeAndCategory -> !shoppingItemWithAmountTypeAndCategory.getShoppingItem().isMovedToBought())
                 .collect(Collectors.toList());
-        holder.bind(categoryList.get(position), shoppingItemWithAmountTypeAndCategories1, removeCategoryAction, addShoppingItemAction, checkBoxListener, updateCategoryAction, deleteShoppingItemAction);
+        holder.bind(categoryList.get(position),
+                shoppingItemWithAmountTypeAndCategories1,
+                removeCategoryAction,
+                addShoppingItemAction,
+                checkBoxListener,
+                updateCategoryAction,
+                deleteShoppingItemAction,
+                modifyShoppingItemAction);
     }
 
     @Override

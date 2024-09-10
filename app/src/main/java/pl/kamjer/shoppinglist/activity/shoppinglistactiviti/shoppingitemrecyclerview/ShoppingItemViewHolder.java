@@ -2,7 +2,6 @@ package pl.kamjer.shoppinglist.activity.shoppinglistactiviti.shoppingitemrecycle
 
 import android.view.View;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
@@ -11,6 +10,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import pl.kamjer.shoppinglist.R;
 import pl.kamjer.shoppinglist.model.ShoppingItemWithAmountTypeAndCategory;
+import pl.kamjer.shoppinglist.util.funcinterface.ModifyShoppingItemAction;
+import pl.kamjer.shoppinglist.util.funcinterface.UpdateShoppingItemActonCheckBox;
 
 public class ShoppingItemViewHolder extends RecyclerView.ViewHolder{
 
@@ -19,6 +20,7 @@ public class ShoppingItemViewHolder extends RecyclerView.ViewHolder{
     private final TextView amountTextView;
     private final TextView amountTypeTextView;
     private final ImageButton deleteShoppingItemButton;
+    private final ImageButton modifyShoppingItemButton;
 
     public ShoppingItemViewHolder(@NonNull View itemView) {
         super(itemView);
@@ -27,18 +29,25 @@ public class ShoppingItemViewHolder extends RecyclerView.ViewHolder{
         amountTextView = itemView.findViewById(R.id.amountTextView);
         amountTypeTextView = itemView.findViewById(R.id.amountTypeTextView);
         deleteShoppingItemButton = itemView.findViewById(R.id.deleteShoppingItemButton);
+        modifyShoppingItemButton = itemView.findViewById(R.id.modifyShoppingItemButton);
     }
 
     public void bind(@NonNull ShoppingItemWithAmountTypeAndCategory shoppingItemWithAmountTypeAndCategory,
                      UpdateShoppingItemActonCheckBox checkBoxListener,
-                     DeleteShoppingItemAction deleteShoppingItemAction) {
+                     ModifyShoppingItemAction deleteShoppingItemAction,
+                     ModifyShoppingItemAction modifyShoppingItemAction) {
         isBoughtCheckBox.setChecked(shoppingItemWithAmountTypeAndCategory.getShoppingItem().isBought());
         isBoughtCheckBox.setOnCheckedChangeListener((buttonView, isChecked) -> checkBoxListener.action(isChecked, shoppingItemWithAmountTypeAndCategory));
 
         shoppingItemsTextView.setText(shoppingItemWithAmountTypeAndCategory.getShoppingItem().getItemName());
-        amountTextView.setText(shoppingItemWithAmountTypeAndCategory.getShoppingItem().getAmount().toString());
+        if (shoppingItemWithAmountTypeAndCategory.getShoppingItem().getAmount() == null) {
+            amountTextView.setText(String.valueOf(0));
+        } else {
+            amountTextView.setText(shoppingItemWithAmountTypeAndCategory.getShoppingItem().getAmount().toString());
+        }
         amountTypeTextView.setText(shoppingItemWithAmountTypeAndCategory.getAmountType().getTypeName());
 
         deleteShoppingItemButton.setOnClickListener(v -> deleteShoppingItemAction.action(shoppingItemWithAmountTypeAndCategory));
+        modifyShoppingItemButton.setOnClickListener(v -> modifyShoppingItemAction.action(shoppingItemWithAmountTypeAndCategory));
     }
 }

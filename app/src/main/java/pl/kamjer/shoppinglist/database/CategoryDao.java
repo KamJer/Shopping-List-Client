@@ -2,7 +2,6 @@ package pl.kamjer.shoppinglist.database;
 
 import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
-import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.Query;
 import androidx.room.Transaction;
@@ -10,19 +9,13 @@ import androidx.room.Update;
 
 import java.util.List;
 
-import pl.kamjer.shoppinglist.model.AmountType;
 import pl.kamjer.shoppinglist.model.Category;
-import pl.kamjer.shoppinglist.model.ShoppingItem;
 
 @Dao
 public interface CategoryDao {
 
     @Insert
     Long insertCategory(Category category);
-
-    @Delete
-    void deleteCategory(Category category);
-
     @Transaction
     default void deleteCategorySoft(Category category) {
         category.setDeleted(true);

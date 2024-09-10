@@ -10,11 +10,15 @@ import androidx.room.Update;
 
 import java.util.List;
 
+import pl.kamjer.shoppinglist.model.AmountType;
 import pl.kamjer.shoppinglist.model.ShoppingItem;
 import pl.kamjer.shoppinglist.model.ShoppingItemWithAmountTypeAndCategory;
 
 @Dao
 public interface ShoppingItemDao {
+
+    @Update
+    void updateAmountType(AmountType amountType);
 
     @Insert
     Long insertShoppingItem(ShoppingItem item);
@@ -25,13 +29,18 @@ public interface ShoppingItemDao {
     @Update
     void updateShoppingItems(List<ShoppingItem> shoppingItems);
 
-    @Delete
-    void deleteShoppingItem(ShoppingItem item);
-
     @Transaction
     default void deleteShoppingItemSoftDelete(ShoppingItem shoppingItem) {
         shoppingItem.setDeleted(true);
         updateShoppingItem(shoppingItem);
+    }
+
+    @Transaction
+    default void deleteShoppingItemsSoftDelete(List<ShoppingItem> shoppingItems) {
+        shoppingItems.forEach(shoppingItem -> {
+            shoppingItem.setDeleted(true);
+            updateShoppingItem(shoppingItem);
+        });
     }
 
     @Transaction
@@ -40,10 +49,29 @@ public interface ShoppingItemDao {
         updateShoppingItem(shoppingItem);
     }
 
+
+    default void updateShoppingItemsAmountTypeAndDeleteAmountType(AmountType amountTypeToDelete, AmountType amountTypeToChange) {
+        findAllShoppingItemsForUser(amountTypeToDelete.getLocalAmountTypeId()).forEach(shoppingItem -> {
+            shoppingItem.setLocalItemAmountTypeId(amountTypeToChange.getLocalAmountTypeId());
+            updateShoppingItem(shoppingItem);
+        });
+        amountTypeToDelete.setDeleted(true);
+        updateAmountType(amountTypeToDelete);
+    }
+
+
     @Transaction
     @Query("SELECT * FROM SHOPPING_ITEM WHERE deleted=0 AND user_name=:userName")
     LiveData<List<ShoppingItemWithAmountTypeAndCategory>> findAllShoppingItemsWithAmountTypeAndCategory(String userName);
 
     @Query("SELECT * FROM SHOPPING_ITEM WHERE user_name=:userName")
     List<ShoppingItem> findAllShoppingItemsForUser(String userName);
+
+    @Transaction
+    @Query("SELECT * FROM SHOPPING_ITEM WHERE deleted=0 AND user_name=:userName AND local_item_amount_type_id=:localAmountTypeId")
+    LiveData<List<ShoppingItem>> loadShoppingItemByAmountTypeId(String userName, long localAmountTypeId);
+
+    @Query("SELECT * FROM SHOPPING_ITEM WHERE local_item_amount_type_id=:localAmountTypeId")
+    List<ShoppingItem> findAllShoppingItemsForUser(Long localAmountTypeId);
+
 }

@@ -1,13 +1,11 @@
 package pl.kamjer.shoppinglist.model;
 
 import androidx.room.ColumnInfo;
-import androidx.room.Embedded;
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
-import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
-import java.time.LocalDateTime;
+import java.io.Serializable;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -37,7 +35,7 @@ import lombok.Setter;
                         onDelete = ForeignKey.CASCADE)
         }
 )
-public class ShoppingItem {
+public class ShoppingItem implements Serializable {
     @ColumnInfo(name = "local_shopping_item_id")
     @PrimaryKey(autoGenerate = true)
     private long localShoppingItemId;
@@ -65,4 +63,6 @@ public class ShoppingItem {
     private boolean updated;
     @ColumnInfo(name = "deleted")
     private boolean deleted;
+
+
 }

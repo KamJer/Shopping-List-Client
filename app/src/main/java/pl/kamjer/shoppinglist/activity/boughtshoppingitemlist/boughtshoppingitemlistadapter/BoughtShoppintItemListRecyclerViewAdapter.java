@@ -3,7 +3,6 @@ package pl.kamjer.shoppinglist.activity.boughtshoppingitemlist.boughtshoppingite
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CompoundButton;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -11,11 +10,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 
 import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import pl.kamjer.shoppinglist.R;
-import pl.kamjer.shoppinglist.activity.shoppinglistactiviti.shoppingitemrecyclerview.DeleteShoppingItemAction;
+import pl.kamjer.shoppinglist.util.funcinterface.ModifyShoppingItemAction;
 import pl.kamjer.shoppinglist.activity.shoppinglistactiviti.shoppingitemrecyclerview.ShoppingItemViewHolder;
-import pl.kamjer.shoppinglist.activity.shoppinglistactiviti.shoppingitemrecyclerview.UpdateShoppingItemActonCheckBox;
+import pl.kamjer.shoppinglist.util.funcinterface.UpdateShoppingItemActonCheckBox;
 import pl.kamjer.shoppinglist.model.ShoppingItemWithAmountTypeAndCategory;
 
 @AllArgsConstructor
@@ -24,7 +22,8 @@ public class BoughtShoppintItemListRecyclerViewAdapter extends RecyclerView.Adap
     private List<ShoppingItemWithAmountTypeAndCategory> shoppingItemWithAmountTypeAndCategories;
 
     private UpdateShoppingItemActonCheckBox checkBoxListener;
-    private DeleteShoppingItemAction deleteShoppingItemAction;
+    private ModifyShoppingItemAction deleteShoppingItemAction;
+    private ModifyShoppingItemAction modifyShoppingItemAction;
 
     @NonNull
     @Override
@@ -36,7 +35,7 @@ public class BoughtShoppintItemListRecyclerViewAdapter extends RecyclerView.Adap
 
     @Override
     public void onBindViewHolder(@NonNull ShoppingItemViewHolder holder, int position) {
-        holder.bind(shoppingItemWithAmountTypeAndCategories.get(position), checkBoxListener, deleteShoppingItemAction);
+        holder.bind(shoppingItemWithAmountTypeAndCategories.get(position), checkBoxListener, deleteShoppingItemAction, modifyShoppingItemAction);
     }
 
     @Override

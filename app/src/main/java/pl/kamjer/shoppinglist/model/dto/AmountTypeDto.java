@@ -1,7 +1,5 @@
 package pl.kamjer.shoppinglist.model.dto;
 
-import java.time.LocalDateTime;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -16,4 +14,6 @@ public class AmountTypeDto {
     private String typeName;
     private boolean deleted;
     private ModifyState modifyState;
+
+    private long localId;
 }

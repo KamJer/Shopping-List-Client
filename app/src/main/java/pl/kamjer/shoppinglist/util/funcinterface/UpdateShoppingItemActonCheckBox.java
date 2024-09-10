@@ -1,4 +1,4 @@
-package pl.kamjer.shoppinglist.activity.shoppinglistactiviti.shoppingitemrecyclerview;
+package pl.kamjer.shoppinglist.util.funcinterface;
 
 import pl.kamjer.shoppinglist.model.ShoppingItemWithAmountTypeAndCategory;
 

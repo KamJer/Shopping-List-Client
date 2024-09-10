@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
         android:allowBackup="true"
@@ -27,11 +28,21 @@
             android:exported="true">
         </activity>
         <activity
-            android:name=".activity.LoginDialog"
+            android:name=".activity.logindialog.LoginDialogOptionalLogin"
+            android:exported="false"
+            android:parentActivityName=".activity.shoppinglistactiviti.ShoppingListActivity">
+        </activity>
+        <activity
+            android:name=".activity.logindialog.LoginDialogForcedLogin"
             android:exported="false">
         </activity>
         <activity
             android:name=".activity.shoppinglistactiviti.newcategorydialog.NewCategoryDialog"
+            android:theme="@style/Theme.AppCompat.Dialog"
+            android:windowIsFloating="true">
+        </activity>
+        <activity
+            android:name=".activity.shoppinglistactiviti.newcategorydialog.UpdateCategoryDialog"
             android:theme="@style/Theme.AppCompat.Dialog"
             android:windowIsFloating="true">
         </activity>
@@ -41,7 +52,17 @@
             android:windowIsFloating="true">
         </activity>
         <activity
+            android:name=".activity.shoppinglistactiviti.newshoppingitemdialog.UpdateShoppingItemDialog"
+            android:theme="@style/Theme.AppCompat.Dialog"
+            android:windowIsFloating="true">
+        </activity>
+        <activity
             android:name=".activity.amounttypelist.addnewamounttypedialog.AddNewAmountTypeDialog"
+            android:theme="@style/Theme.AppCompat.Dialog"
+            android:windowIsFloating="true">
+        </activity>
+        <activity
+            android:name=".activity.amounttypelist.UpdateAmountTypeDialog"
             android:theme="@style/Theme.AppCompat.Dialog"
             android:windowIsFloating="true">
         </activity>
@@ -50,6 +71,11 @@
             android:exported="false"
             android:parentActivityName=".activity.shoppinglistactiviti.ShoppingListActivity">
         </activity>
+        <activity
+        android:name=".activity.amounttypelist.AmountTypeDeleteConflictDialog"
+        android:theme="@style/Theme.AppCompat.Dialog"
+        android:windowIsFloating="true">
+    </activity>
         <activity
             android:name=".activity.boughtshoppingitemlist.BoughtShoppingItemListActivity"
             android:exported="false"

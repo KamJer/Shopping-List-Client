@@ -16,6 +16,7 @@ import lombok.Getter;
 import pl.kamjer.shoppinglist.R;
 import pl.kamjer.shoppinglist.activity.amounttypelist.AmountTypeListActivity;
 import pl.kamjer.shoppinglist.activity.boughtshoppingitemlist.BoughtShoppingItemListActivity;
+import pl.kamjer.shoppinglist.activity.logindialog.LoginDialogOptionalLogin;
 
 @Getter
 public class ShoppingListActionBar extends AppBarLayout {
@@ -36,7 +37,7 @@ public class ShoppingListActionBar extends AppBarLayout {
     };
 
     protected OnClickListener loginDialogButtonAction = v -> {
-        Intent loginDialogIntent = new Intent(this.getContext(), LoginDialog.class);
+        Intent loginDialogIntent = new Intent(this.getContext(), LoginDialogOptionalLogin.class);
         this.getContext().startActivity(loginDialogIntent);
     };
 

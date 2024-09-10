@@ -1,17 +1,13 @@
 package pl.kamjer.shoppinglist.viewmodel;
 
-import androidx.annotation.NonNull;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.viewmodel.ViewModelInitializer;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import lombok.RequiredArgsConstructor;
 import pl.kamjer.shoppinglist.model.Category;
 import pl.kamjer.shoppinglist.model.ShoppingItem;
 import pl.kamjer.shoppinglist.model.ShoppingItemWithAmountTypeAndCategory;
@@ -20,36 +16,29 @@ import pl.kamjer.shoppinglist.repository.SharedRepository;
 import pl.kamjer.shoppinglist.repository.ShoppingRepository;
 import pl.kamjer.shoppinglist.repository.ShoppingServiceRepository;
 import pl.kamjer.shoppinglist.util.exception.NoUserFoundException;
-import pl.kamjer.shoppinglist.util.exception.NotOkHttpResponseException;
 import pl.kamjer.shoppinglist.util.funcinterface.OnFailureAction;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
-@RequiredArgsConstructor
-public class BoughtShoppingItemsListViewModel extends ViewModel {
-
-    private static final String CONNECTION_FAILED_MESSAGE = "Connection failed: Http code:";
-
-    private final SharedRepository sharedRepository;
-    private final ShoppingRepository shoppingRepository;
-    private final ShoppingServiceRepository shoppingServiceRepository;
+public class BoughtShoppingItemsListViewModel extends CustomViewModel {
 
     private LiveData<List<ShoppingItemWithAmountTypeAndCategory>> allShoppingItemWithAmountTypeAndCategoryLiveData;
     private LiveData<List<Category>> allCategoryLiveData;
 
     private LiveData<User> userLiveData;
 
+    public BoughtShoppingItemsListViewModel(ShoppingRepository shoppingRepository, ShoppingServiceRepository shoppingServiceRepository, SharedRepository sharedRepository) {
+        super(shoppingRepository, shoppingServiceRepository, sharedRepository);
+    }
+
     public static final ViewModelInitializer<BoughtShoppingItemsListViewModel> initializer = new ViewModelInitializer<>(
             BoughtShoppingItemsListViewModel.class,
             creationExtras ->
-                    new BoughtShoppingItemsListViewModel(SharedRepository.getSharedRepository(),
-                            ShoppingRepository.getShoppingRepository(),
-                            ShoppingServiceRepository.getShoppingServiceRepository())
+                    new BoughtShoppingItemsListViewModel(ShoppingRepository.getShoppingRepository(),
+                            ShoppingServiceRepository.getShoppingServiceRepository(),
+                            SharedRepository.getSharedRepository())
     );
 
     public void loadAllShoppingItemWithAmountTypeAndCategoryLiveData() {
-        allShoppingItemWithAmountTypeAndCategoryLiveData = shoppingRepository.loadAllShoppingItemsWithAmountTypeAndCategory();
+        allShoppingItemWithAmountTypeAndCategoryLiveData = shoppingRepository.loadAllShoppingItemsWithAmountTypeAndCategory(getUserValue());
     }
 
     public void setShoppingItemWithAmountTypeAndCategoryLiveDataObserver(LifecycleOwner owner, Observer<List<ShoppingItemWithAmountTypeAndCategory>> observer) {
@@ -57,49 +46,15 @@ public class BoughtShoppingItemsListViewModel extends ViewModel {
     }
 
     public void updateShoppingItem(ShoppingItem shoppingItem, OnFailureAction action) {
-        shoppingRepository.updateShoppingItemFlag(shoppingItem, () ->
-                shoppingServiceRepository.updateShoppingItem(shoppingItem, new Callback<LocalDateTime>() {
-            @Override
-            public void onResponse(@NonNull Call<LocalDateTime> call, @NonNull Response<LocalDateTime> response) {
-                if (response.isSuccessful()) {
-                    User user = getUserValue();
-                    user.setSavedTime(response.body());
-                    shoppingRepository.updateUser(user);
-                } else {
-                    action.action(new NotOkHttpResponseException(CONNECTION_FAILED_MESSAGE + response.code()));
-                }
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<LocalDateTime> call, @NonNull Throwable t) {
-                action.action(t);
-            }
-        }));
+        shoppingRepository.updateShoppingItemFlag(shoppingItem, () -> synchronizeData(action));
     }
 
     public void deleteShoppingItem(ShoppingItem shoppingItem, OnFailureAction action) {
-        shoppingRepository.deleteShoppingItemSoftDelete(shoppingItem, () -> shoppingServiceRepository.deleteShoppingItem(shoppingItem, new Callback<LocalDateTime>() {
-            @Override
-            public void onResponse(@NonNull Call<LocalDateTime> call, @NonNull Response<LocalDateTime> response) {
-                if (response.isSuccessful()) {
-                    User user = getUserValue();
-                    user.setSavedTime(response.body());
-                    shoppingRepository.updateUser(user);
-                    shoppingRepository.deleteShoppingItem(shoppingItem);
-                } else {
-                    action.action(new NotOkHttpResponseException(CONNECTION_FAILED_MESSAGE + response.code()));
-                }
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<LocalDateTime> call, @NonNull Throwable t) {
-                action.action(t);
-            }
-        }));
+        shoppingRepository.deleteShoppingItemSoftDelete(shoppingItem, () -> synchronizeData(action));
     }
 
     public void loadAllCategory() {
-        allCategoryLiveData = shoppingRepository.loadAllCategory();
+        allCategoryLiveData = shoppingRepository.loadAllCategory(getUserValue());
     }
 
     public void setAllCategoryLiveDataObserver(LifecycleOwner owner, Observer<List<Category>> observer) {

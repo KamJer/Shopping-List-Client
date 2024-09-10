@@ -4,50 +4,38 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.viewmodel.ViewModelInitializer;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
-import lombok.RequiredArgsConstructor;
-import pl.kamjer.shoppinglist.model.AmountType;
 import pl.kamjer.shoppinglist.model.User;
-import pl.kamjer.shoppinglist.model.dto.AllDto;
-import pl.kamjer.shoppinglist.model.dto.AllIdDto;
 import pl.kamjer.shoppinglist.repository.SharedRepository;
 import pl.kamjer.shoppinglist.repository.ShoppingRepository;
 import pl.kamjer.shoppinglist.repository.ShoppingServiceRepository;
-import pl.kamjer.shoppinglist.util.ServiceUtil;
-import pl.kamjer.shoppinglist.util.exception.NoUserFoundException;
 import pl.kamjer.shoppinglist.util.exception.NotOkHttpResponseException;
+import pl.kamjer.shoppinglist.util.funcinterface.OnConnectAction;
 import pl.kamjer.shoppinglist.util.funcinterface.OnFailureAction;
-import pl.kamjer.shoppinglist.util.funcinterface.OnSuccessAction;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-@RequiredArgsConstructor
-public class LoginDialogViewModel extends ViewModel {
 
-    private static final String CONNECTION_FAILED_MESSAGE = "Connection failed: Http code:";
+public class LoginDialogViewModel extends CustomViewModel {
 
-    private final ShoppingServiceRepository shoppingServiceRepository;
-    private final ShoppingRepository shoppingRepository;
-    private final SharedRepository sharedRepository;
+    private LiveData<List<User>> usersLiveData;
 
-    private LiveData<User> userLiveData;
+    public LoginDialogViewModel(ShoppingRepository shoppingRepository, ShoppingServiceRepository shoppingServiceRepository, SharedRepository sharedRepository) {
+        super(shoppingRepository, shoppingServiceRepository, sharedRepository);
+    }
 
     public static final ViewModelInitializer<LoginDialogViewModel> initializer = new ViewModelInitializer<>(LoginDialogViewModel.class, creationExtras ->
-            new LoginDialogViewModel(ShoppingServiceRepository.getShoppingServiceRepository(),
-                    ShoppingRepository.getShoppingRepository(),
+            new LoginDialogViewModel(ShoppingRepository.getShoppingRepository(),
+                    ShoppingServiceRepository.getShoppingServiceRepository(),
                     SharedRepository.getSharedRepository()));
 
 
-    public void logUser(User user, OnSuccessAction successAction, OnSuccessAction failureAction, OnFailureAction onConecctionFailureAction) {
+    public void logUser(User user, OnConnectAction successAction, OnConnectAction failureAction, OnFailureAction onConecctionFailureAction) {
         shoppingServiceRepository.logUser(user, new Callback<Boolean>() {
             @Override
             public void onResponse(@NonNull Call<Boolean> call, @NonNull Response<Boolean> response) {
@@ -59,7 +47,7 @@ public class LoginDialogViewModel extends ViewModel {
                         failureAction.action();
                     }
                 } else {
-                    onConecctionFailureAction.action(new NotOkHttpResponseException(CONNECTION_FAILED_MESSAGE + response.code()));
+                    onConecctionFailureAction.action(new NotOkHttpResponseException(ShoppingServiceRepository.CONNECTION_FAILED_MESSAGE));
                 }
             }
 
@@ -70,7 +58,7 @@ public class LoginDialogViewModel extends ViewModel {
         });
     }
 
-    public void insertUser(User user, OnSuccessAction onSuccessAction, OnFailureAction action) {
+    public void insertUser(User user, OnConnectAction onSuccessAction, OnFailureAction action) {
         shoppingServiceRepository.insertUser(user, new Callback<LocalDateTime>() {
             @Override
             public void onResponse(@NonNull Call<LocalDateTime> call, @NonNull Response<LocalDateTime> response) {
@@ -81,7 +69,7 @@ public class LoginDialogViewModel extends ViewModel {
                 } else if(response.code() == 400) {
                     action.action(new NotOkHttpResponseException("User name taken, try with different name"));
                 } else {
-                    action.action(new NotOkHttpResponseException(CONNECTION_FAILED_MESSAGE + response.code()));
+                    action.action(new NotOkHttpResponseException(ShoppingServiceRepository.CONNECTION_FAILED_MESSAGE + response.code()));
                 }
             }
 
@@ -98,7 +86,16 @@ public class LoginDialogViewModel extends ViewModel {
 
     }
 
-    public void loadUser() {
-        userLiveData = shoppingRepository.loadUser(sharedRepository.loadUser());
+    public void loadAllUsers() {
+        usersLiveData = shoppingRepository.loadAllUsers();
+    }
+
+    public void setOnUsersObserver(LifecycleOwner owner, Observer<List<User>> observer) {
+        usersLiveData.observe(owner, observer);
+    }
+
+    public void deleteUser(User user) {
+        sharedRepository.deleteUser();
+        shoppingRepository.deleteUser(user);
     }
 }

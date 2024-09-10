@@ -1,6 +1,7 @@
 package pl.kamjer.shoppinglist.util;
 
-import pl.kamjer.shoppinglist.util.exception.ShoppingItemNameException;
+import pl.kamjer.shoppinglist.model.AmountType;
+import pl.kamjer.shoppinglist.model.Category;
 
 public class NewItemDialogDataValidator {
 
@@ -8,7 +9,15 @@ public class NewItemDialogDataValidator {
         return !shoppingItemName.isEmpty();
     }
 
-    public static boolean isShoppingItemWeightValid(String shoppingItemWeight) {
-        return !shoppingItemWeight.isEmpty();
+    public static boolean isShoppingItemAmountValid(String shoppingItemAmount) {
+        return !shoppingItemAmount.isEmpty();
+    }
+
+    public static boolean isShoppingItemAmountTypeValid(AmountType amountType) {
+        return amountType != null;
+    }
+
+    public static boolean isShoppingItemCategoryValid(Category category) {
+        return category != null;
     }
 }

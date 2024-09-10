@@ -5,16 +5,12 @@ import static androidx.core.content.ContextCompat.getString;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import androidx.lifecycle.MutableLiveData;
-
-import java.time.LocalDateTime;
 import java.util.Optional;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import pl.kamjer.shoppinglist.R;
 import pl.kamjer.shoppinglist.model.User;
-import pl.kamjer.shoppinglist.util.funcinterface.LoadToServerAction;
 
 @RequiredArgsConstructor
 public class SharedRepository {
@@ -61,6 +57,12 @@ public class SharedRepository {
     public void updateUser(User user) {
         sharedPref.edit()
                 .putString(USER_NAME_FIELD_NAME, user.getUserName())
+                .apply();
+    }
+
+    public void deleteUser() {
+        sharedPref.edit()
+                .putString(USER_NAME_FIELD_NAME, "")
                 .apply();
     }
 }

@@ -3,7 +3,6 @@ package pl.kamjer.shoppinglist.activity.shoppinglistactiviti.shoppingitemrecycle
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CompoundButton;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -15,6 +14,8 @@ import lombok.Builder;
 import lombok.Getter;
 import pl.kamjer.shoppinglist.R;
 import pl.kamjer.shoppinglist.model.ShoppingItemWithAmountTypeAndCategory;
+import pl.kamjer.shoppinglist.util.funcinterface.ModifyShoppingItemAction;
+import pl.kamjer.shoppinglist.util.funcinterface.UpdateShoppingItemActonCheckBox;
 
 @AllArgsConstructor
 @Getter
@@ -23,7 +24,8 @@ public class ShoppingItemRecyclerViewAdapter extends RecyclerView.Adapter<Shoppi
 
     private List<ShoppingItemWithAmountTypeAndCategory> shoppingItemWithAmountTypeAndCategories;
     private UpdateShoppingItemActonCheckBox checkBoxListener;
-    private DeleteShoppingItemAction deleteShoppingItemAction;
+    private ModifyShoppingItemAction deleteShoppingItemAction;
+    private ModifyShoppingItemAction modifyShoppingItemAction;
 
     @NonNull
     @Override
@@ -35,7 +37,7 @@ public class ShoppingItemRecyclerViewAdapter extends RecyclerView.Adapter<Shoppi
 
     @Override
     public void onBindViewHolder(@NonNull ShoppingItemViewHolder holder, int position) {
-        holder.bind(shoppingItemWithAmountTypeAndCategories.get(position), checkBoxListener, deleteShoppingItemAction);
+        holder.bind(shoppingItemWithAmountTypeAndCategories.get(position), checkBoxListener, deleteShoppingItemAction, modifyShoppingItemAction);
     }
 
     @Override

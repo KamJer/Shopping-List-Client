@@ -14,17 +14,20 @@ import pl.kamjer.shoppinglist.model.AmountType;
 
 public class AmountTypeRecyclerViewHolder extends RecyclerView.ViewHolder {
 
-    private TextView amountTypeTextView;
-    private ImageButton deleteAmountTypeButton;
+    private final TextView amountTypeTextView;
+    private final ImageButton deleteAmountTypeButton;
+    private final ImageButton updateAmountTypeButton;
 
     public AmountTypeRecyclerViewHolder(@NonNull View itemView) {
         super(itemView);
         amountTypeTextView = itemView.findViewById(R.id.amountTypeTextView);
         deleteAmountTypeButton = itemView.findViewById(R.id.deleteAmountTypeButton);
+        updateAmountTypeButton = itemView.findViewById(R.id.modifyAmountTypeButton);
     }
 
     public void bind(AmountType amountType, ModifyAmountTypeAction deleteAmountTypeAction, ModifyAmountTypeAction updateAmountTypeAction) {
         amountTypeTextView.setText(amountType.getTypeName());
         deleteAmountTypeButton.setOnClickListener(v -> deleteAmountTypeAction.action(amountType));
+        updateAmountTypeButton.setOnClickListener(v -> updateAmountTypeAction.action(amountType));
     }
 }

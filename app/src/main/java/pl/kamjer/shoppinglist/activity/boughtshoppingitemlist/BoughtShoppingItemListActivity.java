@@ -9,15 +9,14 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
 import pl.kamjer.shoppinglist.R;
 import pl.kamjer.shoppinglist.activity.ShoppingListActionBar;
 import pl.kamjer.shoppinglist.activity.boughtshoppingitemlist.boughtcategorylistrecyclerviewadapter.BoughtCategoryListRecyclerViewAdapter;
-import pl.kamjer.shoppinglist.activity.shoppinglistactiviti.shoppingitemrecyclerview.DeleteShoppingItemAction;
-import pl.kamjer.shoppinglist.activity.shoppinglistactiviti.shoppingitemrecyclerview.UpdateShoppingItemActonCheckBox;
+import pl.kamjer.shoppinglist.util.funcinterface.ModifyShoppingItemAction;
+import pl.kamjer.shoppinglist.util.funcinterface.UpdateShoppingItemActonCheckBox;
 import pl.kamjer.shoppinglist.model.Category;
 import pl.kamjer.shoppinglist.model.ShoppingItem;
 import pl.kamjer.shoppinglist.model.ShoppingItemWithAmountTypeAndCategory;
@@ -37,7 +36,11 @@ public class BoughtShoppingItemListActivity extends AppCompatActivity {
             (t) -> createToast(Optional.ofNullable(t).map(Throwable::getMessage).orElse("could not found reason for error"));
 
 
-    private final DeleteShoppingItemAction deleteShoppingItemAction = shoppingItemWithAmountTypeAndCategory -> {
+    private final ModifyShoppingItemAction deleteShoppingItemAction = shoppingItemWithAmountTypeAndCategory -> {
+      boughtShoppingItemsListViewModel.deleteShoppingItem(shoppingItemWithAmountTypeAndCategory.getShoppingItem(), connectionFailedAction);
+    };
+
+    private final ModifyShoppingItemAction modifyShoppingItemAction = shoppingItemWithAmountTypeAndCategory -> {
       boughtShoppingItemsListViewModel.deleteShoppingItem(shoppingItemWithAmountTypeAndCategory.getShoppingItem(), connectionFailedAction);
     };
 
@@ -62,9 +65,10 @@ public class BoughtShoppingItemListActivity extends AppCompatActivity {
                 ViewModelProvider.Factory.from(BoughtShoppingItemsListViewModel.initializer)
         ).get(BoughtShoppingItemsListViewModel.class);
 
+//        loading data
+        boughtShoppingItemsListViewModel.loadUser();
         boughtShoppingItemsListViewModel.loadAllShoppingItemWithAmountTypeAndCategoryLiveData();
         boughtShoppingItemsListViewModel.loadAllCategory();
-        boughtShoppingItemsListViewModel.loadUser();
 
         boughtShoppingItemsListRecyclerView = findViewById(R.id.boughtShoppingItemsListRecyclerView);
         boughtShoppingItemsListRecyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -74,7 +78,8 @@ public class BoughtShoppingItemListActivity extends AppCompatActivity {
             boughtShoppingItemsListRecyclerView.setAdapter(new BoughtCategoryListRecyclerViewAdapter(allCategories,
                     allShoppingWithAmountTypeAndCategories,
                     checkBoxListener,
-                    deleteShoppingItemAction));
+                    deleteShoppingItemAction,
+                    modifyShoppingItemAction));
         });
 
         boughtShoppingItemsListViewModel.setShoppingItemWithAmountTypeAndCategoryLiveDataObserver(this, shoppingItemWithAmountTypeAndCategories -> {
@@ -82,7 +87,8 @@ public class BoughtShoppingItemListActivity extends AppCompatActivity {
             boughtShoppingItemsListRecyclerView.setAdapter(new BoughtCategoryListRecyclerViewAdapter(allCategories,
                     allShoppingWithAmountTypeAndCategories,
                     checkBoxListener,
-                    deleteShoppingItemAction));
+                    deleteShoppingItemAction,
+                    modifyShoppingItemAction));
         });
     }
 

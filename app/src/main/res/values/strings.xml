@@ -11,6 +11,21 @@
     <string name="loginButtonText">Logowanie</string>
     <string name="registerButtonText">Rejestracja</string>
     <string name="user_logged_message">Użytkownik zalogowany</string>
-    <string name="shopping_item_error_massege">Nazwa przedmiotu nie może byc pusta</string>
+    <string name="shopping_item_name_error_massage">Nazwa przedmiotu nie może być pusta</string>
+    <string name="shopping_item_amount_type_error_massage">Wybrany typ wielkości nie może byc pusty</string>
+    <string name="shopping_item_category_error_massage">Wybrana categoria nie może być pusta</string>
     <string name="amount_type_name_label">Nazwa typu</string>
+    <string name="users_table_label">Użytkownicy</string>
+    <string name="initializing_connection_to_server_label">Inicjalizowanie połączenia z serwerem</string>
+    <string name="initializing_inner_files_label">Inicjalizowanie wewnętrznych plików</string>
+    <string name="initializing_database_label">Inicjalizowanie bazy danych</string>
+    <string name="such_user_does_not_exist_label">Taki użytkownik nie jest zarejestrwany na serwerze, spróbuj z innym lub się zarejestruj</string>
+    <string name="could_not_find_reason_error_massage">Nie można znaleźć powodu błędu</string>
+    <string name="no_category_found_massage">Nie można znaleźć kategorii</string>
+    <string name="amount_type_delete_conflict_desc_message">Wykryto, że do typa, który próbujesz usunąć przypisane są przedmioty, co chcesz z nimi zrobić?</string>
+    <string name="delete_label_button">Usuń przedmioty</string>
+    <string name="accept_new_amount_type_label_button">Nadaj nowy typ i usuń</string>
+    <string name="cancel_label_button">Anuluj</string>
+    <string name="selected_amount_type_is_null_massage">Wybrany typ nie istnieje</string>
+    <string name="no_amount_type_selected_message">Nie wybrano typu</string>
 </resources>

@@ -15,8 +15,8 @@ public class NewCategoryDialog extends AppCompatActivity {
 
     public static final String NEW_CATEGORY_NAME = "newCategoryName";
 
-    private EditText newCategoryNameEditText;
-    private ImageButton acceptNewCategoryNameImageButton;
+    protected EditText newCategoryNameEditText;
+    protected ImageButton acceptNewCategoryNameImageButton;
 
     private final View.OnClickListener acceptNewCategoryNameAction = v -> {
         getIntent().putExtra(NEW_CATEGORY_NAME, newCategoryNameEditText.getText().toString());

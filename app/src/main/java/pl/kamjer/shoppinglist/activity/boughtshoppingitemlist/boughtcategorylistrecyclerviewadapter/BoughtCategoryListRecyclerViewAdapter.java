@@ -12,8 +12,8 @@ import java.util.stream.Collectors;
 
 import lombok.AllArgsConstructor;
 import pl.kamjer.shoppinglist.R;
-import pl.kamjer.shoppinglist.activity.shoppinglistactiviti.shoppingitemrecyclerview.DeleteShoppingItemAction;
-import pl.kamjer.shoppinglist.activity.shoppinglistactiviti.shoppingitemrecyclerview.UpdateShoppingItemActonCheckBox;
+import pl.kamjer.shoppinglist.util.funcinterface.ModifyShoppingItemAction;
+import pl.kamjer.shoppinglist.util.funcinterface.UpdateShoppingItemActonCheckBox;
 import pl.kamjer.shoppinglist.model.Category;
 import pl.kamjer.shoppinglist.model.ShoppingItemWithAmountTypeAndCategory;
 
@@ -23,7 +23,8 @@ public class BoughtCategoryListRecyclerViewAdapter extends RecyclerView.Adapter<
     private List<Category> categoryList;
     private List<ShoppingItemWithAmountTypeAndCategory> shoppingItemWithAmountTypeAndCategories;
     private UpdateShoppingItemActonCheckBox checkBoxListener;
-    private DeleteShoppingItemAction deleteShoppingItemAction;
+    private ModifyShoppingItemAction deleteShoppingItemAction;
+    private ModifyShoppingItemAction modifyShoppingItemAction;
 
     @NonNull
     @Override
@@ -39,7 +40,11 @@ public class BoughtCategoryListRecyclerViewAdapter extends RecyclerView.Adapter<
                 .filter(shoppingItemWithAmountTypeAndCategory -> shoppingItemWithAmountTypeAndCategory.getCategory().equals(categoryList.get(position)))
                 .filter(shoppingItemWithAmountTypeAndCategory -> shoppingItemWithAmountTypeAndCategory.getShoppingItem().isBought())
                 .collect(Collectors.toList());
-        holder.bind(categoryList.get(position), shoppingItemWithAmountTypeAndCategories1, checkBoxListener, deleteShoppingItemAction);
+        holder.bind(categoryList.get(position),
+                shoppingItemWithAmountTypeAndCategories1,
+                checkBoxListener,
+                deleteShoppingItemAction,
+                modifyShoppingItemAction);
     }
 
     @Override

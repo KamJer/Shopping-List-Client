@@ -11,24 +11,26 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import pl.kamjer.shoppinglist.R;
+import pl.kamjer.shoppinglist.activity.GenericActivity;
 import pl.kamjer.shoppinglist.activity.ShoppingListActionBar;
 import pl.kamjer.shoppinglist.activity.amounttypelist.addnewamounttypedialog.AddNewAmountTypeDialog;
 import pl.kamjer.shoppinglist.activity.amounttypelist.amounttyperecyclerview.AmountTypeRecyclerViewAdapter;
 import pl.kamjer.shoppinglist.activity.amounttypelist.functionalinterface.ModifyAmountTypeAction;
 import pl.kamjer.shoppinglist.activity.shoppinglistactiviti.newcategorydialog.NewCategoryDialog;
 import pl.kamjer.shoppinglist.model.AmountType;
-import pl.kamjer.shoppinglist.model.Category;
+import pl.kamjer.shoppinglist.model.ShoppingItem;
 import pl.kamjer.shoppinglist.viewmodel.AmountTypeViewModel;
 
-public class AmountTypeListActivity extends AppCompatActivity {
+public class AmountTypeListActivity extends GenericActivity {
 
     private AmountTypeViewModel amountTypeViewModel;
 
@@ -36,21 +38,37 @@ public class AmountTypeListActivity extends AppCompatActivity {
 
     private ActivityResultLauncher<Intent> createNewAmountTypeDialogLauncher;
 
-
     private final ModifyAmountTypeAction deleteAmountTypeAction = amountType -> {
-        amountTypeViewModel.deleteAmountType(amountType,
-                (t) -> createToast(Optional.ofNullable(t).map(Throwable::getMessage).orElse("could not found reason for error")));
+//        loading data for that amountType
+        amountTypeViewModel.loadAllShoppingItemsForAmountType(amountType);
+//        observer for data
+        amountTypeViewModel.setAllShoppingItemsForAmountTypeLiveDataObserver(this, new Observer<List<ShoppingItem>>() {
+            @Override
+            public void onChanged(List<ShoppingItem> shoppingItems) {
+//            if data for that amountType is empty ust delete amountType if it is not as user what to do with data data
+                if (shoppingItems.isEmpty()) {
+                    amountTypeViewModel.deleteAmountType(amountType, connectionFailedAction);
+                } else {
+                    Intent createNewCategoryIntent = new Intent(AmountTypeListActivity.this, AmountTypeDeleteConflictDialog.class);
+                    createNewCategoryIntent.putExtra(AmountTypeDeleteConflictDialog.SELECTED_AMOUNT_TYPE_FIELD, amountType);
+                    startActivity(createNewCategoryIntent);
+//                    removing observer so that it does not fire after deleting data
+                    amountTypeViewModel.removeAllShoppingItemsForAmountTypeLiveDataObserver(this);
+                }
+            }
+        });
+
     };
 
     private final ModifyAmountTypeAction updateAmountTypeAction = amountType -> {
-//        TODO: create dialog for updating amount type and process data in here
-        amountTypeViewModel.updateAmountType(amountType,
-                (t) -> createToast(Optional.ofNullable(t).map(Throwable::getMessage).orElse("could not found reason for error")));
+        Intent createNewAmountTypeIntent = new Intent(this, UpdateAmountTypeDialog.class);
+        createNewAmountTypeIntent.putExtra(UpdateAmountTypeDialog.AMOUNT_TYPE_FIELD_NAME, amountType);
+        startActivity(createNewAmountTypeIntent);
     };
 
     private final View.OnClickListener addAmountTypeAction = v -> {
         Intent createNewAmountTypeIntent = new Intent(this, AddNewAmountTypeDialog.class);
-        createNewAmountTypeDialogLauncher.launch(createNewAmountTypeIntent);
+        startActivity(createNewAmountTypeIntent);
     };
 
 
@@ -68,8 +86,8 @@ public class AmountTypeListActivity extends AppCompatActivity {
         ).get(AmountTypeViewModel.class);
 
 //        loading data
-        amountTypeViewModel.loadAllAmountType();
         amountTypeViewModel.loadUser();
+        amountTypeViewModel.loadAllAmountType();
 
 //        finding views
         amountTypeRecyclerView = findViewById(R.id.amountTypeRecyclerView);
@@ -79,28 +97,10 @@ public class AmountTypeListActivity extends AppCompatActivity {
         addNewAmountTypeDialogButton.setOnClickListener(addAmountTypeAction);
 
 //        observers
-        amountTypeViewModel.setUserLiveDataObserver(this, user -> {});
         amountTypeViewModel.setAllAmountTypeLiveDataObserver(this,
                 amountTypes -> amountTypeRecyclerView
                         .setAdapter(new AmountTypeRecyclerViewAdapter(amountTypes,
                                 deleteAmountTypeAction,
                                 updateAmountTypeAction)));
-
-//        launchers
-        createNewAmountTypeDialogLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-            if (result.getResultCode() == Activity.RESULT_OK) {
-                Intent data = result.getData();
-                if (data != null) {
-                    amountTypeViewModel.insertAmountType(AmountType.builder()
-                            .typeName(data.getStringExtra(AddNewAmountTypeDialog.AMOUNT_TYPE_FIELD_NAME))
-                            .build(),
-                            (t) -> createToast(Optional.ofNullable(t).map(Throwable::getMessage).orElse("could not found reason for error")));
-                }
-            }
-        });
-    }
-
-    private void createToast(String s) {
-        Toast.makeText(this, s, Toast.LENGTH_LONG).show();
     }
 }

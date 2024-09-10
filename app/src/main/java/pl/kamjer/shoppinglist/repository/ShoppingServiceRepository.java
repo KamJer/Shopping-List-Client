@@ -2,33 +2,32 @@ package pl.kamjer.shoppinglist.repository;
 
 import android.content.Context;
 
+import androidx.annotation.NonNull;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import java.time.LocalDateTime;
 
+import lombok.Getter;
+import lombok.Setter;
 import okhttp3.OkHttpClient;
 import pl.kamjer.shoppinglist.gsonconverter.LocalDateTimeDeserializer;
 import pl.kamjer.shoppinglist.gsonconverter.LocalDateTimeSerializer;
-import pl.kamjer.shoppinglist.model.AmountType;
-import pl.kamjer.shoppinglist.model.Category;
-import pl.kamjer.shoppinglist.model.ShoppingItem;
 import pl.kamjer.shoppinglist.model.User;
-import pl.kamjer.shoppinglist.model.dto.AddDto;
 import pl.kamjer.shoppinglist.model.dto.AllDto;
-import pl.kamjer.shoppinglist.model.dto.AllIdDto;
-import pl.kamjer.shoppinglist.service.AmountTypeService;
+import pl.kamjer.shoppinglist.model.dto.ExceptionDto;
 import pl.kamjer.shoppinglist.service.BasicAuthInterceptor;
-import pl.kamjer.shoppinglist.service.CategoryService;
 import pl.kamjer.shoppinglist.service.SSLUtil;
-import pl.kamjer.shoppinglist.service.ShoppingItemService;
-import pl.kamjer.shoppinglist.service.UserService;
-import pl.kamjer.shoppinglist.service.UtilService;
+import pl.kamjer.shoppinglist.service.service.UserService;
+import pl.kamjer.shoppinglist.service.service.UtilService;
 import pl.kamjer.shoppinglist.util.ServiceUtil;
 import retrofit2.Call;
 import retrofit2.Callback;
+import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
+
 
 public class ShoppingServiceRepository {
 
@@ -39,10 +38,11 @@ public class ShoppingServiceRepository {
     private static ShoppingServiceRepository shoppingServiceRepository;
 
     private UserService userService;
-    private AmountTypeService amountTypeService;
-    private CategoryService categoryService;
-    private ShoppingItemService shoppingItemService;
     private UtilService utilService;
+
+    @Getter
+    @Setter
+    private boolean initializedWithUser;
 
     public static ShoppingServiceRepository getShoppingServiceRepository() {
         ShoppingServiceRepository result = shoppingServiceRepository;
@@ -69,6 +69,7 @@ public class ShoppingServiceRepository {
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .build();
         userService = retrofit.create(UserService.class);
+        initializedWithUser = false;
     }
 
     public void reInitializeWithUser(Context context, User user) {
@@ -83,10 +84,8 @@ public class ShoppingServiceRepository {
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .build();
         userService = retrofit.create(UserService.class);
-        amountTypeService = retrofit.create(AmountTypeService.class);
-        categoryService = retrofit.create(CategoryService.class);
-        shoppingItemService = retrofit.create(ShoppingItemService.class);
         utilService = retrofit.create(UtilService.class);
+        initializedWithUser = true;
     }
 
     private OkHttpClient createClientWithOutUser(Context context) {
@@ -99,7 +98,6 @@ public class ShoppingServiceRepository {
         OkHttpClient.Builder okHttpClientBuilder = SSLUtil.getSSLContext(context);
         okHttpClientBuilder.addInterceptor(new BasicAuthInterceptor(user));
         return okHttpClientBuilder.build();
-
     }
 
     public void insertUser(User user, Callback<LocalDateTime> callback) {
@@ -112,79 +110,24 @@ public class ShoppingServiceRepository {
         call.enqueue(callback);
     }
 
-    public void insertAmountType(AmountType amountType, Callback<AddDto> callback) {
-        Call<AddDto> call = amountTypeService.postAmountType(ServiceUtil.amountTypeToAmountTypeDto(amountType));
-        call.enqueue(callback);
-    }
-
-    public void updateAmountType(AmountType amountType, Callback<LocalDateTime> callback) {
-        Call<LocalDateTime> call = amountTypeService.putAmountType(ServiceUtil.amountTypeToAmountTypeDto(amountType));
-        call.enqueue(callback);
-    }
-
-    public void deleteAmountType(User user, AmountType amountType, Callback<LocalDateTime> callback) {
-        Call<LocalDateTime> call = amountTypeService.deleteAmountType(amountType.getAmountTypeId(), user.getUserName());
-        call.enqueue(callback);
-    }
-
-    public void insertCategory(Category category, Callback<AddDto> callback) {
-        Call<AddDto> call = categoryService.postCategory(ServiceUtil.categoryToCategoryDto(category));
-        call.enqueue(callback);
-    }
-
-    public void updateCategory(Category category, Callback<LocalDateTime> callback) {
-        Call<LocalDateTime> call = categoryService.putCategory(ServiceUtil.categoryToCategoryDto(category));
-        call.enqueue(callback);
-    }
-
-    public void deleteCategory(Category category, Callback<LocalDateTime> callback) {
-        Call<LocalDateTime> call = categoryService.deleteCategory(category.getCategoryId());
-        call.enqueue(callback);
-    }
-
-    public void insertShoppingItem(ShoppingItem shoppingItem, Callback<AddDto> callback) {
-        Call<AddDto> call = shoppingItemService.postShoppingItem(ServiceUtil.shoppingItemToShoppingItemDto(shoppingItem));
-        call.enqueue(callback);
-    }
-
-    public void updateShoppingItem(ShoppingItem shoppingItem, Callback<LocalDateTime> callback) {
-        Call<LocalDateTime> call = shoppingItemService.putShoppingItem(ServiceUtil.shoppingItemToShoppingItemDto(shoppingItem));
-        call.enqueue(callback);
-    }
-
-    public void deleteShoppingItem(ShoppingItem shoppingItem, Callback<LocalDateTime> callback) {
-        Call<LocalDateTime> call = shoppingItemService.deleteShoppingItem(shoppingItem.getShoppingItemId());
-        call.enqueue(callback);
-    }
-
-//    public void loadAllElements(LocalDateTime savedTime, Callback<AllDto> callback) {
-//        Call<AllDto> call = utilService.getAllDto(savedTime);
-//        call.enqueue(callback);
-//    }
-//
-//    public void loadAllElements(Callback<AllDto> callback) {
-//        Call<AllDto> call = utilService.getAllDto();
-//        call.enqueue(callback);
-//    }
-//
-//    public void insertAllElements(AllDto elements, Callback<AllIdDto> callback) {
-//        Call<AllIdDto> call = utilService.postAllElements(elements);
-//        call.enqueue(callback);
-//    }
-//
-//    public void updateAllElements(AllDto elements, Callback<LocalDateTime> callback) {
-//        Call<LocalDateTime> call = utilService.putAllElements(elements);
-//        call.enqueue(callback);
-//    }
-//
-//    public void deleteAllElements(AllDto allDto, Callback<LocalDateTime> callback) {
-//        Call<LocalDateTime> call = utilService.deleteAllDto(allDto);
-//        call.enqueue(callback);
-//    }
-
     public void synchronizeData(AllDto allDto, Callback<AllDto> callback) {
         Call<AllDto> call = utilService.synchronizeData(allDto);
         call.enqueue(callback);
+    }
+
+    public void sendLog(ExceptionDto e) {
+        Call<Void> call = utilService.sendLog(e);
+        call.enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
+                System.exit(2);
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t) {
+                System.exit(2);
+            }
+        });
     }
 }
 

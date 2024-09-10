@@ -30,7 +30,7 @@ public class SSLUtil {
             X509Certificate caCert = (X509Certificate) cf.generateCertificate(keystoreStream);
 
             KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
-            keyStore.load(null, null); // Inicjalizuj pusty keystore
+            keyStore.load(null, null);
             keyStore.setCertificateEntry("ca", caCert);
 
             TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
@@ -42,8 +42,6 @@ public class SSLUtil {
 
             // Tworzenie OkHttpClient z SSL
             okHttpClient = new OkHttpClient.Builder();
-//          TODO: delete it before production, this is for testing
-            okHttpClient.hostnameVerifier((hostname, session) -> true);
             okHttpClient.sslSocketFactory(sslContext.getSocketFactory(),
                     (X509TrustManager) trustManagerFactory.getTrustManagers()[0]);
 

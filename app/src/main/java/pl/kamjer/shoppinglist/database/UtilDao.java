@@ -82,6 +82,12 @@ public interface UtilDao {
         List<Category> categoriesFromDb = loadAllCategories();
         List<ShoppingItem> shoppingItemsFromDb = loadAllShoppingItems();
 
+        shoppingItems.forEach(shoppingItem -> {
+            shoppingItem.setLocalItemAmountTypeId(getLocalAmountTypeIdForShoppingItem(amountTypesFromDb, shoppingItem));
+            shoppingItem.setLocalItemCategoryId(getLocalCategoryIdForShoppingItem(categoriesFromDb, shoppingItem));
+            shoppingItem.setLocalShoppingItemId(getLocalShoppingItemIdForShoppingItem(shoppingItemsFromDb, shoppingItem));
+            deleteShoppingItem(shoppingItem);
+        });
         amountTypes.forEach(amountType -> {
             amountType.setLocalAmountTypeId(getLocalAmountTypeId(amountTypesFromDb, amountType));
             deleteAmountType(amountType);
@@ -90,12 +96,7 @@ public interface UtilDao {
             category.setLocalCategoryId(getLocalCategoryId(categoriesFromDb, category));
             deleteCategory(category);
         });
-        shoppingItems.forEach(shoppingItem -> {
-            shoppingItem.setLocalItemAmountTypeId(getLocalAmountTypeIdForShoppingItem(amountTypesFromDb, shoppingItem));
-            shoppingItem.setLocalItemCategoryId(getLocalCategoryIdForShoppingItem(categoriesFromDb, shoppingItem));
-            shoppingItem.setLocalShoppingItemId(getLocalShoppingItemIdforShoppingItem(shoppingItemsFromDb, shoppingItem));
-            deleteShoppingItem(shoppingItem);
-        });
+
     }
 
     @Transaction
@@ -105,18 +106,25 @@ public interface UtilDao {
         List<ShoppingItem> shoppingItemsFromDb = loadAllShoppingItems();
 
         amountTypes.forEach(amountType -> {
-            amountType.setLocalAmountTypeId(getLocalAmountTypeId(amountTypesFromDb, amountType));
+            if (amountType.getLocalAmountTypeId() == 0L) {
+                amountType.setLocalAmountTypeId(getLocalAmountTypeId(amountTypesFromDb, amountType));
+            }
             updateAmountType(amountType);
         });
         categories.forEach(category -> {
-            category.setLocalCategoryId(getLocalCategoryId(categoriesFromDb, category));
+            if (category.getLocalCategoryId() == 0L) {
+                category.setLocalCategoryId(getLocalCategoryId(categoriesFromDb, category));
+            }
             updateCategory(category);
         });
 
         shoppingItems.forEach(shoppingItem -> {
+//            this item necessary has this amountTypes in a database if it does not it need to throw exception
             shoppingItem.setLocalItemAmountTypeId(getLocalAmountTypeIdForShoppingItem(amountTypesFromDb, shoppingItem));
             shoppingItem.setLocalItemCategoryId(getLocalCategoryIdForShoppingItem(categoriesFromDb, shoppingItem));
-            shoppingItem.setLocalShoppingItemId(getLocalShoppingItemIdforShoppingItem(shoppingItemsFromDb, shoppingItem));
+            if (shoppingItem.getLocalShoppingItemId() == 0L) {
+                shoppingItem.setLocalShoppingItemId(getLocalShoppingItemIdForShoppingItem(shoppingItemsFromDb, shoppingItem));
+            }
             updateShoppingItem(shoppingItem);
         });
     }
@@ -155,7 +163,7 @@ public interface UtilDao {
                 .orElseThrow(() -> new NoUserFoundException("No Category found for that id: " + shoppingItem.getItemCategoryId()));
     }
 
-    default Long getLocalShoppingItemIdforShoppingItem(List<ShoppingItem> shoppingItems, ShoppingItem shoppingItem) {
+    default Long getLocalShoppingItemIdForShoppingItem(List<ShoppingItem> shoppingItems, ShoppingItem shoppingItem) {
         return shoppingItems
                 .stream()
                 .filter(shoppingItemFromDb -> shoppingItemFromDb.getShoppingItemId() == shoppingItem.getShoppingItemId())
@@ -179,7 +187,19 @@ public interface UtilDao {
                 .filter(categoryFromDb -> categoryFromDb.getCategoryId() == category.getCategoryId())
                 .findFirst()
                 .map(Category::getLocalCategoryId)
-                .orElseThrow(() -> new NoUserFoundException("No Category found for that id: " + category.getCategoryId()));
+                .orElse(0L);
+    }
 
+    @Query("SELECT * FROM SHOPPING_ITEM WHERE local_item_amount_type_id=:localAmountTypeId")
+    List<ShoppingItem> findAllShoppingItemsForAmountType(Long localAmountTypeId);
+
+    @Transaction
+    default void deleteShoppingItemsForAmountTypeAndAmountType(AmountType amountType) {
+        findAllShoppingItemsForAmountType(amountType.getLocalAmountTypeId()).forEach(shoppingItem -> {
+            shoppingItem.setDeleted(true);
+            updateShoppingItem(shoppingItem);
+        });
+        amountType.setDeleted(true);
+        updateAmountType(amountType);
     }
 }

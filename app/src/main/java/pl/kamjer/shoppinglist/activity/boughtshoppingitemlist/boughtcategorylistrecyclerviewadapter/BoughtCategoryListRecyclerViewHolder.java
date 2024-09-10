@@ -1,7 +1,6 @@
 package pl.kamjer.shoppinglist.activity.boughtshoppingitemlist.boughtcategorylistrecyclerviewadapter;
 
 import android.view.View;
-import android.widget.CompoundButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -12,8 +11,8 @@ import java.util.List;
 
 import pl.kamjer.shoppinglist.R;
 import pl.kamjer.shoppinglist.activity.boughtshoppingitemlist.boughtshoppingitemlistadapter.BoughtShoppintItemListRecyclerViewAdapter;
-import pl.kamjer.shoppinglist.activity.shoppinglistactiviti.shoppingitemrecyclerview.DeleteShoppingItemAction;
-import pl.kamjer.shoppinglist.activity.shoppinglistactiviti.shoppingitemrecyclerview.UpdateShoppingItemActonCheckBox;
+import pl.kamjer.shoppinglist.util.funcinterface.ModifyShoppingItemAction;
+import pl.kamjer.shoppinglist.util.funcinterface.UpdateShoppingItemActonCheckBox;
 import pl.kamjer.shoppinglist.model.Category;
 import pl.kamjer.shoppinglist.model.ShoppingItemWithAmountTypeAndCategory;
 
@@ -30,9 +29,9 @@ public class BoughtCategoryListRecyclerViewHolder extends RecyclerView.ViewHolde
 
     public void bind(Category category,
                      List<ShoppingItemWithAmountTypeAndCategory> shoppingItemWithAmountTypeAndCategories,
-                     UpdateShoppingItemActonCheckBox checkBoxListener, DeleteShoppingItemAction deleteShoppingItemAction) {
+                     UpdateShoppingItemActonCheckBox checkBoxListener, ModifyShoppingItemAction deleteShoppingItemAction, ModifyShoppingItemAction modifyShoppingItemAction) {
         boughtCategoryTextView.setText(category.getCategoryName());
         boughtShoppingItemsRecyclerView.setLayoutManager(new LinearLayoutManager(itemView.getContext()));
-        boughtShoppingItemsRecyclerView.setAdapter(new BoughtShoppintItemListRecyclerViewAdapter(shoppingItemWithAmountTypeAndCategories, checkBoxListener, deleteShoppingItemAction));
+        boughtShoppingItemsRecyclerView.setAdapter(new BoughtShoppintItemListRecyclerViewAdapter(shoppingItemWithAmountTypeAndCategories, checkBoxListener, deleteShoppingItemAction, modifyShoppingItemAction));
     }
 }

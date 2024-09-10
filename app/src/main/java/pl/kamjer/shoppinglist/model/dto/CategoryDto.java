@@ -1,10 +1,5 @@
 package pl.kamjer.shoppinglist.model.dto;
 
-import androidx.room.ColumnInfo;
-import androidx.room.PrimaryKey;
-
-import java.time.LocalDateTime;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -19,5 +14,7 @@ public class CategoryDto {
     private String categoryName;
     private boolean deleted;
     private ModifyState modifyState;
+
+    private long localId;
 
 }
