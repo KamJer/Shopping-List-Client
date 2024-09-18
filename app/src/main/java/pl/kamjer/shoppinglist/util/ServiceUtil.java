@@ -2,9 +2,11 @@ package pl.kamjer.shoppinglist.util;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import pl.kamjer.shoppinglist.model.AmountType;
 import pl.kamjer.shoppinglist.model.Category;
+import pl.kamjer.shoppinglist.model.ModifyState;
 import pl.kamjer.shoppinglist.model.ShoppingItem;
 import pl.kamjer.shoppinglist.model.User;
 import pl.kamjer.shoppinglist.model.dto.AmountTypeDto;
@@ -22,17 +24,14 @@ public class ServiceUtil {
                 .build();
     }
 
-    public static AmountTypeDto amountTypeToAmountTypeDto(AmountType amountType) {
+    public static AmountTypeDto amountTypeToAmountTypeDto(AmountType amountType, ModifyState modifyState) {
         return AmountTypeDto.builder()
                 .typeName(amountType.getTypeName())
                 .amountTypeId(amountType.getAmountTypeId())
                 .deleted(amountType.isDeleted())
                 .localId(amountType.getLocalAmountTypeId())
+                .modifyState(modifyState)
                 .build();
-    }
-
-    public static List<AmountTypeDto> amountTypesToAmountTypeDtos(List<AmountType> amountTypes) {
-        return amountTypes.stream().map(ServiceUtil::amountTypeToAmountTypeDto).collect(Collectors.toList());
     }
 
     public static AmountType amountTypeDtoToAmountType(User user, AmountTypeDto amountType) {
@@ -44,17 +43,14 @@ public class ServiceUtil {
                 .build();
     }
 
-    public static CategoryDto categoryToCategoryDto(Category category) {
+    public static CategoryDto categoryToCategoryDto(Category category, ModifyState modifyState) {
         return CategoryDto.builder()
                 .categoryId(category.getCategoryId())
                 .categoryName(category.getCategoryName())
                 .deleted(category.isDeleted())
                 .localId(category.getLocalCategoryId())
+                .modifyState(modifyState)
                 .build();
-    }
-
-    public static List<CategoryDto> categoriesToCategoryDtos(List<Category> categories) {
-        return categories.stream().map(ServiceUtil::categoryToCategoryDto).collect(Collectors.toList());
     }
 
     public static Category categoryDtoToCategory(User user, CategoryDto category) {
@@ -66,7 +62,7 @@ public class ServiceUtil {
                 .build();
     }
 
-    public static ShoppingItemDto shoppingItemToShoppingItemDto(ShoppingItem shoppingItem) {
+    public static ShoppingItemDto shoppingItemToShoppingItemDto(ShoppingItem shoppingItem, ModifyState modifyState) {
         return ShoppingItemDto.builder()
                 .shoppingItemId(shoppingItem.getShoppingItemId())
                 .itemAmountTypeId(shoppingItem.getItemAmountTypeId())
@@ -78,6 +74,7 @@ public class ServiceUtil {
                 .localId(shoppingItem.getLocalShoppingItemId())
                 .localAmountTypeId(shoppingItem.getLocalItemAmountTypeId())
                 .localCategoryId(shoppingItem.getLocalItemCategoryId())
+                .modifyState(modifyState)
                 .build();
     }
 
@@ -94,10 +91,6 @@ public class ServiceUtil {
                 .localItemAmountTypeId(shoppingItem.getLocalAmountTypeId())
                 .localItemCategoryId(shoppingItem.getLocalCategoryId())
                 .build();
-    }
-
-    public static List<ShoppingItemDto> shoppingItemsToShoppingItemDtos(List<ShoppingItem> shoppingItems) {
-        return shoppingItems.stream().map(ServiceUtil::shoppingItemToShoppingItemDto).collect(Collectors.toList());
     }
 
     public static ExceptionDto toExceptionDto(Throwable e) {

@@ -43,6 +43,7 @@ public class ShoppingListExceptionHandler implements Thread.UncaughtExceptionHan
         } catch (InterruptedException ex) {
             executorService.shutdownNow();
             Thread.currentThread().interrupt();
+            System.exit(2);
         }
     }
 }

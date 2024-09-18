@@ -5,6 +5,7 @@ import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
+import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
 import java.io.Serializable;
@@ -24,7 +25,9 @@ import lombok.Setter;
                         parentColumns = "user_name",
                         childColumns = "user_name",
                         onDelete = ForeignKey.CASCADE)
-        })
+        },
+        indices = {@Index(value = {"amount_type_id"}, unique = true)}
+)
 public class AmountType implements Serializable {
 
     @ColumnInfo(name = "local_amount_type_id")

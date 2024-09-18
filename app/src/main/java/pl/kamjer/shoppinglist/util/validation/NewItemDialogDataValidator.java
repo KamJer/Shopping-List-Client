@@ -1,4 +1,4 @@
-package pl.kamjer.shoppinglist.util;
+package pl.kamjer.shoppinglist.util.validation;
 
 import pl.kamjer.shoppinglist.model.AmountType;
 import pl.kamjer.shoppinglist.model.Category;

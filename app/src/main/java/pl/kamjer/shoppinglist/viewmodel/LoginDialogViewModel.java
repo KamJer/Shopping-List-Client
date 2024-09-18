@@ -6,10 +6,19 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.viewmodel.ViewModelInitializer;
 
-import java.time.LocalDateTime;
-import java.util.List;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
+import java.io.IOException;
+import java.lang.reflect.Type;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import lombok.SneakyThrows;
 import pl.kamjer.shoppinglist.model.User;
+import pl.kamjer.shoppinglist.model.dto.ErrorMessage;
 import pl.kamjer.shoppinglist.repository.SharedRepository;
 import pl.kamjer.shoppinglist.repository.ShoppingRepository;
 import pl.kamjer.shoppinglist.repository.ShoppingServiceRepository;
@@ -47,7 +56,7 @@ public class LoginDialogViewModel extends CustomViewModel {
                         failureAction.action();
                     }
                 } else {
-                    onConecctionFailureAction.action(new NotOkHttpResponseException(ShoppingServiceRepository.CONNECTION_FAILED_MESSAGE));
+                    onConecctionFailureAction.action(new NotOkHttpResponseException(decodeErrorMassage(response)));
                 }
             }
 
@@ -67,9 +76,9 @@ public class LoginDialogViewModel extends CustomViewModel {
                     insertUser(user);
                     onSuccessAction.action();
                 } else if(response.code() == 400) {
-                    action.action(new NotOkHttpResponseException("User name taken, try with different name"));
+                    action.action(new NotOkHttpResponseException(decodeErrorMassage(response)));
                 } else {
-                    action.action(new NotOkHttpResponseException(ShoppingServiceRepository.CONNECTION_FAILED_MESSAGE + response.code()));
+                    action.action(new NotOkHttpResponseException(decodeErrorMassage(response)));
                 }
             }
 

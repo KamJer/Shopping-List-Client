@@ -80,6 +80,7 @@ public class InitializerActivity extends GenericActivity {
     }
 
     private void initializeApp() {
+        initializerViewModel.setInitializerLabelLiveDataValue(getString(R.string.initializing_connection_to_server_label));
         ShoppingServiceRepository.getShoppingServiceRepository().initialize(getApplicationContext());
         initializerViewModel.setInitializerLabelLiveDataValue(getString(R.string.initializing_inner_files_label));
         SharedRepository.getSharedRepository().initialize(getApplicationContext());

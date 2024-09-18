@@ -42,6 +42,7 @@ public class SSLUtil {
 
             // Tworzenie OkHttpClient z SSL
             okHttpClient = new OkHttpClient.Builder();
+            okHttpClient.hostnameVerifier((hostname, session) -> true);
             okHttpClient.sslSocketFactory(sslContext.getSocketFactory(),
                     (X509TrustManager) trustManagerFactory.getTrustManagers()[0]);
 

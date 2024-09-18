@@ -7,15 +7,18 @@ import androidx.room.Query;
 import androidx.room.Transaction;
 import androidx.room.Update;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import pl.kamjer.shoppinglist.model.AmountType;
 import pl.kamjer.shoppinglist.model.Category;
 import pl.kamjer.shoppinglist.model.ModifyState;
 import pl.kamjer.shoppinglist.model.ShoppingItem;
+import pl.kamjer.shoppinglist.model.User;
 import pl.kamjer.shoppinglist.util.exception.NoUserFoundException;
 
 @Dao
@@ -60,19 +63,35 @@ public interface UtilDao {
     @Update
     void updateCategory(Category categories);
 
+    @Update
+    void updateUser(User user);
+
     @Transaction
     default void insertAllElements(List<AmountType> amountTypes, List<Category> categories, List<ShoppingItem> shoppingItems) {
-        amountTypes.forEach(amountType -> amountType.setLocalAmountTypeId(insertAmountTypes(amountType)));
-        categories.forEach(category -> category.setLocalCategoryId(insertCategories(category)));
-
         List<AmountType> amountTypesFromDb = loadAllAmountType();
         List<Category> categoriesFromDb = loadAllCategories();
+        List<ShoppingItem> shoppingItemsFromDb = loadAllShoppingItems();
+
+        amountTypes.forEach(amountType -> {
+            if (!amountTypesFromDb.stream().map(AmountType::getAmountTypeId).collect(Collectors.toList()).contains(amountType.getAmountTypeId())) {
+                amountType.setLocalAmountTypeId(insertAmountTypes(amountType));
+                amountTypesFromDb.add(amountType);
+            }
+        });
+        categories.forEach(category -> {
+            if (!categoriesFromDb.stream().map(Category::getCategoryId).collect(Collectors.toList()).contains(category.getCategoryId())) {
+                category.setLocalCategoryId(insertCategories(category));
+                categoriesFromDb.add(category);
+            }
+        });
 
         shoppingItems
                 .forEach(shoppingItem -> {
                     shoppingItem.setLocalItemAmountTypeId(getLocalAmountTypeIdForShoppingItem(amountTypesFromDb, shoppingItem));
                     shoppingItem.setLocalItemCategoryId(getLocalCategoryIdForShoppingItem(categoriesFromDb, shoppingItem));
-                    shoppingItem.setLocalShoppingItemId(insertShoppingItems(shoppingItem));
+                    if (!shoppingItemsFromDb.stream().map(ShoppingItem::getShoppingItemId).collect(Collectors.toList()).contains(shoppingItem.getShoppingItemId())) {
+                        shoppingItem.setLocalShoppingItemId(insertShoppingItems(shoppingItem));
+                    }
                 });
     }
 
@@ -109,12 +128,14 @@ public interface UtilDao {
             if (amountType.getLocalAmountTypeId() == 0L) {
                 amountType.setLocalAmountTypeId(getLocalAmountTypeId(amountTypesFromDb, amountType));
             }
+            amountType.setUpdated(false);
             updateAmountType(amountType);
         });
         categories.forEach(category -> {
             if (category.getLocalCategoryId() == 0L) {
                 category.setLocalCategoryId(getLocalCategoryId(categoriesFromDb, category));
             }
+            category.setUpdated(false);
             updateCategory(category);
         });
 
@@ -125,12 +146,13 @@ public interface UtilDao {
             if (shoppingItem.getLocalShoppingItemId() == 0L) {
                 shoppingItem.setLocalShoppingItemId(getLocalShoppingItemIdForShoppingItem(shoppingItemsFromDb, shoppingItem));
             }
+            shoppingItem.setUpdated(false);
             updateShoppingItem(shoppingItem);
         });
     }
 
     @Transaction
-    default void synchronizeData(Map<ModifyState, List<AmountType>> amountTypes, Map<ModifyState, List<Category>> categories, Map<ModifyState, List<ShoppingItem>> shoppingItems) {
+    default void synchronizeData(Map<ModifyState, List<AmountType>> amountTypes, Map<ModifyState, List<Category>> categories, Map<ModifyState, List<ShoppingItem>> shoppingItems, User user, LocalDateTime savedTime) {
         insertAllElements(
                 Optional.ofNullable(amountTypes.get(ModifyState.INSERT)).orElseGet(ArrayList::new),
                 Optional.ofNullable(categories.get(ModifyState.INSERT)).orElseGet(ArrayList::new),
@@ -143,6 +165,8 @@ public interface UtilDao {
                 Optional.ofNullable(amountTypes.get(ModifyState.DELETE)).orElseGet(ArrayList::new),
                 Optional.ofNullable(categories.get(ModifyState.DELETE)).orElseGet(ArrayList::new),
                 Optional.ofNullable(shoppingItems.get(ModifyState.DELETE)).orElseGet(ArrayList::new));
+        user.setSavedTime(savedTime);
+        updateUser(user);
     }
 
     default Long getLocalAmountTypeIdForShoppingItem(List<AmountType> amountTypes, ShoppingItem shoppingItem) {
@@ -202,4 +226,17 @@ public interface UtilDao {
         amountType.setDeleted(true);
         updateAmountType(amountType);
     }
+
+    @Transaction
+    default void deleteCategorySoft(Category category) {
+        findAllShoppingItemsForCategory(category.getLocalCategoryId()).forEach(shoppingItem-> {
+            shoppingItem.setDeleted(true);
+            updateShoppingItem(shoppingItem);
+        });
+        category.setDeleted(true);
+        updateCategory(category);
+    }
+
+    @Query("SELECT * FROM SHOPPING_ITEM WHERE local_item_category_id=:localCategoryId")
+    List<ShoppingItem> findAllShoppingItemsForCategory(long localCategoryId);
 }

@@ -18,7 +18,7 @@ import pl.kamjer.shoppinglist.activity.GenericActivity;
 import pl.kamjer.shoppinglist.model.AmountType;
 import pl.kamjer.shoppinglist.model.Category;
 import pl.kamjer.shoppinglist.model.ShoppingItem;
-import pl.kamjer.shoppinglist.util.NewItemDialogDataValidator;
+import pl.kamjer.shoppinglist.util.validation.NewItemDialogDataValidator;
 import pl.kamjer.shoppinglist.viewmodel.NewShoppingItemDialogViewModel;
 
 public class NewShoppingItemDialog extends GenericActivity {

@@ -29,7 +29,6 @@ public class ShoppingListViewModel extends CustomViewModel {
 
     private LiveData<List<ShoppingItemWithAmountTypeAndCategory>> allShoppingItemWithAmountTypeAndCategoryLiveData;
     private LiveData<List<Category>> allCategoryLiveData;
-    private LiveData<User> userLiveData;
 
     public ShoppingListViewModel(ShoppingRepository shoppingRepository, ShoppingServiceRepository shoppingServiceRepository, SharedRepository sharedRepository) {
         super(shoppingRepository, shoppingServiceRepository, sharedRepository);
@@ -39,6 +38,12 @@ public class ShoppingListViewModel extends CustomViewModel {
             new ShoppingListViewModel(ShoppingRepository.getShoppingRepository(),
                     ShoppingServiceRepository.getShoppingServiceRepository(),
                     SharedRepository.getSharedRepository()));
+
+    public void initialize() {
+        loadUser();
+        loadAllCategory();
+        loadAllShoppingItemWithAmountTypeAndCategory();
+    }
 
     public void loadAllShoppingItemWithAmountTypeAndCategory() {
         allShoppingItemWithAmountTypeAndCategoryLiveData = shoppingRepository
@@ -83,13 +88,5 @@ public class ShoppingListViewModel extends CustomViewModel {
 
     public void updateCategory(Category category, OnFailureAction action) {
         shoppingRepository.updateCategoryFlag(category, () -> synchronizeData(action));
-    }
-
-    public void loadUser() {
-        userLiveData = shoppingRepository.loadUser(sharedRepository.loadUser());
-    }
-
-    public User getUserValue() throws NoUserFoundException {
-        return Optional.ofNullable(userLiveData.getValue()).orElseThrow(() -> new NoUserFoundException("No user is logged"));
     }
 }

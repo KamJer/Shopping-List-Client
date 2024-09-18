@@ -7,6 +7,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 import androidx.room.Room;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -189,7 +190,7 @@ public class ShoppingRepository {
 
     public void deleteCategorySoft(Category category, LoadToServerAction action) {
         executorService.execute(() -> {
-            categoryDao.deleteCategorySoft(category);
+            utilDao.deleteCategorySoft(category);
             action.action();
         });
     }
@@ -238,8 +239,10 @@ public class ShoppingRepository {
 
     public void synchronizeData(Map<ModifyState, List<AmountType>> amountTypes,
                                 Map<ModifyState, List<Category>> categories,
-                                Map<ModifyState, List<ShoppingItem>> shoppingItems) {
-        executorService.execute(() -> utilDao.synchronizeData(amountTypes, categories, shoppingItems));
+                                Map<ModifyState, List<ShoppingItem>> shoppingItems,
+                                User user,
+                                LocalDateTime savedTime) {
+        executorService.execute(() -> utilDao.synchronizeData(amountTypes, categories, shoppingItems, user, savedTime));
     }
 
     public LiveData<List<User>> loadAllUsers() {

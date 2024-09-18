@@ -52,7 +52,7 @@ public class InitializerViewModel extends CustomViewModel {
                         failureAction.action();
                     }
                 } else {
-                    onConecctionFailureAction.action(new NotOkHttpResponseException(ShoppingServiceRepository.CONNECTION_FAILED_MESSAGE + response.code()));
+                    onConecctionFailureAction.action(new NotOkHttpResponseException(ShoppingServiceRepository.CONNECTION_FAILED_MESSAGE + response.body()));
                 }
             }
 

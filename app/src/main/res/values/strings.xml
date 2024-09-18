@@ -28,4 +28,6 @@
     <string name="cancel_label_button">Anuluj</string>
     <string name="selected_amount_type_is_null_massage">Wybrany typ nie istnieje</string>
     <string name="no_amount_type_selected_message">Nie wybrano typu</string>
+    <string name="user_name_can_not_be_empty_message">Nazwa użytkownika ne może być pusta</string>
+    <string name="no_such_user_message">Nie ma takiego użytkownika</string>
 </resources>

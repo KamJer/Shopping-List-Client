@@ -24,17 +24,11 @@ import pl.kamjer.shoppinglist.repository.ShoppingServiceRepository;
 import pl.kamjer.shoppinglist.util.exception.NotOkHttpResponseException;
 import pl.kamjer.shoppinglist.util.funcinterface.DeleteUserAction;
 import pl.kamjer.shoppinglist.util.funcinterface.OnFailureAction;
+import pl.kamjer.shoppinglist.util.validation.UserValidator;
 import pl.kamjer.shoppinglist.viewmodel.LoginDialogViewModel;
 
 @Log
 public class LoginDialogOptionalLogin extends GenericActivity {
-
-    protected final OnFailureAction connectionFailedAction =
-            (t) -> {
-                String message = Optional.ofNullable(t).map(Throwable::getMessage).orElse("could not found reason for error");
-                log.log(Level.WARNING, message);
-                createToast(message);
-            };
 
     protected LoginDialogViewModel loginDialogViewModel;
 
@@ -63,6 +57,10 @@ public class LoginDialogOptionalLogin extends GenericActivity {
                 .userName(userName)
                 .password(password)
                 .build();
+        if (!UserValidator.isUserValid(user)) {
+            createToast(getString(R.string.user_name_can_not_be_empty_message));
+            return;
+        }
         loginDialogViewModel.insertUser(
                 user,
                 () -> ShoppingServiceRepository.getShoppingServiceRepository().reInitializeWithUser(this, user),
@@ -82,7 +80,8 @@ public class LoginDialogOptionalLogin extends GenericActivity {
                     loginDialogViewModel.insertUser(user);
                     ShoppingServiceRepository.getShoppingServiceRepository().reInitializeWithUser(getApplicationContext(), user);
                 },
-                () -> createToast("No such User try again"),
+//                () -> createToast("No such User try again"),
+                () -> createToast(getString(R.string.no_such_user_message)),
                 (t) -> {
                     connectionFailedAction.action(t);
                     if (!(t instanceof NotOkHttpResponseException)) {

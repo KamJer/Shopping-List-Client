@@ -91,10 +91,9 @@ public class ShoppingListActivity extends GenericActivity {
                 connectionFailedAction);
     };
 
-    private final ModifyShoppingItemAction deleteShoppingItemAction = shoppingItemWithAmountTypeAndCategory -> {
-        shoppingListViewModel.deleteShoppingItem(shoppingItemWithAmountTypeAndCategory.getShoppingItem(),
-                connectionFailedAction);
-    };
+    private final ModifyShoppingItemAction deleteShoppingItemAction = shoppingItemWithAmountTypeAndCategory ->
+            shoppingListViewModel.deleteShoppingItem(shoppingItemWithAmountTypeAndCategory.getShoppingItem(),
+            connectionFailedAction);
     private final ModifyShoppingItemAction modifyShoppingItemAction = shoppingItemWithAmountTypeAndCategory -> {
         Intent updateShoppingItemIntent = new Intent(this, UpdateShoppingItemDialog.class);
         updateShoppingItemIntent.putExtra(NewShoppingItemDialog.CATEGORY_FIELD_NAME, shoppingItemWithAmountTypeAndCategory.getCategory());
@@ -120,9 +119,7 @@ public class ShoppingListActivity extends GenericActivity {
         ).get(ShoppingListViewModel.class);
 
 //        loading data
-        shoppingListViewModel.loadUser();
-        shoppingListViewModel.loadAllCategory();
-        shoppingListViewModel.loadAllShoppingItemWithAmountTypeAndCategory();
+        shoppingListViewModel.initialize();
 
         categoryList = new ArrayList<>();
         shoppingItemWithAmountTypeAndCategoriesList = new ArrayList<>();
@@ -162,7 +159,6 @@ public class ShoppingListActivity extends GenericActivity {
                     checkBoxListener,
                     deleteShoppingItemAction,
                     modifyShoppingItemAction);
-            categoryRecyclerView.setLayoutManager(new LinearLayoutManager(this));
             categoryRecyclerView.setAdapter(shoppingCategoryRecyclerViewAdapter);
         });
 
