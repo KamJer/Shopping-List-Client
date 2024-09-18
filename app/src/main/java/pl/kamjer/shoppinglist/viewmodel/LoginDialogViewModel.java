@@ -75,8 +75,6 @@ public class LoginDialogViewModel extends CustomViewModel {
                     user.setSavedTime(response.body());
                     insertUser(user);
                     onSuccessAction.action();
-                } else if(response.code() == 400) {
-                    action.action(new NotOkHttpResponseException(decodeErrorMassage(response)));
                 } else {
                     action.action(new NotOkHttpResponseException(decodeErrorMassage(response)));
                 }

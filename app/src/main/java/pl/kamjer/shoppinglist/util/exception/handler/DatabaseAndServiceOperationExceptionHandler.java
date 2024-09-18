@@ -21,7 +21,7 @@ public class DatabaseAndServiceOperationExceptionHandler implements Thread.Uncau
     public void uncaughtException(@NonNull Thread t, @NonNull Throwable e) {
         new Handler(Looper.getMainLooper()).post(() ->
                 Toast.makeText(context, e.getMessage(), Toast.LENGTH_LONG).show());
-        shoppingServiceRepository.sendLog(ServiceUtil.toExceptionDto(e));
+        shoppingServiceRepository.sendLog(ServiceUtil.toExceptionDto(e), () -> {});
         Thread.currentThread().interrupt();
     }
 }

@@ -8,7 +8,6 @@ import androidx.annotation.Nullable;
 
 public class LoginDialogForcedLogin extends LoginDialogOptionalLogin {
 
-
     protected OnBackPressedCallback onBack = new OnBackPressedCallback(true) {
         @Override
         public void handleOnBackPressed() {

@@ -23,6 +23,7 @@ import pl.kamjer.shoppinglist.service.SSLUtil;
 import pl.kamjer.shoppinglist.service.service.UserService;
 import pl.kamjer.shoppinglist.service.service.UtilService;
 import pl.kamjer.shoppinglist.util.ServiceUtil;
+import pl.kamjer.shoppinglist.util.funcinterface.OnConnectAction;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -117,17 +118,17 @@ public class ShoppingServiceRepository {
         call.enqueue(callback);
     }
 
-    public void sendLog(ExceptionDto e) {
+    public void sendLog(ExceptionDto e, OnConnectAction action) {
         Call<Void> call = utilService.sendLog(e);
         call.enqueue(new Callback<Void>() {
             @Override
             public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
-                System.exit(2);
+                action.action();
             }
 
             @Override
             public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t) {
-                System.exit(2);
+                action.action();
             }
         });
     }

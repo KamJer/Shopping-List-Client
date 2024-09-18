@@ -34,7 +34,7 @@ public class ShoppingListExceptionHandler implements Thread.UncaughtExceptionHan
     public void uncaughtException(@NonNull Thread t, @NonNull Throwable e) {
         new Handler(Looper.getMainLooper()).post(() ->
                 Toast.makeText(context, e.getMessage(), Toast.LENGTH_LONG).show());
-        shoppingServiceRepository.sendLog(ServiceUtil.toExceptionDto(e));
+        shoppingServiceRepository.sendLog(ServiceUtil.toExceptionDto(e), () -> android.os.Process.killProcess(android.os.Process.myPid()));
         executorService.shutdown();
         try {
             if (!executorService.awaitTermination(10, TimeUnit.SECONDS)) {
@@ -43,7 +43,7 @@ public class ShoppingListExceptionHandler implements Thread.UncaughtExceptionHan
         } catch (InterruptedException ex) {
             executorService.shutdownNow();
             Thread.currentThread().interrupt();
-            System.exit(2);
+            android.os.Process.killProcess(android.os.Process.myPid());
         }
     }
 }
