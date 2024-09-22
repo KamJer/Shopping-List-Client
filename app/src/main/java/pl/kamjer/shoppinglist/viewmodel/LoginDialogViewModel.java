@@ -18,6 +18,7 @@ import java.util.Optional;
 
 import lombok.SneakyThrows;
 import pl.kamjer.shoppinglist.model.User;
+import pl.kamjer.shoppinglist.model.dto.AllDto;
 import pl.kamjer.shoppinglist.model.dto.ErrorMessage;
 import pl.kamjer.shoppinglist.repository.SharedRepository;
 import pl.kamjer.shoppinglist.repository.ShoppingRepository;
@@ -42,30 +43,6 @@ public class LoginDialogViewModel extends CustomViewModel {
             new LoginDialogViewModel(ShoppingRepository.getShoppingRepository(),
                     ShoppingServiceRepository.getShoppingServiceRepository(),
                     SharedRepository.getSharedRepository()));
-
-
-    public void logUser(User user, OnConnectAction successAction, OnConnectAction failureAction, OnFailureAction onConecctionFailureAction) {
-        shoppingServiceRepository.logUser(user, new Callback<Boolean>() {
-            @Override
-            public void onResponse(@NonNull Call<Boolean> call, @NonNull Response<Boolean> response) {
-                if (response.isSuccessful()) {
-                    boolean result = Boolean.TRUE.equals(response.body());
-                    if (result) {
-                        successAction.action();
-                    } else {
-                        failureAction.action();
-                    }
-                } else {
-                    onConecctionFailureAction.action(new NotOkHttpResponseException(decodeErrorMassage(response)));
-                }
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<Boolean> call, @NonNull Throwable t) {
-                onConecctionFailureAction.action(t);
-            }
-        });
-    }
 
     public void insertUser(User user, OnConnectAction onSuccessAction, OnFailureAction action) {
         shoppingServiceRepository.insertUser(user, new Callback<LocalDateTime>() {

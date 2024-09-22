@@ -35,6 +35,7 @@ dependencies {
     implementation(libs.room.rxjava3)
     implementation(libs.retrofit)
     implementation(libs.retrofit.converter)
+    implementation(libs.androidx.recyclerView)
     compileOnly(libs.lombok)
     annotationProcessor(libs.lombok)
     annotationProcessor(libs.room.compiler)

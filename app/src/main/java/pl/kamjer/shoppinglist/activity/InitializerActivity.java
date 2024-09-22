@@ -63,11 +63,11 @@ public class InitializerActivity extends GenericActivity {
 //            if user is null this means no user data was saved, so it needs to be created and inserted,
             if (user != null) {
                 ShoppingServiceRepository.getShoppingServiceRepository().reInitializeWithUser(this, user);
-                initializerViewModel.logUser(user, () -> {
-                            initializerViewModel.synchronizeData(connectionFailedAction);
-                            startShoppingListActivity();
-                        }, () -> {
+                initializerViewModel.synchronizeData(user,
+                        this::startShoppingListActivity
+                        , () -> {
                             createToast(getString(R.string.such_user_does_not_exist_label));
+//                            if user
                             startLogDialog();
                         },
                         connectionFailedAction);

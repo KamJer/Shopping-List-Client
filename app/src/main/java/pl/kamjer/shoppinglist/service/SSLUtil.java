@@ -18,7 +18,6 @@ import javax.net.ssl.X509TrustManager;
 
 import okhttp3.OkHttpClient;
 import pl.kamjer.shoppinglist.R;
-import pl.kamjer.shoppinglist.model.User;
 
 public class SSLUtil {
 
@@ -42,7 +41,7 @@ public class SSLUtil {
 
             // Tworzenie OkHttpClient z SSL
             okHttpClient = new OkHttpClient.Builder();
-//            okHttpClient.hostnameVerifier((hostname, session) -> true);
+            okHttpClient.hostnameVerifier((hostname, session) -> true);
             okHttpClient.sslSocketFactory(sslContext.getSocketFactory(),
                     (X509TrustManager) trustManagerFactory.getTrustManagers()[0]);
 

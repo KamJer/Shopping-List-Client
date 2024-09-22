@@ -7,6 +7,7 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.viewmodel.ViewModelInitializer;
 
 import pl.kamjer.shoppinglist.model.User;
+import pl.kamjer.shoppinglist.model.dto.AllDto;
 import pl.kamjer.shoppinglist.repository.SharedRepository;
 import pl.kamjer.shoppinglist.repository.ShoppingRepository;
 import pl.kamjer.shoppinglist.repository.ShoppingServiceRepository;
@@ -38,29 +39,6 @@ public class InitializerViewModel extends CustomViewModel {
 
     public void setUserLiveDataObserver(Observer<User> observer) {
         userLiveData.observeForever(observer);
-    }
-
-    public void logUser(User user, OnConnectAction successAction, OnConnectAction failureAction, OnFailureAction onConecctionFailureAction) {
-        shoppingServiceRepository.logUser(user, new Callback<Boolean>() {
-            @Override
-            public void onResponse(@NonNull Call<Boolean> call, @NonNull Response<Boolean> response) {
-                if (response.isSuccessful()) {
-                    boolean result = Boolean.TRUE.equals(response.body());
-                    if (result) {
-                        successAction.action();
-                    } else {
-                        failureAction.action();
-                    }
-                } else {
-                    onConecctionFailureAction.action(new NotOkHttpResponseException(ShoppingServiceRepository.CONNECTION_FAILED_MESSAGE + response.body()));
-                }
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<Boolean> call, @NonNull Throwable t) {
-                onConecctionFailureAction.action(t);
-            }
-        });
     }
 
     public void setInitializerLabelLiveDataValue(String value) {

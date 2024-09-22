@@ -44,9 +44,8 @@ public class ShoppingListActivity extends GenericActivity {
 
     private ShoppingListViewModel shoppingListViewModel;
     private ShoppingCategoryRecyclerViewAdapter shoppingCategoryRecyclerViewAdapter;
-    private RecyclerView categoryRecyclerView;
 
-    private List<Category> categoryList;
+    private List<Category> categoryList = new ArrayList<>();
     private List<ShoppingItemWithAmountTypeAndCategory> shoppingItemWithAmountTypeAndCategoriesList;
 
     private ActivityResultLauncher<Intent> createNewCategoryDialogLauncher;
@@ -127,7 +126,7 @@ public class ShoppingListActivity extends GenericActivity {
         ShoppingListActionBar shoppingListActionBar = findViewById(R.id.appBar);
         setSupportActionBar(shoppingListActionBar.getToolbar());
 
-        categoryRecyclerView = findViewById(R.id.categoryListRecyclerView);
+        RecyclerView categoryRecyclerView = findViewById(R.id.categoryListRecyclerView);
         categoryRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         ImageButton addCategoryImageButton = findViewById(R.id.addCategoryImageButton);
@@ -136,30 +135,29 @@ public class ShoppingListActivity extends GenericActivity {
         ImageButton moveToBoughtImageButton = findViewById(R.id.moveToBoughtImageButton);
         moveToBoughtImageButton.setOnClickListener(moveToBoughtImageButtonAction);
 
+        shoppingCategoryRecyclerViewAdapter = new ShoppingCategoryRecyclerViewAdapter(categoryList,
+                shoppingItemWithAmountTypeAndCategoriesList,
+                deleteCategoryAction,
+                updateCategoryAction,
+                addShoppingItemAction,
+                checkBoxListener,
+                deleteShoppingItemAction,
+                modifyShoppingItemAction);
+        shoppingCategoryRecyclerViewAdapter.setStateRestorationPolicy(RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY);
+        categoryRecyclerView.setAdapter(shoppingCategoryRecyclerViewAdapter);
+
         shoppingListViewModel.setAllCategoryObserver(this, categories -> {
             categoryList = categories;
-            shoppingCategoryRecyclerViewAdapter = new ShoppingCategoryRecyclerViewAdapter(categoryList,
-                    shoppingItemWithAmountTypeAndCategoriesList,
-                    deleteCategoryAction,
-                    updateCategoryAction,
-                    addShoppingItemAction,
-                    checkBoxListener,
-                    deleteShoppingItemAction,
-                    modifyShoppingItemAction);
-            categoryRecyclerView.setAdapter(shoppingCategoryRecyclerViewAdapter);
+            shoppingCategoryRecyclerViewAdapter.setCategoryList(categoryList);
+            shoppingCategoryRecyclerViewAdapter.setShoppingItemWithAmountTypeAndCategories(shoppingItemWithAmountTypeAndCategoriesList);
+            shoppingCategoryRecyclerViewAdapter.notifyDataSetChanged();
         });
 
         shoppingListViewModel.setShoppingItemWithAmountTypeAndCategoryLiveDataObserver(this, shoppingItemWithAmountTypeAndCategories -> {
             shoppingItemWithAmountTypeAndCategoriesList = shoppingItemWithAmountTypeAndCategories;
-            shoppingCategoryRecyclerViewAdapter = new ShoppingCategoryRecyclerViewAdapter(categoryList,
-                    shoppingItemWithAmountTypeAndCategoriesList,
-                    deleteCategoryAction,
-                    updateCategoryAction,
-                    addShoppingItemAction,
-                    checkBoxListener,
-                    deleteShoppingItemAction,
-                    modifyShoppingItemAction);
-            categoryRecyclerView.setAdapter(shoppingCategoryRecyclerViewAdapter);
+            shoppingCategoryRecyclerViewAdapter.setCategoryList(categoryList);
+            shoppingCategoryRecyclerViewAdapter.setShoppingItemWithAmountTypeAndCategories(shoppingItemWithAmountTypeAndCategoriesList);
+            shoppingCategoryRecyclerViewAdapter.notifyDataSetChanged();
         });
 
 //        dialogsLaunchers

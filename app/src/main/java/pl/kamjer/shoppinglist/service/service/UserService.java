@@ -2,6 +2,7 @@ package pl.kamjer.shoppinglist.service.service;
 
 import java.time.LocalDateTime;
 
+import pl.kamjer.shoppinglist.model.dto.AllDto;
 import pl.kamjer.shoppinglist.model.dto.UserDto;
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -15,5 +16,5 @@ public interface UserService {
     Call<LocalDateTime> postUser(@Body UserDto user);
 
     @GET("/user/log/{userName}")
-    Call<Boolean> logUser(@Path("userName") String userName);
+    Call<AllDto> logUser(@Path("userName") String userName);
 }

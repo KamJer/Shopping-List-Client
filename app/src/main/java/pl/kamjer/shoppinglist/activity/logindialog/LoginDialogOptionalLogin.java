@@ -46,6 +46,10 @@ public class LoginDialogOptionalLogin extends GenericActivity {
                 .userName(userName)
                 .password(password)
                 .build();
+        if (!UserValidator.isUserValid(user)) {
+            createToast(getString(R.string.user_name_can_not_be_empty_message));
+            return;
+        }
 
         logUserInAndInitialize(user);
     };
@@ -72,15 +76,12 @@ public class LoginDialogOptionalLogin extends GenericActivity {
     protected final DeleteUserAction logUserAction = this::logUserInAndInitialize;
 
     protected void logUserInAndInitialize(User user) {
-        if (ShoppingServiceRepository.getShoppingServiceRepository().isInitializedWithUser()) {
-            ShoppingServiceRepository.getShoppingServiceRepository().initialize(getApplicationContext());
-        }
-        loginDialogViewModel.logUser(user,
+        ShoppingServiceRepository.getShoppingServiceRepository().reInitializeWithUser(getApplicationContext(), user);
+        loginDialogViewModel.synchronizeData(user,
                 () -> {
                     loginDialogViewModel.insertUser(user);
                     ShoppingServiceRepository.getShoppingServiceRepository().reInitializeWithUser(getApplicationContext(), user);
                 },
-//                () -> createToast("No such User try again"),
                 () -> createToast(getString(R.string.no_such_user_message)),
                 (t) -> {
                     connectionFailedAction.action(t);
@@ -121,7 +122,7 @@ public class LoginDialogOptionalLogin extends GenericActivity {
                 new ArrayList<>(),
                 deleteUserAction,
                 logUserAction
-                ));
+        ));
 
         loginDialogViewModel.setOnUsersObserver(this, users -> usersRecyclerViewAdapter.setUsers(users));
     }

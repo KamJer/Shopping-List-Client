@@ -43,11 +43,15 @@ public class ShoppingItemViewHolder extends RecyclerView.ViewHolder{
         if (shoppingItemWithAmountTypeAndCategory.getShoppingItem().getAmount() == null) {
             amountTextView.setText(String.valueOf(0));
         } else {
-            amountTextView.setText(shoppingItemWithAmountTypeAndCategory.getShoppingItem().getAmount().toString());
+            amountTextView.setText(convertDoubleToString(shoppingItemWithAmountTypeAndCategory.getShoppingItem().getAmount()));
         }
         amountTypeTextView.setText(shoppingItemWithAmountTypeAndCategory.getAmountType().getTypeName());
 
         deleteShoppingItemButton.setOnClickListener(v -> deleteShoppingItemAction.action(shoppingItemWithAmountTypeAndCategory));
         modifyShoppingItemButton.setOnClickListener(v -> modifyShoppingItemAction.action(shoppingItemWithAmountTypeAndCategory));
+    }
+
+    public String convertDoubleToString(double number) {
+        return String.valueOf(number).replaceAll("\\.?0+$", "");
     }
 }

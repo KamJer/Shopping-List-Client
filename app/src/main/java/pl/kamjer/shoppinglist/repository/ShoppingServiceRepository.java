@@ -35,8 +35,8 @@ public class ShoppingServiceRepository {
 
     public static final String CONNECTION_FAILED_MESSAGE = "Connection failed: Http code:";
 
-    private static final String BASE_URL = "https://35.212.210.42";
-//    private static final String BASE_URL = "https://192.168.0.13";
+//    private static final String BASE_URL = "https://35.212.210.42";
+    private static final String BASE_URL = "https://192.168.0.13";
 
     private static ShoppingServiceRepository shoppingServiceRepository;
 
@@ -108,8 +108,8 @@ public class ShoppingServiceRepository {
         call.enqueue(callback);
     }
 
-    public void logUser(User user, Callback<Boolean> callback) {
-        Call<Boolean> call = userService.logUser(user.getUserName());
+    public void logUser(User user, Callback<AllDto> callback) {
+        Call<AllDto> call = userService.logUser(user.getUserName());
         call.enqueue(callback);
     }
 
