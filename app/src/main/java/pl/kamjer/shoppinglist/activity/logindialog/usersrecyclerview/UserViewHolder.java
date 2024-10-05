@@ -1,14 +1,11 @@
 package pl.kamjer.shoppinglist.activity.logindialog.usersrecyclerview;
 
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
-import org.w3c.dom.Text;
 
 import pl.kamjer.shoppinglist.R;
 import pl.kamjer.shoppinglist.model.User;

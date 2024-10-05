@@ -14,11 +14,9 @@ import lombok.extern.java.Log;
 import pl.kamjer.shoppinglist.model.Category;
 import pl.kamjer.shoppinglist.model.ShoppingItem;
 import pl.kamjer.shoppinglist.model.ShoppingItemWithAmountTypeAndCategory;
-import pl.kamjer.shoppinglist.model.User;
 import pl.kamjer.shoppinglist.repository.SharedRepository;
 import pl.kamjer.shoppinglist.repository.ShoppingRepository;
 import pl.kamjer.shoppinglist.repository.ShoppingServiceRepository;
-import pl.kamjer.shoppinglist.util.exception.NoUserFoundException;
 import pl.kamjer.shoppinglist.util.funcinterface.OnFailureAction;
 
 @Getter
@@ -88,5 +86,9 @@ public class ShoppingListViewModel extends CustomViewModel {
 
     public void updateCategory(Category category, OnFailureAction action) {
         shoppingRepository.updateCategoryFlag(category, () -> synchronizeData(action));
+    }
+
+    public void testWebsocket() {
+        shoppingServiceRepository.sendWensocketTest();
     }
 }

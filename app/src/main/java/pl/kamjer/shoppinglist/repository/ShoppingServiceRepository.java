@@ -1,6 +1,7 @@
 package pl.kamjer.shoppinglist.repository;
 
 import android.content.Context;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
@@ -11,12 +12,12 @@ import java.time.LocalDateTime;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.java.Log;
 import okhttp3.OkHttpClient;
 import pl.kamjer.shoppinglist.gsonconverter.LocalDateTimeDeserializer;
 import pl.kamjer.shoppinglist.gsonconverter.LocalDateTimeSerializer;
 import pl.kamjer.shoppinglist.model.User;
 import pl.kamjer.shoppinglist.model.dto.AllDto;
-import pl.kamjer.shoppinglist.model.dto.ErrorMessage;
 import pl.kamjer.shoppinglist.model.dto.ExceptionDto;
 import pl.kamjer.shoppinglist.service.BasicAuthInterceptor;
 import pl.kamjer.shoppinglist.service.SSLUtil;
@@ -24,24 +25,29 @@ import pl.kamjer.shoppinglist.service.service.UserService;
 import pl.kamjer.shoppinglist.service.service.UtilService;
 import pl.kamjer.shoppinglist.util.ServiceUtil;
 import pl.kamjer.shoppinglist.util.funcinterface.OnConnectAction;
+import pl.kamjer.shoppinglist.websocketconnect.WebSocket;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-
+@Log
 public class ShoppingServiceRepository {
 
     public static final String CONNECTION_FAILED_MESSAGE = "Connection failed: Http code:";
 
 //    private static final String BASE_URL = "https://35.212.210.42";
-    private static final String BASE_URL = "https://192.168.0.13";
+    private static final String IP = "192.168.0.13";
+    private static final String BASE_URL = "https://" + IP;
+    private static final String WEBSOCKET_BASE_URL = "wss://" + IP;
 
     private static ShoppingServiceRepository shoppingServiceRepository;
 
     private UserService userService;
     private UtilService utilService;
+
+    private WebSocket webSocket;
 
     @Getter
     @Setter
@@ -75,12 +81,20 @@ public class ShoppingServiceRepository {
         initializedWithUser = false;
     }
 
-    public void reInitializeWithUser(Context context, User user) {
+    public void reInitializeWithUser(Context appContext, User user) {
         Gson gson = new GsonBuilder()
                 .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeSerializer())
                 .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeDeserializer())
                 .create();
-        OkHttpClient okHttpClient = createClient(context, user);
+        OkHttpClient okHttpClient = createClient(appContext, user);
+
+        webSocket = new WebSocket(WEBSOCKET_BASE_URL + "/ws")
+                .basicWebsocketHeader()
+                .onOpen((webSocket1, response) -> log.info("open"))
+                .onClosed((webSocket1, code, reason) -> log.info("closed"))
+                .onFailure((webSocket1, t, response) -> log.info(t.getMessage()))
+                .subscribe("test1", "/topic/messages", (webSocket1, text) -> log.info(text))
+                .connect(okHttpClient);
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(BASE_URL)
                 .client(okHttpClient)
@@ -91,14 +105,18 @@ public class ShoppingServiceRepository {
         initializedWithUser = true;
     }
 
+    public void sendWensocketTest(){
+        webSocket.send("/app/send", "text/plain", "test");
+    }
+
     private OkHttpClient createClientWithOutUser(Context context) {
         OkHttpClient.Builder okHttpClientBuilder = SSLUtil.getSSLContext(context);
         return okHttpClientBuilder.build();
 
     }
 
-    private OkHttpClient createClient(Context context, User user) {
-        OkHttpClient.Builder okHttpClientBuilder = SSLUtil.getSSLContext(context);
+    private OkHttpClient createClient(Context appContext, User user) {
+        OkHttpClient.Builder okHttpClientBuilder = SSLUtil.getSSLContext(appContext);
         okHttpClientBuilder.addInterceptor(new BasicAuthInterceptor(user));
         return okHttpClientBuilder.build();
     }
@@ -108,14 +126,9 @@ public class ShoppingServiceRepository {
         call.enqueue(callback);
     }
 
-    public void logUser(User user, Callback<AllDto> callback) {
-        Call<AllDto> call = userService.logUser(user.getUserName());
-        call.enqueue(callback);
-    }
-
     public void synchronizeData(AllDto allDto, Callback<AllDto> callback) {
         Call<AllDto> call = utilService.synchronizeData(allDto);
-        call.enqueue(callback);
+//        call.enqueue(callback);
     }
 
     public void sendLog(ExceptionDto e, OnConnectAction action) {

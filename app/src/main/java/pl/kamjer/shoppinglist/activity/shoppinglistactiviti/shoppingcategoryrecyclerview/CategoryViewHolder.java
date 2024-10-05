@@ -11,13 +11,13 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 
 import pl.kamjer.shoppinglist.R;
-import pl.kamjer.shoppinglist.util.funcinterface.AddShoppingItemAction;
-import pl.kamjer.shoppinglist.util.funcinterface.ModifyShoppingItemAction;
 import pl.kamjer.shoppinglist.activity.shoppinglistactiviti.shoppingitemrecyclerview.ShoppingItemRecyclerViewAdapter;
-import pl.kamjer.shoppinglist.util.funcinterface.RemoveCategoryAction;
-import pl.kamjer.shoppinglist.util.funcinterface.UpdateShoppingItemActonCheckBox;
 import pl.kamjer.shoppinglist.model.Category;
 import pl.kamjer.shoppinglist.model.ShoppingItemWithAmountTypeAndCategory;
+import pl.kamjer.shoppinglist.util.funcinterface.AddShoppingItemAction;
+import pl.kamjer.shoppinglist.util.funcinterface.ModifyShoppingItemAction;
+import pl.kamjer.shoppinglist.util.funcinterface.RemoveCategoryAction;
+import pl.kamjer.shoppinglist.util.funcinterface.UpdateShoppingItemActonCheckBox;
 
 public class CategoryViewHolder extends RecyclerView.ViewHolder {
 

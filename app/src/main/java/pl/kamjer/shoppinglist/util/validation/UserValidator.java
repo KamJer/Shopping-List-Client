@@ -1,7 +1,5 @@
 package pl.kamjer.shoppinglist.util.validation;
 
-import java.util.HashMap;
-
 import pl.kamjer.shoppinglist.model.User;
 
 public class UserValidator {

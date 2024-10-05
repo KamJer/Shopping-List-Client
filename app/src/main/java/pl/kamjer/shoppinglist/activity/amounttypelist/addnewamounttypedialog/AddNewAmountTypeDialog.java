@@ -11,7 +11,6 @@ import androidx.lifecycle.ViewModelProvider;
 import pl.kamjer.shoppinglist.R;
 import pl.kamjer.shoppinglist.activity.GenericActivity;
 import pl.kamjer.shoppinglist.model.AmountType;
-import pl.kamjer.shoppinglist.viewmodel.AmountTypeViewModel;
 import pl.kamjer.shoppinglist.viewmodel.NewAmountTypeDialogViewModel;
 
 public class AddNewAmountTypeDialog extends GenericActivity {

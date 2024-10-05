@@ -10,12 +10,10 @@ import androidx.annotation.NonNull;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import lombok.extern.java.Log;
 import pl.kamjer.shoppinglist.repository.ShoppingServiceRepository;
 import pl.kamjer.shoppinglist.util.ServiceUtil;
 
@@ -23,7 +21,6 @@ import pl.kamjer.shoppinglist.util.ServiceUtil;
 @Builder
 @Getter
 @Setter
-@Log
 public class ShoppingListExceptionHandler implements Thread.UncaughtExceptionHandler {
 
     private final Context context;

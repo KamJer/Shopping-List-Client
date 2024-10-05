@@ -7,7 +7,6 @@ import android.widget.Button;
 import android.widget.Spinner;
 
 import androidx.annotation.Nullable;
-import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.ViewModelProvider;
 
 import java.util.Optional;
@@ -16,10 +15,8 @@ import java.util.stream.Collectors;
 import pl.kamjer.shoppinglist.R;
 import pl.kamjer.shoppinglist.activity.GenericActivity;
 import pl.kamjer.shoppinglist.model.AmountType;
-import pl.kamjer.shoppinglist.model.ShoppingItemWithAmountTypeAndCategory;
 import pl.kamjer.shoppinglist.util.exception.NoUserFoundException;
 import pl.kamjer.shoppinglist.viewmodel.AmountTypeDeleteConflictDialogViewModel;
-import pl.kamjer.shoppinglist.viewmodel.InitializerViewModel;
 
 public class AmountTypeDeleteConflictDialog extends GenericActivity {
 

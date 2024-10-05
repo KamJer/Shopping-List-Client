@@ -11,10 +11,10 @@ import java.util.List;
 
 import pl.kamjer.shoppinglist.R;
 import pl.kamjer.shoppinglist.activity.boughtshoppingitemlist.boughtshoppingitemlistadapter.BoughtShoppintItemListRecyclerViewAdapter;
-import pl.kamjer.shoppinglist.util.funcinterface.ModifyShoppingItemAction;
-import pl.kamjer.shoppinglist.util.funcinterface.UpdateShoppingItemActonCheckBox;
 import pl.kamjer.shoppinglist.model.Category;
 import pl.kamjer.shoppinglist.model.ShoppingItemWithAmountTypeAndCategory;
+import pl.kamjer.shoppinglist.util.funcinterface.ModifyShoppingItemAction;
+import pl.kamjer.shoppinglist.util.funcinterface.UpdateShoppingItemActonCheckBox;
 
 public class BoughtCategoryListRecyclerViewHolder extends RecyclerView.ViewHolder {
 

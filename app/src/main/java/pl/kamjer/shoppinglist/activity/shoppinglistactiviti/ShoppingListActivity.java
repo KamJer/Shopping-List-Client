@@ -103,6 +103,7 @@ public class ShoppingListActivity extends GenericActivity {
     protected OnBackPressedCallback onBack = new OnBackPressedCallback(true) {
         @Override
         public void handleOnBackPressed() {
+            shoppingListViewModel.testWebsocket();
             moveTaskToBack(true);
         }
     };

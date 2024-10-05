@@ -62,7 +62,7 @@ public class InitializerActivity extends GenericActivity {
             initializerViewModel.setInitializerLabelLiveDataValue(getString(R.string.initializing_connection_to_server_label));
 //            if user is null this means no user data was saved, so it needs to be created and inserted,
             if (user != null) {
-                ShoppingServiceRepository.getShoppingServiceRepository().reInitializeWithUser(this, user);
+                ShoppingServiceRepository.getShoppingServiceRepository().reInitializeWithUser(this.getApplicationContext(), user);
                 initializerViewModel.synchronizeData(user,
                         this::startShoppingListActivity
                         , () -> {
@@ -74,8 +74,9 @@ public class InitializerActivity extends GenericActivity {
             } else {
                 startLogDialog();
             }
+//            TODO: for testing delete later
+            startShoppingListActivity();
         });
-
         initializerViewModel.setInitializerLabelLiveDataObserver(this, initializerLabelObserver);
     }
 

@@ -19,7 +19,6 @@ public class BasicAuthInterceptor implements Interceptor {
     @NonNull
     @Override
     public Response intercept(Chain chain) throws IOException {
-        // Tworzenie nagłówka Authorization
         String credential = user.getUserName() + ":" + user.getPassword();
         String basicAuth = "Basic " + Base64.getEncoder().encodeToString(credential.getBytes());
 

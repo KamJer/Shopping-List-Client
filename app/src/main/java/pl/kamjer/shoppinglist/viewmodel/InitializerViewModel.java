@@ -1,22 +1,14 @@
 package pl.kamjer.shoppinglist.viewmodel;
 
-import androidx.annotation.NonNull;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.viewmodel.ViewModelInitializer;
 
 import pl.kamjer.shoppinglist.model.User;
-import pl.kamjer.shoppinglist.model.dto.AllDto;
 import pl.kamjer.shoppinglist.repository.SharedRepository;
 import pl.kamjer.shoppinglist.repository.ShoppingRepository;
 import pl.kamjer.shoppinglist.repository.ShoppingServiceRepository;
-import pl.kamjer.shoppinglist.util.exception.NotOkHttpResponseException;
-import pl.kamjer.shoppinglist.util.funcinterface.OnConnectAction;
-import pl.kamjer.shoppinglist.util.funcinterface.OnFailureAction;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class InitializerViewModel extends CustomViewModel {
 

@@ -1,6 +1,5 @@
 package pl.kamjer.shoppinglist.activity.amounttypelist.amounttyperecyclerview;
 
-import android.media.Image;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;

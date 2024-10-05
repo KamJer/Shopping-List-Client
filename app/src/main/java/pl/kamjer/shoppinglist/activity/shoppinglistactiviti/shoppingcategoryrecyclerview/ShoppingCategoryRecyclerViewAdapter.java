@@ -17,12 +17,12 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import pl.kamjer.shoppinglist.R;
+import pl.kamjer.shoppinglist.model.Category;
+import pl.kamjer.shoppinglist.model.ShoppingItemWithAmountTypeAndCategory;
 import pl.kamjer.shoppinglist.util.funcinterface.AddShoppingItemAction;
 import pl.kamjer.shoppinglist.util.funcinterface.ModifyShoppingItemAction;
 import pl.kamjer.shoppinglist.util.funcinterface.RemoveCategoryAction;
 import pl.kamjer.shoppinglist.util.funcinterface.UpdateShoppingItemActonCheckBox;
-import pl.kamjer.shoppinglist.model.Category;
-import pl.kamjer.shoppinglist.model.ShoppingItemWithAmountTypeAndCategory;
 
 @AllArgsConstructor
 @Getter

@@ -35,11 +35,9 @@ public class SSLUtil {
             TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
             trustManagerFactory.init(keyStore);
 
-            // Inicjalizacja SSLContext
             SSLContext sslContext = SSLContext.getInstance("TLS");
             sslContext.init(null, trustManagerFactory.getTrustManagers(), null);
 
-            // Tworzenie OkHttpClient z SSL
             okHttpClient = new OkHttpClient.Builder();
             okHttpClient.hostnameVerifier((hostname, session) -> true);
             okHttpClient.sslSocketFactory(sslContext.getSocketFactory(),

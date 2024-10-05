@@ -12,7 +12,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.Optional;
-import java.util.logging.Level;
 
 import lombok.extern.java.Log;
 import pl.kamjer.shoppinglist.R;
@@ -23,7 +22,6 @@ import pl.kamjer.shoppinglist.model.User;
 import pl.kamjer.shoppinglist.repository.ShoppingServiceRepository;
 import pl.kamjer.shoppinglist.util.exception.NotOkHttpResponseException;
 import pl.kamjer.shoppinglist.util.funcinterface.DeleteUserAction;
-import pl.kamjer.shoppinglist.util.funcinterface.OnFailureAction;
 import pl.kamjer.shoppinglist.util.validation.UserValidator;
 import pl.kamjer.shoppinglist.viewmodel.LoginDialogViewModel;
 
@@ -67,7 +65,7 @@ public class LoginDialogOptionalLogin extends GenericActivity {
         }
         loginDialogViewModel.insertUser(
                 user,
-                () -> ShoppingServiceRepository.getShoppingServiceRepository().reInitializeWithUser(this, user),
+                () -> ShoppingServiceRepository.getShoppingServiceRepository().reInitializeWithUser(this.getApplicationContext(), user),
                 connectionFailedAction);
     };
 
@@ -76,18 +74,18 @@ public class LoginDialogOptionalLogin extends GenericActivity {
     protected final DeleteUserAction logUserAction = this::logUserInAndInitialize;
 
     protected void logUserInAndInitialize(User user) {
-        ShoppingServiceRepository.getShoppingServiceRepository().reInitializeWithUser(getApplicationContext(), user);
+        ShoppingServiceRepository.getShoppingServiceRepository().reInitializeWithUser(this.getApplicationContext(), user);
         loginDialogViewModel.synchronizeData(user,
                 () -> {
                     loginDialogViewModel.insertUser(user);
-                    ShoppingServiceRepository.getShoppingServiceRepository().reInitializeWithUser(getApplicationContext(), user);
+                    ShoppingServiceRepository.getShoppingServiceRepository().reInitializeWithUser(this.getApplicationContext(), user);
                 },
                 () -> createToast(getString(R.string.no_such_user_message)),
                 (t) -> {
                     connectionFailedAction.action(t);
                     if (!(t instanceof NotOkHttpResponseException)) {
                         loginDialogViewModel.insertUser(user);
-                        ShoppingServiceRepository.getShoppingServiceRepository().reInitializeWithUser(getApplicationContext(), user);
+                        ShoppingServiceRepository.getShoppingServiceRepository().reInitializeWithUser(this.getApplicationContext(), user);
                     }
                 });
     }
