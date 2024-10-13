@@ -1,5 +1,8 @@
 package pl.kamjer.shoppinglist.viewmodel;
 
+import android.os.Handler;
+import android.os.Looper;
+
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModel;
@@ -27,8 +30,10 @@ import pl.kamjer.shoppinglist.repository.ShoppingServiceRepository;
 import pl.kamjer.shoppinglist.util.ServiceUtil;
 import pl.kamjer.shoppinglist.util.exception.NoUserFoundException;
 import pl.kamjer.shoppinglist.util.exception.NotOkHttpResponseException;
+import pl.kamjer.shoppinglist.util.exception.WebSocketErrorConnection;
 import pl.kamjer.shoppinglist.util.funcinterface.OnConnectAction;
 import pl.kamjer.shoppinglist.util.funcinterface.OnFailureAction;
+import pl.kamjer.shoppinglist.websocketconnect.funcIntarface.OnMessageAction;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -47,7 +52,7 @@ public class CustomViewModel extends ViewModel {
             @Override
             public void onResponse(@NonNull Call<AllDto> call, @NonNull Response<AllDto> response) {
                 if (response.isSuccessful()) {
-                    synchronizeData(user, response);
+                    synchronizeData(user, Optional.ofNullable(response.body()).orElse(AllDto.builder().build()));
                     successAction.action();
                 } else {
                     failureAction.action();
@@ -73,23 +78,20 @@ public class CustomViewModel extends ViewModel {
     /**
      * Synchronizes data for currently logged user, if user is not logged will throw NoUserFoundException,
      * to avoid this, in a situation call synchronizeData(User user, ...)
-     * @param connectionFailedAction - action for failed connection
      */
-    public void synchronizeData(OnFailureAction connectionFailedAction) {
-        synchronizeData(getUserValue(), () -> {}, () -> {}, connectionFailedAction);
+    public void synchronizeData() {
+        synchronizeData(getUserValue());
     }
 
     /**
      * Method for synchronization for passed user, and act on success or failure
+     *
      * @param user - to synchronize for
-     * @param successAction - action for success with synchronization
-     * @param failureAction - action for failure with synchronization
-     * @param connectionFailedAction - action when connection fails
      */
-    public void synchronizeData(User user, OnConnectAction successAction, OnConnectAction failureAction, OnFailureAction connectionFailedAction) {
+    public void synchronizeData(User user) {
         shoppingRepository.getAllDataAndAct(user, (amountTypes, categories, shoppingItems) -> {
             AllDto allDto = collectEntitiyToAllDto(user, amountTypes, categories, shoppingItems);
-            shoppingServiceRepository.synchronizeData(allDto, synchronizeDataCallback(user, connectionFailedAction, successAction, failureAction));
+            shoppingServiceRepository.websocketSynchronize(allDto, user);
         });
     }
 
@@ -147,9 +149,7 @@ public class CustomViewModel extends ViewModel {
                 .build();
     }
 
-    protected void synchronizeData(User user, Response<AllDto> response) {
-        AllDto responseAllDto = Optional.ofNullable(response.body()).orElse(AllDto.builder().build());
-
+    protected void synchronizeData(User user, AllDto responseAllDto) {
         Map<ModifyState, List<AmountType>> amountTypeListFiltered = Optional.ofNullable(responseAllDto.getAmountTypeDtoList()).orElse(new ArrayList<>())
                 .stream()
                 .collect(Collectors.groupingBy(
@@ -186,5 +186,19 @@ public class CustomViewModel extends ViewModel {
                 })
                 .filter(s -> !s.isEmpty())
                 .orElse(ShoppingServiceRepository.CONNECTION_FAILED_MESSAGE + response.code());
+    }
+
+    public void initializeOnMessageAction(User user, OnMessageAction<String> onErrorAction, OnFailureAction failure) {
+        shoppingServiceRepository.setOnMessageActionSynchronize((webSocket, allDto) ->
+                synchronizeData(user, allDto));
+
+        shoppingServiceRepository.setOnMessageActionPip((webSocket, pip) ->
+                shoppingRepository.getAllDataAndAct(user, (amountTypeList, categoryList, shoppingItemList) ->
+                        shoppingServiceRepository.websocketSynchronize(collectEntitiyToAllDto(user, amountTypeList, categoryList, shoppingItemList), user)));
+
+        shoppingServiceRepository.setOnErrorAction((webSocket, object) -> new Handler(Looper.getMainLooper()).post(() -> onErrorAction.action(webSocket, object)));
+
+        shoppingServiceRepository.setOnFailureAction((webSocket, t) ->
+                failure.action(new WebSocketErrorConnection(t.getMessage())));
     }
 }

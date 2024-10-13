@@ -61,11 +61,11 @@ public class ShoppingListViewModel extends CustomViewModel {
     }
 
     public void updateShoppingItem(ShoppingItem shoppingItem, OnFailureAction action) {
-        shoppingRepository.updateShoppingItemFlag(shoppingItem, () -> synchronizeData(action));
+        shoppingRepository.updateShoppingItemFlag(shoppingItem, () -> synchronizeData());
     }
 
     public void deleteShoppingItem(ShoppingItem shoppingItem, OnFailureAction action) {
-        shoppingRepository.deleteShoppingItemSoftDelete(shoppingItem, () -> synchronizeData(action));
+        shoppingRepository.deleteShoppingItemSoftDelete(shoppingItem, () -> synchronizeData());
     }
 
     public void loadAllCategory() {
@@ -77,18 +77,14 @@ public class ShoppingListViewModel extends CustomViewModel {
     }
 
     public void deleteCategory(Category category, OnFailureAction action) {
-        shoppingRepository.deleteCategorySoft(category, () -> synchronizeData(action));
+        shoppingRepository.deleteCategorySoft(category, () -> synchronizeData());
     }
 
     public void insertCategory(Category category, OnFailureAction action) {
-        shoppingRepository.insertCategory(getUserValue(), category, () -> synchronizeData(action));
+        shoppingRepository.insertCategory(getUserValue(), category, () -> synchronizeData());
     }
 
     public void updateCategory(Category category, OnFailureAction action) {
-        shoppingRepository.updateCategoryFlag(category, () -> synchronizeData(action));
-    }
-
-    public void testWebsocket() {
-        shoppingServiceRepository.sendWensocketTest();
+        shoppingRepository.updateCategoryFlag(category, () -> synchronizeData());
     }
 }

@@ -20,7 +20,6 @@ import pl.kamjer.shoppinglist.activity.ShoppingListActionBar;
 import pl.kamjer.shoppinglist.activity.logindialog.usersrecyclerview.UsersRecyclerViewAdapter;
 import pl.kamjer.shoppinglist.model.User;
 import pl.kamjer.shoppinglist.repository.ShoppingServiceRepository;
-import pl.kamjer.shoppinglist.util.exception.NotOkHttpResponseException;
 import pl.kamjer.shoppinglist.util.funcinterface.DeleteUserAction;
 import pl.kamjer.shoppinglist.util.validation.UserValidator;
 import pl.kamjer.shoppinglist.viewmodel.LoginDialogViewModel;
@@ -63,9 +62,9 @@ public class LoginDialogOptionalLogin extends GenericActivity {
             createToast(getString(R.string.user_name_can_not_be_empty_message));
             return;
         }
+        loginDialogViewModel.initialzeshoppingservicerepository(getApplicationContext());
         loginDialogViewModel.insertUser(
                 user,
-                () -> ShoppingServiceRepository.getShoppingServiceRepository().reInitializeWithUser(this.getApplicationContext(), user),
                 connectionFailedAction);
     };
 
@@ -74,20 +73,7 @@ public class LoginDialogOptionalLogin extends GenericActivity {
     protected final DeleteUserAction logUserAction = this::logUserInAndInitialize;
 
     protected void logUserInAndInitialize(User user) {
-        ShoppingServiceRepository.getShoppingServiceRepository().reInitializeWithUser(this.getApplicationContext(), user);
-        loginDialogViewModel.synchronizeData(user,
-                () -> {
-                    loginDialogViewModel.insertUser(user);
-                    ShoppingServiceRepository.getShoppingServiceRepository().reInitializeWithUser(this.getApplicationContext(), user);
-                },
-                () -> createToast(getString(R.string.no_such_user_message)),
-                (t) -> {
-                    connectionFailedAction.action(t);
-                    if (!(t instanceof NotOkHttpResponseException)) {
-                        loginDialogViewModel.insertUser(user);
-                        ShoppingServiceRepository.getShoppingServiceRepository().reInitializeWithUser(this.getApplicationContext(), user);
-                    }
-                });
+        loginDialogViewModel.insertUser(user);
     }
 
     @Override

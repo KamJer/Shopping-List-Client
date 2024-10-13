@@ -1,7 +1,6 @@
 package pl.kamjer.shoppinglist.repository;
 
 import android.content.Context;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
@@ -26,6 +25,7 @@ import pl.kamjer.shoppinglist.service.service.UtilService;
 import pl.kamjer.shoppinglist.util.ServiceUtil;
 import pl.kamjer.shoppinglist.util.funcinterface.OnConnectAction;
 import pl.kamjer.shoppinglist.websocketconnect.WebSocket;
+import pl.kamjer.shoppinglist.websocketconnect.funcIntarface.OnMessageAction;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -47,11 +47,23 @@ public class ShoppingServiceRepository {
     private UserService userService;
     private UtilService utilService;
 
+    @Getter
     private WebSocket webSocket;
+
+    @Setter
+    private OnMessageAction<AllDto> onMessageActionSynchronize;
+    @Setter
+    private OnMessageAction<String> onMessageActionPip;
+    @Setter
+    private OnMessageAction<String> onErrorAction;
+    @Setter
+    private OnMessageAction<Throwable> onFailureAction;
 
     @Getter
     @Setter
     private boolean initializedWithUser;
+
+    private Gson gson;
 
     public static ShoppingServiceRepository getShoppingServiceRepository() {
         ShoppingServiceRepository result = shoppingServiceRepository;
@@ -82,7 +94,7 @@ public class ShoppingServiceRepository {
     }
 
     public void reInitializeWithUser(Context appContext, User user) {
-        Gson gson = new GsonBuilder()
+        gson = new GsonBuilder()
                 .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeSerializer())
                 .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeDeserializer())
                 .create();
@@ -92,8 +104,10 @@ public class ShoppingServiceRepository {
                 .basicWebsocketHeader()
                 .onOpen((webSocket1, response) -> log.info("open"))
                 .onClosed((webSocket1, code, reason) -> log.info("closed"))
-                .onFailure((webSocket1, t, response) -> log.info(t.getMessage()))
-                .subscribe("test1", "/topic/messages", (webSocket1, text) -> log.info(text))
+                .onFailure((webSocket1, t, response) -> onFailureAction.action(webSocket1, t))
+                .onError((webSocket1, errorMessage) -> onErrorAction.action(webSocket1, errorMessage))
+                .subscribe(gson, "/synchronizeData", AllDto.class, onMessageActionSynchronize)
+                .subscribe(gson, "/{username}/pip", String.class, onMessageActionPip, user.getUserName())
                 .connect(okHttpClient);
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(BASE_URL)
@@ -105,8 +119,8 @@ public class ShoppingServiceRepository {
         initializedWithUser = true;
     }
 
-    public void sendWensocketTest(){
-        webSocket.send("/app/send", "text/plain", "test");
+    public void websocketSynchronize(AllDto allDto, User user) {
+        webSocket.send(gson, "/synchronizeData", allDto, user.getUserName());
     }
 
     private OkHttpClient createClientWithOutUser(Context context) {
@@ -128,7 +142,7 @@ public class ShoppingServiceRepository {
 
     public void synchronizeData(AllDto allDto, Callback<AllDto> callback) {
         Call<AllDto> call = utilService.synchronizeData(allDto);
-//        call.enqueue(callback);
+        call.enqueue(callback);
     }
 
     public void sendLog(ExceptionDto e, OnConnectAction action) {

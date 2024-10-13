@@ -39,8 +39,8 @@ public class AmountTypeViewModel extends CustomViewModel {
         allAmountTypeLiveData.observe(owner, observer);
     }
 
-    public void deleteAmountType(AmountType amountType, OnFailureAction action) {
-        shoppingRepository.deleteAmountTypeSoft(amountType, () -> synchronizeData(action));
+    public void deleteAmountType(AmountType amountType) {
+        shoppingRepository.deleteAmountTypeSoft(amountType, () -> synchronizeData());
     }
 
     public void loadAllShoppingItemsForAmountType(AmountType amountType) {

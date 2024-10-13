@@ -15,10 +15,7 @@ import lombok.extern.java.Log;
 import pl.kamjer.shoppinglist.R;
 import pl.kamjer.shoppinglist.activity.logindialog.LoginDialogForcedLogin;
 import pl.kamjer.shoppinglist.activity.shoppinglistactiviti.ShoppingListActivity;
-import pl.kamjer.shoppinglist.repository.SharedRepository;
-import pl.kamjer.shoppinglist.repository.ShoppingRepository;
 import pl.kamjer.shoppinglist.repository.ShoppingServiceRepository;
-import pl.kamjer.shoppinglist.util.exception.handler.ShoppingListExceptionHandler;
 import pl.kamjer.shoppinglist.util.funcinterface.OnFailureAction;
 import pl.kamjer.shoppinglist.viewmodel.InitializerViewModel;
 
@@ -49,11 +46,7 @@ public class InitializerActivity extends GenericActivity {
         ).get(InitializerViewModel.class);
 
 //        initialize all of a necessary components of an app
-        initializeApp();
-        Thread.setDefaultUncaughtExceptionHandler(new ShoppingListExceptionHandler(
-                getApplicationContext(),
-                ShoppingServiceRepository.getShoppingServiceRepository(),
-                ShoppingRepository.getShoppingRepository().getExecutorService()));
+        initializerViewModel.initialize(getApplicationContext());
 
         initializertextView = findViewById(R.id.initializerLabel);
 
@@ -62,33 +55,20 @@ public class InitializerActivity extends GenericActivity {
             initializerViewModel.setInitializerLabelLiveDataValue(getString(R.string.initializing_connection_to_server_label));
 //            if user is null this means no user data was saved, so it needs to be created and inserted,
             if (user != null) {
-                ShoppingServiceRepository.getShoppingServiceRepository().reInitializeWithUser(this.getApplicationContext(), user);
-                initializerViewModel.synchronizeData(user,
-                        this::startShoppingListActivity
-                        , () -> {
-                            createToast(getString(R.string.such_user_does_not_exist_label));
-//                            if user
+                initializerViewModel.initializeOnMessageAction(user,
+                        (webSocket, object) -> createToast(object),
+                        (t) -> {
+                            createToast(getString(R.string.wrong_user_name_or_password_label));
                             startLogDialog();
-                        },
-                        connectionFailedAction);
+                        });
+                ShoppingServiceRepository.getShoppingServiceRepository().reInitializeWithUser(this.getApplicationContext(), user);
+                initializerViewModel.synchronizeData(user);
+                startShoppingListActivity();
             } else {
                 startLogDialog();
             }
-//            TODO: for testing delete later
-            startShoppingListActivity();
         });
         initializerViewModel.setInitializerLabelLiveDataObserver(this, initializerLabelObserver);
-    }
-
-    private void initializeApp() {
-        initializerViewModel.setInitializerLabelLiveDataValue(getString(R.string.initializing_connection_to_server_label));
-        ShoppingServiceRepository.getShoppingServiceRepository().initialize(getApplicationContext());
-        initializerViewModel.setInitializerLabelLiveDataValue(getString(R.string.initializing_inner_files_label));
-        SharedRepository.getSharedRepository().initialize(getApplicationContext());
-        initializerViewModel.setInitializerLabelLiveDataValue(getString(R.string.initializing_database_label));
-        ShoppingRepository.getShoppingRepository().initialize(
-                getApplicationContext(),
-                ShoppingServiceRepository.getShoppingServiceRepository());
     }
 
     private void startLogDialog() {

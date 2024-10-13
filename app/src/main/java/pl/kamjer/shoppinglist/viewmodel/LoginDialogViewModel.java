@@ -1,5 +1,7 @@
 package pl.kamjer.shoppinglist.viewmodel;
 
+import android.content.Context;
+
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.LiveData;
@@ -34,14 +36,13 @@ public class LoginDialogViewModel extends CustomViewModel {
                     ShoppingServiceRepository.getShoppingServiceRepository(),
                     SharedRepository.getSharedRepository()));
 
-    public void insertUser(User user, OnConnectAction onSuccessAction, OnFailureAction action) {
-        shoppingServiceRepository.insertUser(user, new Callback<LocalDateTime>() {
+    public void insertUser(User user, OnFailureAction action) {
+        shoppingServiceRepository.insertUser(user, new Callback<>() {
             @Override
             public void onResponse(@NonNull Call<LocalDateTime> call, @NonNull Response<LocalDateTime> response) {
                 if (response.isSuccessful()) {
                     user.setSavedTime(response.body());
                     insertUser(user);
-                    onSuccessAction.action();
                 } else {
                     action.action(new NotOkHttpResponseException(decodeErrorMassage(response)));
                 }
@@ -57,7 +58,6 @@ public class LoginDialogViewModel extends CustomViewModel {
     public void insertUser(User user) {
         sharedRepository.insertUser(user);
         shoppingRepository.insertUser(user);
-
     }
 
     public void loadAllUsers() {
@@ -71,5 +71,9 @@ public class LoginDialogViewModel extends CustomViewModel {
     public void deleteUser(User user) {
         sharedRepository.deleteUser();
         shoppingRepository.deleteUser(user);
+    }
+
+    public void initialzeshoppingservicerepository(Context applicationContext) {
+        shoppingServiceRepository.initialize(applicationContext);
     }
 }

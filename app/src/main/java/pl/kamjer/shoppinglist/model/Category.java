@@ -25,8 +25,7 @@ import lombok.Setter;
                         parentColumns = "user_name",
                         childColumns = "user_name",
                         onDelete = ForeignKey.CASCADE)
-        },
-        indices = {@Index(value = {"category_id"}, unique = true)}
+        }
 )
 public class Category implements Serializable {
 

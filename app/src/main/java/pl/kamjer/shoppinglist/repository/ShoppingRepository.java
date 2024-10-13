@@ -144,8 +144,7 @@ public class ShoppingRepository {
 
     public void updateShoppingItemFlag(ShoppingItem shoppingItem, LoadToServerAction action) {
         executorService.execute(() -> {
-            shoppingItem.setUpdated(true);
-            shoppingItemDao.updateShoppingItem(shoppingItem);
+            shoppingItemDao.updateShoppingItemFlag(shoppingItem);
             action.action();
         });
     }
@@ -224,11 +223,12 @@ public class ShoppingRepository {
 
     public void updateAmountType(AmountType amountType, LoadToServerAction action) {
         executorService.execute(() -> {
-            amountTypeDao.updateAmountType(amountType);
+            amountTypeDao.updateAmountTypeFlag(amountType);
             action.action();
         });
     }
 
+    //util
     public void getAllDataAndAct(User user, PostNewElements action) {
         executorService.execute(() ->
                 action.action(

@@ -44,7 +44,9 @@ public interface ShoppingItemDao {
 
     @Transaction
     default void updateShoppingItemFlag(ShoppingItem shoppingItem) {
-        shoppingItem.setUpdated(true);
+        if (shoppingItem.getShoppingItemId() != 0) {
+            shoppingItem.setUpdated(true);
+        }
         updateShoppingItem(shoppingItem);
     }
 

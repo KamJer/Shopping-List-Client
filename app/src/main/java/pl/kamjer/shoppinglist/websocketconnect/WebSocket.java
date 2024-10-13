@@ -2,40 +2,45 @@ package pl.kamjer.shoppinglist.websocketconnect;
 
 import androidx.lifecycle.MutableLiveData;
 
-import java.nio.charset.StandardCharsets;
+import com.google.gson.Gson;
+
+import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.NoSuchElementException;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
-import okio.ByteString;
 import pl.kamjer.shoppinglist.websocketconnect.funcIntarface.OnClosedAction;
 import pl.kamjer.shoppinglist.websocketconnect.funcIntarface.OnFailureAction;
 import pl.kamjer.shoppinglist.websocketconnect.funcIntarface.OnMessageAction;
 import pl.kamjer.shoppinglist.websocketconnect.funcIntarface.OnOpenAction;
+import pl.kamjer.shoppinglist.websocketconnect.message.Command;
+import pl.kamjer.shoppinglist.websocketconnect.message.Header;
+import pl.kamjer.shoppinglist.websocketconnect.message.Message;
+import pl.kamjer.shoppinglist.websocketconnect.message.SubscribeMessage;
 
 @RequiredArgsConstructor
 @Getter
 @Log
 public class WebSocket {
 
-    protected static final String NOT_OPEN_EXCEPTION_MESSAGE = "Connection not open";
-    protected static final String NO_SUCH_SUBS_EXCEPTION_MESSAGE = "There is no subscription with such id";
+    private static final String NOT_OPEN_EXCEPTION_MESSAGE = "Connection not open";
+    private static final String NO_SUCH_SUBS_EXCEPTION_MESSAGE = "There is no subscription with such id";
 
-    protected final Request.Builder request;
-    protected final String baseUrl;
-    protected final WebSocketConnectorListener webSocketListener;
-    protected final MutableLiveData<HashMap<String, SubscribeMessage>> subscribeMessagesLiveData;
-    protected final MutableLiveData<LinkedList<SendMessage>> messageQueueLiveData;
-    private final MutableLiveData<Boolean> openLiveData;
-    private boolean connected;
+    private final Request.Builder request;
+    private final String baseUrl;
+    private final WebSocketConnectorListener webSocketListener;
+    private final MutableLiveData<HashMap<String, SubscribeMessage>> subscribeMessagesLiveData;
+    private final MutableLiveData<LinkedList<Message>> messageQueueLiveData;
+    private final MutableLiveData<Message> connectedLiveData;
+    private final OnMessageHolder onMessageHolder;
 
-    protected okhttp3.WebSocket okHttpWebSocket;
+    private okhttp3.WebSocket okHttpWebSocket;
 
     public WebSocket(String baseUrl) {
         this(new Request.Builder(),
@@ -43,33 +48,30 @@ public class WebSocket {
                 new WebSocketConnectorListener(),
                 new MutableLiveData<>(new HashMap<>()),
                 new MutableLiveData<>(new LinkedList<>()),
-                new MutableLiveData<>(false));
-
-        webSocketListener.setOnOpenActionDefault((webSocket, response) -> openLiveData.postValue(true));
-        webSocketListener.setOnClosedActionDefault((webSocket, code, reason) -> openLiveData.postValue(false));
-        webSocketListener.setOnFailureActionDefault((webSocket, t, reason) -> openLiveData.postValue(false));
+                new MutableLiveData<>(),
+                new OnMessageHolder(new HashMap<>(), new HashMap<>(), null));
 
         request.url(baseUrl);
     }
 
-    protected void sendSavedSubs(HashMap<String, SubscribeMessage> subscribeMessages) {
+
+
+    void sendSavedSubs(HashMap<String, SubscribeMessage> subscribeMessages) {
         Optional.ofNullable(okHttpWebSocket).ifPresent(webSocket ->
-                subscribeMessages.values()
-                        .forEach(subscribeMessage -> {
+                subscribeMessages.values().forEach(subscribeMessage -> {
                             if (subscribeMessage.isSend() && subscribeMessage.isUnsubscribed()) {
                                 log.info("Sending message by websocket connection:\n" +
-                                        subscribeMessage.getUnsubscribeMessage() + "\n" +
-                                        subscribeMessage.getByteUnsubscribeMessage());
-                                if (webSocket.send(subscribeMessage.getByteUnsubscribeMessage())) {
+                                        subscribeMessage.getUnsubscribeMessage() + "\n");
+                                if (webSocket.send(subscribeMessage.getUnsubscribeMessage())) {
                                     subscribeMessage.setSend(false);
                                     subscribeMessage.setUnsubscribed(true);
-                                    subscribeMessages.remove(subscribeMessage.getId());
+                                    subscribeMessages.remove(subscribeMessage);
+                                    getOnMessageHolder().getOnMessageActionsForSubs().remove(subscribeMessage.getBaseUrl());
                                 }
                             } else if (!subscribeMessage.isSend()) {
                                 log.info("Sending message by websocket connection:\n" +
-                                        subscribeMessage.getSubscribeMessage() + "\n" +
-                                        subscribeMessage.getByteSubscribeMessage());
-                                if (webSocket.send(subscribeMessage.getByteSubscribeMessage())) {
+                                        subscribeMessage.getSubscribeMessage() + "\n");
+                                if (webSocket.send(subscribeMessage.getSubscribeMessage())) {
                                     subscribeMessage.setSend(true);
                                     subscribeMessage.setUnsubscribed(false);
                                 }
@@ -77,9 +79,9 @@ public class WebSocket {
                         }));
     }
 
-    protected void sendMessage(SendMessage sendMessage) {
-        log.info("Sending message by websocket connection:\n" + sendMessage.getMessage() + "\n" + sendMessage.getByteMessage());
-        Optional.ofNullable(okHttpWebSocket).ifPresent(webSocket -> webSocket.send(sendMessage.getByteMessage()));
+    private void sendMessage(Message message) {
+        log.info("Sending message by websocket connection:\n" + message.jsonyfy());
+        Optional.ofNullable(okHttpWebSocket).ifPresent(webSocket -> webSocket.send(message.jsonyfy()));
     }
 
     public WebSocket basicWebsocketHeader() {
@@ -98,35 +100,31 @@ public class WebSocket {
 
     public WebSocket connect(OkHttpClient okHttpClient) {
         subscribeMessagesLiveData.observeForever(subscribeMessages -> {
-            if (getOpenValue()) {
+            if (getOpenValue().isPresent()) {
                 sendSavedSubs(subscribeMessages);
             }
         });
-        openLiveData.observeForever(open -> {
-            if (open) {
-                if (!connected) {
-                    sendConnectMessage();
-                    connected = true;
-                }
+        connectedLiveData.observeForever(open -> {
+            if (open != null) {
                 sendSavedSubs(getSubscribeMessageValue());
-                LinkedList<SendMessage> sendMessages = getStompMessagesValue();
+                LinkedList<Message> sendMessages = getStompMessagesValue();
                 while (!sendMessages.isEmpty()) {
-                    sendMessage(sendMessages.poll());
+                    Message message = sendMessages.poll();
+                    message.getHeaders().put(Header.ID, getOpenValue().orElseThrow(() -> new NoSuchElementException(NOT_OPEN_EXCEPTION_MESSAGE)).getHeaders().get(Header.ID));
+                    sendMessage(message);
                 }
             }
         });
         messageQueueLiveData.observeForever(sendMessages -> {
-            if (getOpenValue()) {
+            if (getOpenValue().isPresent()) {
                 while (!sendMessages.isEmpty()) {
-                    sendMessage(sendMessages.poll());
+                    Message message = sendMessages.poll();
+                    message.getHeaders().put(Header.ID, getOpenValue().orElseThrow(() -> new NoSuchElementException(NOT_OPEN_EXCEPTION_MESSAGE)).getHeaders().get(Header.ID));
+                    sendMessage(message);
                 }
             }
         });
-        webSocketListener.setOnMassageActions(getSubscribeMessageValue()
-                .values()
-                .stream()
-                .map(SubscribeMessage::getOnMessageAction)
-                .collect(Collectors.toList()));
+        webSocketListener.setMessageBroker(new MessageBroker(getSubscribeMessageValue(), connectedLiveData, onMessageHolder));
         okHttpWebSocket = okHttpClient.newWebSocket(request.build(), webSocketListener);
         return this;
     }
@@ -161,13 +159,46 @@ public class WebSocket {
         return this;
     }
 
-    public WebSocket subscribe(String id, String subscribeUrl, OnMessageAction onMassageAction) {
-        addSubscribeMessagesValue(new SubscribeMessage(id, subscribeUrl, onMassageAction, false, false));
+    public WebSocket onError(OnMessageAction<String> action) {
+        getOnMessageHolder().setOnErrorAction(action);
         return this;
     }
 
-    public WebSocket unsubscribe(String id) {
-        Optional.ofNullable(getSubscribeMessageValue().get(id))
+    /**
+     * Method for subscribing a topic on a service, creates new gson object
+     * @param subscribeUrl - url of a topic
+     * @param type - type of a field topic will return
+     * @param onMassageAction - action on a message
+     * @return websocket
+     */
+    public WebSocket subscribe(String subscribeUrl, Type type, OnMessageAction<?> onMassageAction) {
+        subscribe(new Gson(), subscribeUrl, type, onMassageAction);
+        return this;
+    }
+
+    /**
+     * Subscribes topic on a service, takes gson as a parameter allowing definition of a gson with its own deserialization and serialization
+     * @param gson - Gson object for deserialization and serialization
+     * @param subscribeUrl - url of a topic
+     * @param type - type of a field topic will return
+     * @param onMassageAction - action on a message
+     * @return websocket
+     */
+    public WebSocket subscribe(Gson gson, String subscribeUrl, Type type, OnMessageAction<?> onMassageAction, String... parameters) {
+        SubscribeMessage subscribeMessage = new SubscribeMessage(subscribeUrl, type, false, false, parameters);
+        if (parameters.length > 0) {
+            getOnMessageHolder().addOnMessageAction(subscribeMessage.getParameterUrl(), onMassageAction);
+            getOnMessageHolder().getGsonsForSubs().put(subscribeMessage.getParameterUrl(), gson);
+        } else {
+            getOnMessageHolder().addOnMessageAction(subscribeMessage.getBaseUrl(), onMassageAction);
+            getOnMessageHolder().getGsonsForSubs().put(subscribeMessage.getBaseUrl(), gson);
+        }
+        addSubscribeMessagesValue(subscribeMessage);
+        return this;
+    }
+
+    public WebSocket unsubscribe(String subscribeUrl) {
+        Optional.ofNullable(getSubscribeMessageValue().get(subscribeUrl))
                 .map(subscribeMessage -> {
                     subscribeMessage.setUnsubscribed(true);
                     return subscribeMessage;
@@ -177,49 +208,41 @@ public class WebSocket {
         return this;
     }
 
-    public WebSocket sendJson(String url, String payload) {
-        addMessage(new SendMessage(url, "application/json", payload));
+    public WebSocket send(Gson gson, String dest, Object body, String... parameters) {
+        HashMap<Header, String> headers = new HashMap<>();
+        headers.put(Header.DEST, dest);
+        headers.put(Header.BODY, gson.toJson(body));
+        StringBuilder parameterBuilder = new StringBuilder();
+        for (String parameter: parameters) {
+            parameterBuilder.append(parameter).append(";");
+        }
+        headers.put(Header.PARA, parameterBuilder.toString());
+        addMessage(new Message(Command.MESSAGE, headers));
         return this;
     }
 
-    public WebSocket send(String url, String contentType, String payload) {
-        addMessage(new SendMessage(url, contentType, payload));
-        return this;
-    }
-
-    protected HashMap<String, SubscribeMessage> getSubscribeMessageValue() {
+    private HashMap<String, SubscribeMessage> getSubscribeMessageValue() {
         return Optional.ofNullable(subscribeMessagesLiveData.getValue()).orElse(new HashMap<>());
     }
 
-    protected void addSubscribeMessagesValue(SubscribeMessage subscribeMessage) {
+    private void addSubscribeMessagesValue(SubscribeMessage subscribeMessage) {
         HashMap<String, SubscribeMessage> subscribeMessageList = getSubscribeMessageValue();
-        subscribeMessageList.put(subscribeMessage.getId(), subscribeMessage);
+        subscribeMessageList.put(subscribeMessage.getSubscribeUrl(), subscribeMessage);
         subscribeMessagesLiveData.postValue(subscribeMessageList);
     }
 
-    protected Boolean getOpenValue() {
-        return Optional.ofNullable(openLiveData.getValue()).orElse(false);
+    private Optional<Message> getOpenValue() {
+        return Optional.ofNullable(connectedLiveData.getValue());
     }
 
-    protected LinkedList<SendMessage> getStompMessagesValue() {
+    private LinkedList<Message> getStompMessagesValue() {
         return Optional.ofNullable(messageQueueLiveData.getValue()).orElse(new LinkedList<>());
     }
 
-    protected void addMessage(SendMessage stompMessage) {
-        LinkedList<SendMessage> stompMessages = getStompMessagesValue();
-        stompMessages.add(stompMessage);
-        messageQueueLiveData.postValue(stompMessages);
+    private void addMessage(Message message) {
+        LinkedList<Message> messages = getStompMessagesValue();
+        messages.add(message);
+        messageQueueLiveData.postValue(messages);
     }
 
-    protected void sendConnectMessage() {
-        String message = "CONNECT" + System.lineSeparator() +
-                "accept-version:1.2" + System.lineSeparator() +
-                "host:stomp.github.org" + System.lineSeparator() +
-                System.lineSeparator() +
-                (char) 0;
-        ByteString byteMessage = ByteString.encodeString(message,
-                StandardCharsets.UTF_8);
-        log.info(message + "\n" + byteMessage);
-        okHttpWebSocket.send(byteMessage);
-    }
 }

@@ -37,18 +37,18 @@ public class BoughtShoppingItemListActivity extends AppCompatActivity {
 
 
     private final ModifyShoppingItemAction deleteShoppingItemAction = shoppingItemWithAmountTypeAndCategory -> {
-      boughtShoppingItemsListViewModel.deleteShoppingItem(shoppingItemWithAmountTypeAndCategory.getShoppingItem(), connectionFailedAction);
+      boughtShoppingItemsListViewModel.deleteShoppingItem(shoppingItemWithAmountTypeAndCategory.getShoppingItem());
     };
 
     private final ModifyShoppingItemAction modifyShoppingItemAction = shoppingItemWithAmountTypeAndCategory -> {
-      boughtShoppingItemsListViewModel.deleteShoppingItem(shoppingItemWithAmountTypeAndCategory.getShoppingItem(), connectionFailedAction);
+      boughtShoppingItemsListViewModel.deleteShoppingItem(shoppingItemWithAmountTypeAndCategory.getShoppingItem());
     };
 
     private final UpdateShoppingItemActonCheckBox checkBoxListener = (isChecked, shoppingItemWithAmountTypeAndCategory) -> {
         ShoppingItem shoppingItem = shoppingItemWithAmountTypeAndCategory.getShoppingItem();
         shoppingItem.setBought(isChecked);
         shoppingItem.setMovedToBought(isChecked);
-        boughtShoppingItemsListViewModel.updateShoppingItem(shoppingItem, connectionFailedAction);
+        boughtShoppingItemsListViewModel.updateShoppingItem(shoppingItem);
     };
 
     @Override

@@ -47,12 +47,10 @@ public class NewShoppingItemDialogViewModel extends CustomViewModel{
     }
 
     public void insertShoppingItem(ShoppingItem shoppingItem, OnFailureAction action) {
-        shoppingRepository.insertShoppingItem(getUserValue(), shoppingItem, () ->
-                synchronizeData(action));
+        shoppingRepository.insertShoppingItem(getUserValue(), shoppingItem, this::synchronizeData);
     }
 
     public void updateShoppingItem(ShoppingItem shoppingItem, OnFailureAction action) {
-        shoppingRepository.updateShoppingItemFlag(shoppingItem, () ->
-                synchronizeData(action));
+        shoppingRepository.updateShoppingItemFlag(shoppingItem, this::synchronizeData);
     }
 }

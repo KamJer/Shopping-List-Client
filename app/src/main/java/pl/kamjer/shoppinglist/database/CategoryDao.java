@@ -24,7 +24,9 @@ public interface CategoryDao {
 
     @Transaction
     default void updateCategoryFlag(Category category) {
-        category.setUpdated(true);
+        if (category.getCategoryId() != 0) {
+            category.setUpdated(true);
+        }
         updateCategory(category);
     }
 

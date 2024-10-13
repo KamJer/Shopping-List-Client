@@ -41,7 +41,7 @@ public class AmountTypeListActivity extends GenericActivity {
             public void onChanged(List<ShoppingItem> shoppingItems) {
 //            if data for that amountType is empty ust delete amountType if it is not as user what to do with data data
                 if (shoppingItems.isEmpty()) {
-                    amountTypeViewModel.deleteAmountType(amountType, connectionFailedAction);
+                    amountTypeViewModel.deleteAmountType(amountType);
                 } else {
                     Intent createNewCategoryIntent = new Intent(AmountTypeListActivity.this, AmountTypeDeleteConflictDialog.class);
                     createNewCategoryIntent.putExtra(AmountTypeDeleteConflictDialog.SELECTED_AMOUNT_TYPE_FIELD, amountType);

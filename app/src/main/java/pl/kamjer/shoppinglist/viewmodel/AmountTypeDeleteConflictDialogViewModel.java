@@ -42,11 +42,11 @@ public class AmountTypeDeleteConflictDialogViewModel extends CustomViewModel{
         amountTypesLiveData.observe(owner, observer);
     }
 
-    public void deleteShoppingItemsForAmountType(AmountType amountType, OnFailureAction action) {
-        shoppingRepository.deleteShoppingItemsSoftDeleteAndDeleteAmountType(amountType, () -> synchronizeData(action));
+    public void deleteShoppingItemsForAmountType(AmountType amountType) {
+        shoppingRepository.deleteShoppingItemsSoftDeleteAndDeleteAmountType(amountType, this::synchronizeData);
     }
 
-    public void updateShoppingItemsAmountTypeAndDeleteAmountType(AmountType amountTypeToDelete, AmountType amountTypeToChange, OnFailureAction action) {
-        shoppingRepository.updateShoppingItemsAmountTypeAndDeleteAmountType(amountTypeToDelete, amountTypeToChange, () -> synchronizeData(action));
+    public void updateShoppingItemsAmountTypeAndDeleteAmountType(AmountType amountTypeToDelete, AmountType amountTypeToChange) {
+        shoppingRepository.updateShoppingItemsAmountTypeAndDeleteAmountType(amountTypeToDelete, amountTypeToChange, this::synchronizeData);
     }
 }

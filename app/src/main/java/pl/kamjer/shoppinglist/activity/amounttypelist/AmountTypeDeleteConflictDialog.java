@@ -33,14 +33,14 @@ public class AmountTypeDeleteConflictDialog extends GenericActivity {
 
 
     protected View.OnClickListener deleteItemsButtonAction = v -> {
-        amountTypeDeleteConflictDialogViewModel.deleteShoppingItemsForAmountType(selectedAmountType, connectionFailedAction);
+        amountTypeDeleteConflictDialogViewModel.deleteShoppingItemsForAmountType(selectedAmountType);
         this.finish();
     };
 
     protected View.OnClickListener cancelDeletingButtonAction = v -> this.finish();
 
     protected View.OnClickListener acceptNewAmountTypeButtonAction = v -> {
-        amountTypeDeleteConflictDialogViewModel.updateShoppingItemsAmountTypeAndDeleteAmountType(selectedAmountType, (AmountType) newAmountTypeSpinner.getSelectedItem(), connectionFailedAction);
+        amountTypeDeleteConflictDialogViewModel.updateShoppingItemsAmountTypeAndDeleteAmountType(selectedAmountType, (AmountType) newAmountTypeSpinner.getSelectedItem());
         this.finish();
     };
 

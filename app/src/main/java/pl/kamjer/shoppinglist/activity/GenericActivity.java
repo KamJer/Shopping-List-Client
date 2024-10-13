@@ -22,7 +22,6 @@ public class GenericActivity extends AppCompatActivity {
             };
 
     protected void createToast(String s) {
-        Toast.makeText(this, s, Toast.LENGTH_LONG).show();
+        Toast.makeText(getApplicationContext(), s, Toast.LENGTH_LONG).show();
     }
-
 }

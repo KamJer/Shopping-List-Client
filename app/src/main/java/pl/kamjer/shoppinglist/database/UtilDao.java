@@ -233,8 +233,12 @@ public interface UtilDao {
             shoppingItem.setDeleted(true);
             updateShoppingItem(shoppingItem);
         });
-        category.setDeleted(true);
-        updateCategory(category);
+        if (category.getCategoryId() != 0) {
+            category.setDeleted(true);
+            updateCategory(category);
+        } else {
+            deleteCategory(category);
+        }
     }
 
     @Query("SELECT * FROM SHOPPING_ITEM WHERE local_item_category_id=:localCategoryId")

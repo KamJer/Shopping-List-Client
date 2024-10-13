@@ -7,7 +7,7 @@ import lombok.Getter;
 @AllArgsConstructor
 @Builder
 @Getter
-public class UserDto {
+public class UserDto extends Dto{
 
     private String userName;
     private String password;

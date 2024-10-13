@@ -25,7 +25,9 @@ public interface AmountTypeDao {
 
     @Transaction
     default void updateAmountTypeFlag(AmountType amountType) {
-        amountType.setUpdated(true);
+        if (amountType.getAmountTypeId() != 0) {
+            amountType.setUpdated(true);
+        }
         updateAmountType(amountType);
     }
     @Update

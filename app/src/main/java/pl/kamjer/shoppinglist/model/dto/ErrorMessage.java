@@ -7,7 +7,7 @@ import lombok.ToString;
 @Getter
 @AllArgsConstructor
 @ToString
-public class ErrorMessage {
+public class ErrorMessage extends Dto{
     private String field;
     private String message;
 }

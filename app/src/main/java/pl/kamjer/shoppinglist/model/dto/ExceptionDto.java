@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Builder
 @Getter
-public class ExceptionDto {
+public class ExceptionDto extends Dto{
     private String massage;
     private StackTraceElement[] stackTrace;
 }

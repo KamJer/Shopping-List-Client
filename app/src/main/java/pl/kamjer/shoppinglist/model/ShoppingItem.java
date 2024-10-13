@@ -34,8 +34,7 @@ import lombok.Setter;
                         parentColumns = "user_name",
                         childColumns = "user_name",
                         onDelete = ForeignKey.CASCADE)
-        },
-        indices = {@Index(value = {"item_amount_type_id", "shopping_item_id", "item_category_id"}, unique = true)}
+        }
 )
 public class ShoppingItem implements Serializable {
     @ColumnInfo(name = "local_shopping_item_id")

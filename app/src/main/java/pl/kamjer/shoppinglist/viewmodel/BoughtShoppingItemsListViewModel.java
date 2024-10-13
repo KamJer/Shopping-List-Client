@@ -45,12 +45,12 @@ public class BoughtShoppingItemsListViewModel extends CustomViewModel {
         this.allShoppingItemWithAmountTypeAndCategoryLiveData.observe(owner, observer);
     }
 
-    public void updateShoppingItem(ShoppingItem shoppingItem, OnFailureAction action) {
-        shoppingRepository.updateShoppingItemFlag(shoppingItem, () -> synchronizeData(action));
+    public void updateShoppingItem(ShoppingItem shoppingItem) {
+        shoppingRepository.updateShoppingItemFlag(shoppingItem, this::synchronizeData);
     }
 
-    public void deleteShoppingItem(ShoppingItem shoppingItem, OnFailureAction action) {
-        shoppingRepository.deleteShoppingItemSoftDelete(shoppingItem, () -> synchronizeData(action));
+    public void deleteShoppingItem(ShoppingItem shoppingItem) {
+        shoppingRepository.deleteShoppingItemSoftDelete(shoppingItem, this::synchronizeData);
     }
 
     public void loadAllCategory() {

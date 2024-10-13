@@ -8,7 +8,7 @@ import pl.kamjer.shoppinglist.model.ModifyState;
 @AllArgsConstructor
 @Builder
 @Getter
-public class CategoryDto {
+public class CategoryDto extends Dto {
 
     private long categoryId;
     private String categoryName;

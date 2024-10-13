@@ -25,9 +25,7 @@ import lombok.Setter;
                         parentColumns = "user_name",
                         childColumns = "user_name",
                         onDelete = ForeignKey.CASCADE)
-        },
-        indices = {@Index(value = {"amount_type_id"}, unique = true)}
-)
+        })
 public class AmountType implements Serializable {
 
     @ColumnInfo(name = "local_amount_type_id")

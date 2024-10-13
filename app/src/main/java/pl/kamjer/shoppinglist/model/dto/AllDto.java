@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-public class AllDto {
+public class AllDto extends Dto {
 
     private List<AmountTypeDto> amountTypeDtoList;
     private List<CategoryDto> categoryDtoList;
