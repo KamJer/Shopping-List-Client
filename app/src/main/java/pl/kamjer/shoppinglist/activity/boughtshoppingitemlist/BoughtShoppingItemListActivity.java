@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,19 +30,19 @@ public class BoughtShoppingItemListActivity extends AppCompatActivity {
 
     private RecyclerView boughtShoppingItemsListRecyclerView;
 
-    private List<Category> allCategories;
-    private List<ShoppingItemWithAmountTypeAndCategory> allShoppingWithAmountTypeAndCategories;
+    private List<Category> allCategories = new ArrayList<>();
+    private List<ShoppingItemWithAmountTypeAndCategory> allShoppingWithAmountTypeAndCategories = new ArrayList<>();
 
     private final OnFailureAction connectionFailedAction =
             (t) -> createToast(Optional.ofNullable(t).map(Throwable::getMessage).orElse("could not found reason for error"));
 
 
     private final ModifyShoppingItemAction deleteShoppingItemAction = shoppingItemWithAmountTypeAndCategory -> {
-      boughtShoppingItemsListViewModel.deleteShoppingItem(shoppingItemWithAmountTypeAndCategory.getShoppingItem());
+        boughtShoppingItemsListViewModel.deleteShoppingItem(shoppingItemWithAmountTypeAndCategory.getShoppingItem());
     };
 
     private final ModifyShoppingItemAction modifyShoppingItemAction = shoppingItemWithAmountTypeAndCategory -> {
-      boughtShoppingItemsListViewModel.deleteShoppingItem(shoppingItemWithAmountTypeAndCategory.getShoppingItem());
+        boughtShoppingItemsListViewModel.deleteShoppingItem(shoppingItemWithAmountTypeAndCategory.getShoppingItem());
     };
 
     private final UpdateShoppingItemActonCheckBox checkBoxListener = (isChecked, shoppingItemWithAmountTypeAndCategory) -> {

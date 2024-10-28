@@ -47,6 +47,7 @@ public class CustomViewModel extends ViewModel {
 
     protected LiveData<User> userLiveData;
 
+    @Deprecated
     protected Callback<AllDto> synchronizeDataCallback(User user, OnFailureAction connectionFailedAction, OnConnectAction successAction, OnConnectAction failureAction) {
         return new Callback<AllDto>() {
             @Override
@@ -196,9 +197,12 @@ public class CustomViewModel extends ViewModel {
                 shoppingRepository.getAllDataAndAct(user, (amountTypeList, categoryList, shoppingItemList) ->
                         shoppingServiceRepository.websocketSynchronize(collectEntitiyToAllDto(user, amountTypeList, categoryList, shoppingItemList), user)));
 
-        shoppingServiceRepository.setOnErrorAction((webSocket, object) -> new Handler(Looper.getMainLooper()).post(() -> onErrorAction.action(webSocket, object)));
+        shoppingServiceRepository.setOnErrorAction((webSocket, object) ->
+                new Handler(Looper.getMainLooper()).post(() -> onErrorAction.action(webSocket, object)));
 
         shoppingServiceRepository.setOnFailureAction((webSocket, t) ->
                 failure.action(new WebSocketErrorConnection(t.getMessage())));
     }
+
+
 }

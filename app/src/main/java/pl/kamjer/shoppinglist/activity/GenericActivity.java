@@ -9,6 +9,7 @@ import java.util.logging.Level;
 
 import lombok.extern.java.Log;
 import pl.kamjer.shoppinglist.R;
+import pl.kamjer.shoppinglist.repository.ShoppingServiceRepository;
 import pl.kamjer.shoppinglist.util.funcinterface.OnFailureAction;
 
 @Log

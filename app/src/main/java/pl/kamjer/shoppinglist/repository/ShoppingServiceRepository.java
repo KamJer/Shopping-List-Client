@@ -37,7 +37,7 @@ public class ShoppingServiceRepository {
 
     public static final String CONNECTION_FAILED_MESSAGE = "Connection failed: Http code:";
 
-//    private static final String BASE_URL = "https://35.212.210.42";
+//    private static final String IP = "35.212.210.42";
     private static final String IP = "192.168.0.13";
     private static final String BASE_URL = "https://" + IP;
     private static final String WEBSOCKET_BASE_URL = "wss://" + IP;

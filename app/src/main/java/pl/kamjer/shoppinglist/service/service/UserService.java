@@ -14,7 +14,4 @@ public interface UserService {
 
     @POST("/user")
     Call<LocalDateTime> postUser(@Body UserDto user);
-
-    @GET("/user/log/{userName}")
-    Call<AllDto> logUser(@Path("userName") String userName);
 }

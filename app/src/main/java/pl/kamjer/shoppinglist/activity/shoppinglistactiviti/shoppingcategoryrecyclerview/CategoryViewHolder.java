@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 
 import pl.kamjer.shoppinglist.R;
+import pl.kamjer.shoppinglist.activity.shoppinglistactiviti.shoppingitemrecyclerview.ShoppingItemLinearLayoutMenager;
 import pl.kamjer.shoppinglist.activity.shoppinglistactiviti.shoppingitemrecyclerview.ShoppingItemRecyclerViewAdapter;
 import pl.kamjer.shoppinglist.model.Category;
 import pl.kamjer.shoppinglist.model.ShoppingItemWithAmountTypeAndCategory;
@@ -45,7 +46,7 @@ public class CategoryViewHolder extends RecyclerView.ViewHolder {
                      ModifyShoppingItemAction deleteShoppingItemAction,
                      ModifyShoppingItemAction modifyShoppingItemAction) {
         categoryNameTextView.setText(category.getCategoryName());
-        shoppingItemsRecyclerView.setLayoutManager(new LinearLayoutManager(itemView.getContext()));
+        shoppingItemsRecyclerView.setLayoutManager(new ShoppingItemLinearLayoutMenager(itemView.getContext()));
         ShoppingItemRecyclerViewAdapter shoppingItemRecyclerViewAdapter = new ShoppingItemRecyclerViewAdapter(shoppingItemWithAmountTypeAndCategories,
                 checkBoxListener,
                 deleteShoppingItemAction,

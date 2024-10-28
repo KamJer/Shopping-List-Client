@@ -58,8 +58,8 @@ public class InitializerActivity extends GenericActivity {
                 initializerViewModel.initializeOnMessageAction(user,
                         (webSocket, object) -> createToast(object),
                         (t) -> {
-                            createToast(getString(R.string.wrong_user_name_or_password_label));
-                            startLogDialog();
+                            createToast(t.getMessage());
+//                            startLogDialog();
                         });
                 ShoppingServiceRepository.getShoppingServiceRepository().reInitializeWithUser(this.getApplicationContext(), user);
                 initializerViewModel.synchronizeData(user);
