@@ -1,12 +1,17 @@
 package pl.kamjer.shoppinglist.activity.shoppinglistactiviti.newshoppingitemdialog;
 
 import android.os.Bundle;
+import android.widget.ArrayAdapter;
 
 import androidx.annotation.Nullable;
 
 import java.util.Optional;
+import java. util. List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import pl.kamjer.shoppinglist.model.ShoppingItem;
+import pl.kamjer.shoppinglist.model.AmountType;
 
 public class UpdateShoppingItemDialog extends NewShoppingItemDialog{
 
@@ -23,7 +28,19 @@ public class UpdateShoppingItemDialog extends NewShoppingItemDialog{
 
             shoppingItemEditText.setText(shoppingItem.getItemName());
             amountEditText.setText(String.valueOf(shoppingItem.getAmount()));
+
+            newShoppingItemDialogViewModel.setAmountTypesListLiveDataObserver(this, amountTypes -> {
+                amountTypeSpinner.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, amountTypes));
+                amountTypeSpinner.setSelection(findIndex(amountTypes, shoppingItemToUpdate.getLocalItemAmountTypeId()).orElseThrow(IllegalStateException::new));
+            });
         });
+    }
+
+    private Optional<Integer> findIndex(List<AmountType> objects, long localId) {
+        return Optional.of(objects.stream().map(AmountType::getLocalAmountTypeId)
+                .collect(Collectors.toList())
+                .indexOf(localId))
+                .filter(integer -> integer >= 0);
     }
 
     @Override

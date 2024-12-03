@@ -33,7 +33,7 @@ public class WebSocketConnectorListener extends WebSocketListener {
     protected OnClosedAction onClosingAction;
     protected OnClosedAction onClosedAction;
     protected OnFailureAction onFailureAction;
-
+    private Gson gson;
 
 
     @Override
@@ -44,7 +44,7 @@ public class WebSocketConnectorListener extends WebSocketListener {
 
     @Override
     public void onMessage(@NonNull WebSocket webSocket, @NonNull String text) {
-        Message message = new Gson().fromJson(text, Message.class);
+        Message message = gson.fromJson(text, Message.class);
         messageBroker.directMessage(webSocket, message);
     }
 

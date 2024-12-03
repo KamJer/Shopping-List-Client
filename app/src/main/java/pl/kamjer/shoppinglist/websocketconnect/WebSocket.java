@@ -125,6 +125,7 @@ public class WebSocket {
             }
         });
         webSocketListener.setMessageBroker(new MessageBroker(getSubscribeMessageValue(), connectedLiveData, onMessageHolder));
+        webSocketListener.setGson(new Gson());
         okHttpWebSocket = okHttpClient.newWebSocket(request.build(), webSocketListener);
         return this;
     }

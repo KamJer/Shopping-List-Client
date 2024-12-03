@@ -88,6 +88,7 @@ public class LoginDialogOptionalLogin extends GenericActivity {
 
         loginDialogViewModel.loadAllUsers();
 
+//        setting action bar
         shoppingListActionBar = findViewById(R.id.appBar);
         setSupportActionBar(shoppingListActionBar.getToolbar());
         Optional.ofNullable(getSupportActionBar()).ifPresent(actionBar -> actionBar.setDisplayHomeAsUpEnabled(true));

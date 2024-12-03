@@ -13,6 +13,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.java.Log;
 import okhttp3.OkHttpClient;
+import pl.kamjer.shoppinglist.R;
 import pl.kamjer.shoppinglist.gsonconverter.LocalDateTimeDeserializer;
 import pl.kamjer.shoppinglist.gsonconverter.LocalDateTimeSerializer;
 import pl.kamjer.shoppinglist.model.User;
@@ -37,10 +38,9 @@ public class ShoppingServiceRepository {
 
     public static final String CONNECTION_FAILED_MESSAGE = "Connection failed: Http code:";
 
-//    private static final String IP = "35.212.210.42";
-    private static final String IP = "192.168.0.13";
-    private static final String BASE_URL = "https://" + IP;
-    private static final String WEBSOCKET_BASE_URL = "wss://" + IP;
+    private String ip;
+    private String baseUrl = "https://";
+    private String websocketBaseUrl = "wss://";
 
     private static ShoppingServiceRepository shoppingServiceRepository;
 
@@ -78,14 +78,15 @@ public class ShoppingServiceRepository {
         }
     }
 
-    public void initialize(Context context) {
+    public void initialize(Context appContext) {
+        ip = appContext.getResources().getString(R.string.ip);
         Gson gson = new GsonBuilder()
                 .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeSerializer())
                 .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeDeserializer())
                 .create();
-        OkHttpClient okHttpClient = createClientWithOutUser(context);
+        OkHttpClient okHttpClient = createClientWithOutUser(appContext);
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(BASE_URL)
+                .baseUrl(baseUrl + ip)
                 .client(okHttpClient)
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .build();
@@ -100,7 +101,7 @@ public class ShoppingServiceRepository {
                 .create();
         OkHttpClient okHttpClient = createClient(appContext, user);
 
-        webSocket = new WebSocket(WEBSOCKET_BASE_URL + "/ws")
+        webSocket = new WebSocket(websocketBaseUrl + ip + "/ws")
                 .basicWebsocketHeader()
                 .onOpen((webSocket1, response) -> log.info("open"))
                 .onClosed((webSocket1, code, reason) -> log.info("closed"))
@@ -110,7 +111,7 @@ public class ShoppingServiceRepository {
                 .subscribe(gson, "/{username}/pip", String.class, onMessageActionPip, user.getUserName())
                 .connect(okHttpClient);
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(BASE_URL)
+                .baseUrl(baseUrl + ip)
                 .client(okHttpClient)
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .build();
