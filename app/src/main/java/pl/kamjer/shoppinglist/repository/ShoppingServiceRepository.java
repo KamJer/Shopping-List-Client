@@ -23,6 +23,7 @@ import pl.kamjer.shoppinglist.service.BasicAuthInterceptor;
 import pl.kamjer.shoppinglist.service.SSLUtil;
 import pl.kamjer.shoppinglist.service.service.UserService;
 import pl.kamjer.shoppinglist.service.service.UtilService;
+import pl.kamjer.shoppinglist.util.NetworkReceiver;
 import pl.kamjer.shoppinglist.util.ServiceUtil;
 import pl.kamjer.shoppinglist.util.funcinterface.OnConnectAction;
 import pl.kamjer.shoppinglist.websocketconnect.WebSocket;
@@ -108,8 +109,7 @@ public class ShoppingServiceRepository {
                 .onFailure((webSocket1, t, response) -> onFailureAction.action(webSocket1, t))
                 .onError((webSocket1, errorMessage) -> onErrorAction.action(webSocket1, errorMessage))
                 .subscribe(gson, "/synchronizeData", AllDto.class, onMessageActionSynchronize)
-                .subscribe(gson, "/{username}/pip", String.class, onMessageActionPip, user.getUserName())
-                .connect(okHttpClient);
+                .subscribe(gson, "/{username}/pip", String.class, onMessageActionPip, user.getUserName());
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(baseUrl + ip)
                 .client(okHttpClient)
@@ -118,6 +118,16 @@ public class ShoppingServiceRepository {
         userService = retrofit.create(UserService.class);
         utilService = retrofit.create(UtilService.class);
         initializedWithUser = true;
+
+        NetworkReceiver.register(appContext,
+                network -> {
+                    log.info("connected");
+                    webSocket.connect(okHttpClient);
+                },
+                network -> {
+                    log.info("lost");
+                    webSocket.disconnect();
+                });
     }
 
     public void websocketSynchronize(AllDto allDto, User user) {

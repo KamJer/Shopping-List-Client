@@ -7,16 +7,15 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.viewmodel.ViewModelInitializer;
 
+import lombok.extern.java.Log;
 import pl.kamjer.shoppinglist.R;
 import pl.kamjer.shoppinglist.model.User;
 import pl.kamjer.shoppinglist.repository.SharedRepository;
 import pl.kamjer.shoppinglist.repository.ShoppingRepository;
 import pl.kamjer.shoppinglist.repository.ShoppingServiceRepository;
-import pl.kamjer.shoppinglist.util.exception.WebSocketErrorConnection;
 import pl.kamjer.shoppinglist.util.exception.handler.ShoppingListExceptionHandler;
-import pl.kamjer.shoppinglist.util.funcinterface.OnConnectAction;
-import pl.kamjer.shoppinglist.util.funcinterface.OnFailureAction;
 
+@Log
 public class InitializerViewModel extends CustomViewModel {
 
     private final MutableLiveData<String> initializerLabelLiveData;

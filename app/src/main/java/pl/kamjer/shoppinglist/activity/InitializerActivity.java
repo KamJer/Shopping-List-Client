@@ -1,7 +1,6 @@
 package pl.kamjer.shoppinglist.activity;
 
 import android.content.Intent;
-import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.widget.TextView;
 
@@ -15,10 +14,6 @@ import pl.kamjer.shoppinglist.activity.logindialog.LoginDialogForcedLogin;
 import pl.kamjer.shoppinglist.activity.shoppinglistactiviti.ShoppingListActivity;
 import pl.kamjer.shoppinglist.repository.ShoppingServiceRepository;
 import pl.kamjer.shoppinglist.viewmodel.InitializerViewModel;
-
-import android.net.Network;
-import android.net.NetworkCapabilities;
-import android.net.NetworkRequest;
 
 @Log
 public class InitializerActivity extends GenericActivity {
@@ -53,7 +48,6 @@ public class InitializerActivity extends GenericActivity {
                         (webSocket, object) -> createToast(object),
                         (t) -> {
                             createToast(t.getMessage());
-//                            startLogDialog();
                         });
                 ShoppingServiceRepository.getShoppingServiceRepository().reInitializeWithUser(this.getApplicationContext(), user);
                 initializerViewModel.synchronizeData(user);

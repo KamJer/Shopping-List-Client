@@ -1,6 +1,10 @@
 package pl.kamjer.shoppinglist.websocketconnect;
 
+import android.os.Handler;
+import android.os.Looper;
+
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Observer;
 
 import com.google.gson.Gson;
 
@@ -98,45 +102,63 @@ public class WebSocket {
         return this;
     }
 
+    private Observer<HashMap<String, SubscribeMessage>> subscribeMessagesLiveDataObserver = subscribeMessages -> {
+        if (getOpenValue().isPresent()) {
+            sendSavedSubs(subscribeMessages);
+        }
+    };
+
+    private Observer<Message> connectedLiveDataObserver = open -> {
+        if (open != null) {
+            sendSavedSubs(getSubscribeMessageValue());
+            LinkedList<Message> sendMessages = getStompMessagesValue();
+            while (!sendMessages.isEmpty()) {
+                Message message = sendMessages.poll();
+                message.getHeaders().put(Header.ID, getOpenValue().orElseThrow(() -> new NoSuchElementException(NOT_OPEN_EXCEPTION_MESSAGE)).getHeaders().get(Header.ID));
+                sendMessage(message);
+            }
+        }
+    };
+
+    private Observer<LinkedList<Message>> messageQueueLiveDataObserver = sendMessages -> {
+        if (getOpenValue().isPresent()) {
+            while (!sendMessages.isEmpty()) {
+                Message message = sendMessages.poll();
+                message.getHeaders().put(Header.ID, getOpenValue().orElseThrow(() -> new NoSuchElementException(NOT_OPEN_EXCEPTION_MESSAGE)).getHeaders().get(Header.ID));
+                sendMessage(message);
+            }
+        }
+    };
+
     public WebSocket connect(OkHttpClient okHttpClient) {
-        subscribeMessagesLiveData.observeForever(subscribeMessages -> {
-            if (getOpenValue().isPresent()) {
-                sendSavedSubs(subscribeMessages);
-            }
+//        makes sure that observers are set on main thread
+        new Handler(Looper.getMainLooper()).post(() -> {
+            subscribeMessagesLiveData.observeForever(subscribeMessagesLiveDataObserver);
+            connectedLiveData.observeForever(connectedLiveDataObserver);
+            messageQueueLiveData.observeForever(messageQueueLiveDataObserver);
+
+            webSocketListener.setMessageBroker(new MessageBroker(getSubscribeMessageValue(), connectedLiveData, onMessageHolder));
+            webSocketListener.setGson(new Gson());
+            okHttpWebSocket = okHttpClient.newWebSocket(request.build(), webSocketListener);
         });
-        connectedLiveData.observeForever(open -> {
-            if (open != null) {
-                sendSavedSubs(getSubscribeMessageValue());
-                LinkedList<Message> sendMessages = getStompMessagesValue();
-                while (!sendMessages.isEmpty()) {
-                    Message message = sendMessages.poll();
-                    message.getHeaders().put(Header.ID, getOpenValue().orElseThrow(() -> new NoSuchElementException(NOT_OPEN_EXCEPTION_MESSAGE)).getHeaders().get(Header.ID));
-                    sendMessage(message);
-                }
-            }
-        });
-        messageQueueLiveData.observeForever(sendMessages -> {
-            if (getOpenValue().isPresent()) {
-                while (!sendMessages.isEmpty()) {
-                    Message message = sendMessages.poll();
-                    message.getHeaders().put(Header.ID, getOpenValue().orElseThrow(() -> new NoSuchElementException(NOT_OPEN_EXCEPTION_MESSAGE)).getHeaders().get(Header.ID));
-                    sendMessage(message);
-                }
-            }
-        });
-        webSocketListener.setMessageBroker(new MessageBroker(getSubscribeMessageValue(), connectedLiveData, onMessageHolder));
-        webSocketListener.setGson(new Gson());
-        okHttpWebSocket = okHttpClient.newWebSocket(request.build(), webSocketListener);
         return this;
+    }
+
+    private void unregisterObservers() {
+        subscribeMessagesLiveData.removeObserver(subscribeMessagesLiveDataObserver);
+        connectedLiveData.removeObserver(connectedLiveDataObserver);
+        messageQueueLiveData.removeObserver(messageQueueLiveDataObserver);
     }
 
     public WebSocket disconnect() {
         okHttpWebSocket.close(1000, "finished");
+        unregisterObservers();
         return this;
     }
 
     public WebSocket disconnect(int code, String reason) {
         okHttpWebSocket.close(code, reason);
+        unregisterObservers();
         return this;
     }
 
