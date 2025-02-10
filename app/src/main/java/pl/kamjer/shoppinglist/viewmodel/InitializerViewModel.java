@@ -62,6 +62,4 @@ public class InitializerViewModel extends CustomViewModel {
     public void setInitializerLabelLiveDataObserver(LifecycleOwner owner, Observer<String> observer) {
         initializerLabelLiveData.observe(owner, observer);
     }
-
-
 }

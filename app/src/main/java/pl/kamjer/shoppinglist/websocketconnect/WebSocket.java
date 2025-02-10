@@ -47,18 +47,16 @@ public class WebSocket {
     private okhttp3.WebSocket okHttpWebSocket;
 
     public WebSocket(String baseUrl) {
-        this(new Request.Builder(),
-                baseUrl,
-                new WebSocketConnectorListener(),
-                new MutableLiveData<>(new HashMap<>()),
-                new MutableLiveData<>(new LinkedList<>()),
-                new MutableLiveData<>(),
-                new OnMessageHolder(new HashMap<>(), new HashMap<>(), null));
+        this.request = new Request.Builder();
+        this.baseUrl = baseUrl;
+        this.webSocketListener = new WebSocketConnectorListener();
+        this.subscribeMessagesLiveData = new MutableLiveData<>(new HashMap<>());
+        this.messageQueueLiveData = new MutableLiveData<>(new LinkedList<>());
+        this.connectedLiveData =new MutableLiveData<>();
+        this.onMessageHolder =new OnMessageHolder(new HashMap<>(), new HashMap<>(), null);
 
         request.url(baseUrl);
     }
-
-
 
     void sendSavedSubs(HashMap<String, SubscribeMessage> subscribeMessages) {
         Optional.ofNullable(okHttpWebSocket).ifPresent(webSocket ->
@@ -108,8 +106,9 @@ public class WebSocket {
         }
     };
 
-    private Observer<Message> connectedLiveDataObserver = open -> {
-        if (open != null) {
+    private Observer<Message> connectedLiveDataObserver = openMessage -> {
+//        if message is not null it means connection was successful
+        if (openMessage != null) {
             sendSavedSubs(getSubscribeMessageValue());
             LinkedList<Message> sendMessages = getStompMessagesValue();
             while (!sendMessages.isEmpty()) {
@@ -117,6 +116,9 @@ public class WebSocket {
                 message.getHeaders().put(Header.ID, getOpenValue().orElseThrow(() -> new NoSuchElementException(NOT_OPEN_EXCEPTION_MESSAGE)).getHeaders().get(Header.ID));
                 sendMessage(message);
             }
+        } else {
+//            if received connect message is null unregister all observers
+            unregisterObservers();
         }
     };
 
@@ -152,13 +154,13 @@ public class WebSocket {
 
     public WebSocket disconnect() {
         okHttpWebSocket.close(1000, "finished");
-        unregisterObservers();
+        connectedLiveData.postValue(null);
         return this;
     }
 
     public WebSocket disconnect(int code, String reason) {
         okHttpWebSocket.close(code, reason);
-        unregisterObservers();
+        connectedLiveData.postValue(null);
         return this;
     }
 

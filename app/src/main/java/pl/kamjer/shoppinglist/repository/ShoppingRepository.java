@@ -71,7 +71,6 @@ public class ShoppingRepository {
 
     /**
      * Method for initializing shopping database repository
-     *
      * @param appContext                - context of an app
      * @param shoppingServiceRepository - initialized repository for a server, necessary for sending exceptions to the server
      */
@@ -121,12 +120,6 @@ public class ShoppingRepository {
 
     public void setLoggedUser(User user) {
         userLiveData.postValue(user);
-    }
-
-    public void updateUser(User user) {
-        executorService.execute(() -> {
-            userDao.updateUser(user);
-        });
     }
 
     //    ShoppingItem

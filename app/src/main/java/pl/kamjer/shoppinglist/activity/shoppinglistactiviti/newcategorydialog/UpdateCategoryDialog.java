@@ -29,6 +29,8 @@ public class UpdateCategoryDialog extends NewCategoryDialog {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setTitle(R.string.modify_category_dialog_title);
+
         acceptNewCategoryNameImageButton.setOnClickListener(updateCategoryAction);
 
         try {

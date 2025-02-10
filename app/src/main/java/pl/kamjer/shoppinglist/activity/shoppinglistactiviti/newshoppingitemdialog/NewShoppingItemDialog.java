@@ -84,6 +84,8 @@ public class NewShoppingItemDialog extends GenericActivity {
         newShoppingItemDialogViewModel.loadAllAmountTypes();
         newShoppingItemDialogViewModel.loadAllCategory();
 
+        setTitle(R.string.new_item_dialog_title);
+
         amountTypeSpinner = findViewById(R.id.amountTypeSpinner);
 
         Category category = (Category) getIntent().getSerializableExtra(CATEGORY_FIELD_NAME);

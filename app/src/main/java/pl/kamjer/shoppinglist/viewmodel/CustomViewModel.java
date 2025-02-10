@@ -78,7 +78,7 @@ public class CustomViewModel extends ViewModel {
 
     /**
      * Synchronizes data for currently logged user, if user is not logged will throw NoUserFoundException,
-     * to avoid this, in a situation call synchronizeData(User user, ...)
+     * to avoid this, in a situation call synchronizeData(User user)
      */
     public void synchronizeData() {
         synchronizeData(getUserValue());
@@ -86,7 +86,6 @@ public class CustomViewModel extends ViewModel {
 
     /**
      * Method for synchronization for passed user, and act on success or failure
-     *
      * @param user - to synchronize for
      */
     public void synchronizeData(User user) {
@@ -190,12 +189,9 @@ public class CustomViewModel extends ViewModel {
     }
 
     public void initializeOnMessageAction(User user, OnMessageAction<String> onErrorAction, OnFailureAction failure) {
-        shoppingServiceRepository.setOnMessageActionSynchronize((webSocket, allDto) ->
-                synchronizeData(user, allDto));
+        shoppingServiceRepository.setOnMessageActionSynchronize((webSocket, allDto) -> synchronizeData(user, allDto));
 
-        shoppingServiceRepository.setOnMessageActionPip((webSocket, pip) ->
-                shoppingRepository.getAllDataAndAct(user, (amountTypeList, categoryList, shoppingItemList) ->
-                        shoppingServiceRepository.websocketSynchronize(collectEntitiyToAllDto(user, amountTypeList, categoryList, shoppingItemList), user)));
+        shoppingServiceRepository.setOnMessageActionPip((webSocket, pip) -> shoppingRepository.getAllDataAndAct(user, (amountTypeList, categoryList, shoppingItemList) -> shoppingServiceRepository.websocketSynchronize(collectEntitiyToAllDto(user, amountTypeList, categoryList, shoppingItemList), user)));
 
         shoppingServiceRepository.setOnErrorAction((webSocket, object) ->
                 new Handler(Looper.getMainLooper()).post(() -> onErrorAction.action(webSocket, object)));

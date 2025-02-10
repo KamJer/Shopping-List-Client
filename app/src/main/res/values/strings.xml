@@ -30,4 +30,11 @@
     <string name="no_amount_type_selected_message">Nie wybrano typu</string>
     <string name="user_name_can_not_be_empty_message">Nazwa użytkownika nie może być pusta</string>
     <string name="no_such_user_message">Nie ma takiego użytkownika</string>
+    <string name="item_name_edit_text_hint">Nazwa produktu</string>
+    <string name="category_name_edit_text_hint">Nazwa kategorii</string>
+    <string name="item_amount_edit_text_hint">Ilość do kupienia</string>
+    <string name="new_item_dialog_title">Dodaj nowy produkt</string>"
+    <string name="modify_item_dialog_title">Zmień istniejący produkt</string>"
+    <string name="new_category_dialog_title">Dodaj nową kategorię</string>"
+    <string name="modify_category_dialog_title">Zmień istniejącą kategorię</string>"
 </resources>

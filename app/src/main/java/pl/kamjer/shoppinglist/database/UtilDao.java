@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
 import pl.kamjer.shoppinglist.model.AmountType;
@@ -23,6 +25,8 @@ import pl.kamjer.shoppinglist.util.exception.NoUserFoundException;
 
 @Dao
 public interface UtilDao {
+
+    Lock lock = new ReentrantLock();
 
     @Transaction
     @Query("SELECT * FROM AMOUNT_TYPE")
@@ -46,13 +50,16 @@ public interface UtilDao {
     Long insertShoppingItems(ShoppingItem shoppingItem);
 
     @Delete
-    void deleteAmountType(AmountType amountType);
+    void deleteListAmountType(List<AmountType> amountType);
+
+    @Delete
+    void deleteListCategory(List<Category> category);
 
     @Delete
     void deleteCategory(Category category);
 
     @Delete
-    void deleteShoppingItem(ShoppingItem shoppingItem);
+    void deleteListShoppingItem(List<ShoppingItem> shoppingItem);
 
     @Update
     void updateShoppingItem(ShoppingItem shoppingItems);
@@ -68,87 +75,101 @@ public interface UtilDao {
 
     @Transaction
     default void insertAllElements(List<AmountType> amountTypes, List<Category> categories, List<ShoppingItem> shoppingItems) {
-        List<AmountType> amountTypesFromDb = loadAllAmountType();
-        List<Category> categoriesFromDb = loadAllCategories();
-        List<ShoppingItem> shoppingItemsFromDb = loadAllShoppingItems();
+        lock.lock();
+        try {
+            List<AmountType> amountTypesFromDb = loadAllAmountType();
+            List<Category> categoriesFromDb = loadAllCategories();
+            List<ShoppingItem> shoppingItemsFromDb = loadAllShoppingItems();
 
-        amountTypes.forEach(amountType -> {
-            if (!amountTypesFromDb.stream().map(AmountType::getAmountTypeId).collect(Collectors.toList()).contains(amountType.getAmountTypeId())) {
-                amountType.setLocalAmountTypeId(insertAmountTypes(amountType));
-                amountTypesFromDb.add(amountType);
-            }
-        });
-        categories.forEach(category -> {
-            if (!categoriesFromDb.stream().map(Category::getCategoryId).collect(Collectors.toList()).contains(category.getCategoryId())) {
-                category.setLocalCategoryId(insertCategories(category));
-                categoriesFromDb.add(category);
-            }
-        });
+            amountTypes.forEach(amountType -> {
+                if (!amountTypesFromDb.stream().map(AmountType::getAmountTypeId).collect(Collectors.toList()).contains(amountType.getAmountTypeId())) {
+                    amountType.setLocalAmountTypeId(insertAmountTypes(amountType));
+                    amountTypesFromDb.add(amountType);
+                }
+            });
+            categories.forEach(category -> {
+                if (!categoriesFromDb.stream().map(Category::getCategoryId).collect(Collectors.toList()).contains(category.getCategoryId())) {
+                    category.setLocalCategoryId(insertCategories(category));
+                    categoriesFromDb.add(category);
+                }
+            });
 
-        shoppingItems
-                .forEach(shoppingItem -> {
-                    shoppingItem.setLocalItemAmountTypeId(getLocalAmountTypeIdForShoppingItem(amountTypesFromDb, shoppingItem));
-                    shoppingItem.setLocalItemCategoryId(getLocalCategoryIdForShoppingItem(categoriesFromDb, shoppingItem));
-                    if (!shoppingItemsFromDb.stream().map(ShoppingItem::getShoppingItemId).collect(Collectors.toList()).contains(shoppingItem.getShoppingItemId())) {
-                        shoppingItem.setLocalShoppingItemId(insertShoppingItems(shoppingItem));
-                    }
-                });
+            shoppingItems
+                    .forEach(shoppingItem -> {
+                        shoppingItem.setLocalItemAmountTypeId(getLocalAmountTypeIdForShoppingItem(amountTypesFromDb, shoppingItem));
+                        shoppingItem.setLocalItemCategoryId(getLocalCategoryIdForShoppingItem(categoriesFromDb, shoppingItem));
+                        if (!shoppingItemsFromDb.stream().map(ShoppingItem::getShoppingItemId).collect(Collectors.toList()).contains(shoppingItem.getShoppingItemId())) {
+                            shoppingItem.setLocalShoppingItemId(insertShoppingItems(shoppingItem));
+                        }
+                    });
+        } finally {
+            lock.unlock();
+        }
     }
 
     @Transaction
     default void deleteAllElements(List<AmountType> amountTypes, List<Category> categories, List<ShoppingItem> shoppingItems) {
-        List<AmountType> amountTypesFromDb = loadAllAmountType();
-        List<Category> categoriesFromDb = loadAllCategories();
-        List<ShoppingItem> shoppingItemsFromDb = loadAllShoppingItems();
+        lock.lock();
+        try {
+            List<AmountType> amountTypesFromDb = loadAllAmountType();
+            List<Category> categoriesFromDb = loadAllCategories();
+            List<ShoppingItem> shoppingItemsFromDb = loadAllShoppingItems();
 
-        shoppingItems.forEach(shoppingItem -> {
-            shoppingItem.setLocalItemAmountTypeId(getLocalAmountTypeIdForShoppingItem(amountTypesFromDb, shoppingItem));
-            shoppingItem.setLocalItemCategoryId(getLocalCategoryIdForShoppingItem(categoriesFromDb, shoppingItem));
-            shoppingItem.setLocalShoppingItemId(getLocalShoppingItemIdForShoppingItem(shoppingItemsFromDb, shoppingItem));
-            deleteShoppingItem(shoppingItem);
-        });
-        amountTypes.forEach(amountType -> {
-            amountType.setLocalAmountTypeId(getLocalAmountTypeId(amountTypesFromDb, amountType));
-            deleteAmountType(amountType);
-        });
-        categories.forEach(category -> {
-            category.setLocalCategoryId(getLocalCategoryId(categoriesFromDb, category));
-            deleteCategory(category);
-        });
-
+            shoppingItems.forEach(shoppingItem -> {
+                shoppingItem.setLocalItemAmountTypeId(getLocalAmountTypeIdForShoppingItem(amountTypesFromDb, shoppingItem));
+                shoppingItem.setLocalItemCategoryId(getLocalCategoryIdForShoppingItem(categoriesFromDb, shoppingItem));
+                shoppingItem.setLocalShoppingItemId(getLocalShoppingItemIdForShoppingItem(shoppingItemsFromDb, shoppingItem));
+            });
+            deleteListShoppingItem(shoppingItems);
+            amountTypes.forEach(amountType -> {
+                amountType.setLocalAmountTypeId(getLocalAmountTypeId(amountTypesFromDb, amountType));
+            });
+            deleteListAmountType(amountTypes);
+            categories.forEach(category -> {
+                category.setLocalCategoryId(getLocalCategoryId(categoriesFromDb, category));
+            });
+            deleteListCategory(categories);
+        } finally {
+            lock.unlock();
+        }
     }
 
     @Transaction
     default void updateAllElements(List<AmountType> amountTypes, List<Category> categories, List<ShoppingItem> shoppingItems) {
-        List<AmountType> amountTypesFromDb = loadAllAmountType();
-        List<Category> categoriesFromDb = loadAllCategories();
-        List<ShoppingItem> shoppingItemsFromDb = loadAllShoppingItems();
+        lock.lock();
+        try {
+            List<AmountType> amountTypesFromDb = loadAllAmountType();
+            List<Category> categoriesFromDb = loadAllCategories();
+            List<ShoppingItem> shoppingItemsFromDb = loadAllShoppingItems();
 
-        amountTypes.forEach(amountType -> {
-            if (amountType.getLocalAmountTypeId() == 0L) {
-                amountType.setLocalAmountTypeId(getLocalAmountTypeId(amountTypesFromDb, amountType));
-            }
-            amountType.setUpdated(false);
-            updateAmountType(amountType);
-        });
-        categories.forEach(category -> {
-            if (category.getLocalCategoryId() == 0L) {
-                category.setLocalCategoryId(getLocalCategoryId(categoriesFromDb, category));
-            }
-            category.setUpdated(false);
-            updateCategory(category);
-        });
+            amountTypes.forEach(amountType -> {
+                if (amountType.getLocalAmountTypeId() == 0L) {
+                    amountType.setLocalAmountTypeId(getLocalAmountTypeId(amountTypesFromDb, amountType));
+                }
+                amountType.setUpdated(false);
+                updateAmountType(amountType);
+            });
+            categories.forEach(category -> {
+                if (category.getLocalCategoryId() == 0L) {
+                    category.setLocalCategoryId(getLocalCategoryId(categoriesFromDb, category));
+                }
+                category.setUpdated(false);
+                updateCategory(category);
+            });
 
-        shoppingItems.forEach(shoppingItem -> {
+            shoppingItems.forEach(shoppingItem -> {
 //            this item necessary has this amountTypes in a database if it does not it need to throw exception
-            shoppingItem.setLocalItemAmountTypeId(getLocalAmountTypeIdForShoppingItem(amountTypesFromDb, shoppingItem));
-            shoppingItem.setLocalItemCategoryId(getLocalCategoryIdForShoppingItem(categoriesFromDb, shoppingItem));
-            if (shoppingItem.getLocalShoppingItemId() == 0L) {
-                shoppingItem.setLocalShoppingItemId(getLocalShoppingItemIdForShoppingItem(shoppingItemsFromDb, shoppingItem));
-            }
-            shoppingItem.setUpdated(false);
-            updateShoppingItem(shoppingItem);
-        });
+                shoppingItem.setLocalItemAmountTypeId(getLocalAmountTypeIdForShoppingItem(amountTypesFromDb, shoppingItem));
+                shoppingItem.setLocalItemCategoryId(getLocalCategoryIdForShoppingItem(categoriesFromDb, shoppingItem));
+                if (shoppingItem.getLocalShoppingItemId() == 0L) {
+                    shoppingItem.setLocalShoppingItemId(getLocalShoppingItemIdForShoppingItem(shoppingItemsFromDb, shoppingItem));
+                }
+                shoppingItem.setUpdated(false);
+                updateShoppingItem(shoppingItem);
+            });
+        } finally {
+            lock.unlock();
+        }
     }
 
     @Transaction
@@ -229,7 +250,7 @@ public interface UtilDao {
 
     @Transaction
     default void deleteCategorySoft(Category category) {
-        findAllShoppingItemsForCategory(category.getLocalCategoryId()).forEach(shoppingItem-> {
+        findAllShoppingItemsForCategory(category.getLocalCategoryId()).forEach(shoppingItem -> {
             shoppingItem.setDeleted(true);
             updateShoppingItem(shoppingItem);
         });

@@ -28,6 +28,7 @@ public class NewCategoryDialog extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.new_category_dialog_layout);
+        setTitle(R.string.new_category_dialog_title);
         newCategoryNameEditText = findViewById(R.id.newCategoryNameEditText);
         acceptNewCategoryNameImageButton = findViewById(R.id.acceptNewCategoryNameImageButton);
         acceptNewCategoryNameImageButton.setOnClickListener(acceptNewCategoryNameAction);

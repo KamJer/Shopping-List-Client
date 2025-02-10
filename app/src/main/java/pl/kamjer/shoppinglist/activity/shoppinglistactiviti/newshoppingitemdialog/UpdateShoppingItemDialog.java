@@ -5,13 +5,13 @@ import android.widget.ArrayAdapter;
 
 import androidx.annotation.Nullable;
 
+import java.util.List;
 import java.util.Optional;
-import java. util. List;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
-import pl.kamjer.shoppinglist.model.ShoppingItem;
+import pl.kamjer.shoppinglist.R;
 import pl.kamjer.shoppinglist.model.AmountType;
+import pl.kamjer.shoppinglist.model.ShoppingItem;
 
 public class UpdateShoppingItemDialog extends NewShoppingItemDialog{
 
@@ -22,6 +22,8 @@ public class UpdateShoppingItemDialog extends NewShoppingItemDialog{
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        setTitle(R.string.modify_item_dialog_title);
 
         Optional.ofNullable((ShoppingItem) getIntent().getSerializableExtra(SELECTED_SHOPPING_ITEM)).ifPresent(shoppingItem -> {
             shoppingItemToUpdate = shoppingItem;
