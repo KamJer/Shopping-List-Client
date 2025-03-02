@@ -27,6 +27,7 @@ import pl.kamjer.shoppinglist.util.NetworkReceiver;
 import pl.kamjer.shoppinglist.util.ServiceUtil;
 import pl.kamjer.shoppinglist.util.funcinterface.OnConnectAction;
 import pl.kamjer.shoppinglist.websocketconnect.WebSocket;
+import pl.kamjer.shoppinglist.websocketconnect.funcIntarface.OnConnectChangeAction;
 import pl.kamjer.shoppinglist.websocketconnect.funcIntarface.OnMessageAction;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -59,6 +60,8 @@ public class ShoppingServiceRepository {
     private OnMessageAction<String> onErrorAction;
     @Setter
     private OnMessageAction<Throwable> onFailureAction;
+    @Setter
+    private OnConnectChangeAction onConnectChangeAction;
 
     @Getter
     @Setter
@@ -104,8 +107,7 @@ public class ShoppingServiceRepository {
 
         webSocket = new WebSocket(websocketBaseUrl + ip + "/ws")
                 .basicWebsocketHeader()
-                .onOpen((webSocket1, response) -> log.info("open"))
-                .onClosed((webSocket1, code, reason) -> log.info("closed"))
+                .onConnectAction((connected) -> onConnectChangeAction.action(connected))
                 .onFailure((webSocket1, t, response) -> onFailureAction.action(webSocket1, t))
                 .onError((webSocket1, errorMessage) -> onErrorAction.action(webSocket1, errorMessage))
                 .subscribe(gson, "/synchronizeData", AllDto.class, onMessageActionSynchronize)

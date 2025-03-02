@@ -23,16 +23,28 @@
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
 
         <ImageButton
-            android:id="@+id/boughtListButton"
+            android:id="@+id/connectionIndicationImageButton"
             android:layout_width="?attr/actionBarSize"
             android:layout_height="?attr/actionBarSize"
-            android:contentDescription="@string/todo"
-            android:scaleX="0.75"
-            android:scaleY="0.75"
+            android:background="@drawable/baseline_circle_24"
             android:layout_alignParentEnd="true"
             android:layout_alignParentTop="true"
             android:layout_alignParentBottom="true"
-            android:background="@drawable/baseline_shopping_cart_checkout_24" />
+            android:contentDescription="@string/todo"
+            android:scaleX="0.25"
+            android:scaleY="0.25" />
+
+        <ImageButton
+            android:id="@+id/boughtListButton"
+            android:layout_width="?attr/actionBarSize"
+            android:layout_height="?attr/actionBarSize"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentBottom="true"
+            android:layout_toStartOf="@+id/connectionIndicationImageButton"
+            android:background="@drawable/baseline_shopping_cart_checkout_24"
+            android:contentDescription="@string/todo"
+            android:scaleX="0.75"
+            android:scaleY="0.75" />
 
         <ImageButton
             android:id="@+id/amountTypeListButton"

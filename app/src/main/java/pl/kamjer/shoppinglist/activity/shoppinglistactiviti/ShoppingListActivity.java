@@ -29,7 +29,6 @@ import pl.kamjer.shoppinglist.activity.shoppinglistactiviti.newcategorydialog.Up
 import pl.kamjer.shoppinglist.activity.shoppinglistactiviti.newshoppingitemdialog.NewShoppingItemDialog;
 import pl.kamjer.shoppinglist.activity.shoppinglistactiviti.newshoppingitemdialog.UpdateShoppingItemDialog;
 import pl.kamjer.shoppinglist.activity.shoppinglistactiviti.shoppingcategoryrecyclerview.ShoppingCategoryRecyclerViewAdapter;
-import pl.kamjer.shoppinglist.activity.shoppinglistactiviti.shoppingitemrecyclerview.ShoppingItemLinearLayoutMenager;
 import pl.kamjer.shoppinglist.model.Category;
 import pl.kamjer.shoppinglist.model.ShoppingItem;
 import pl.kamjer.shoppinglist.model.ShoppingItemWithAmountTypeAndCategory;
@@ -111,8 +110,11 @@ public class ShoppingListActivity extends GenericActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.shopping_list_activity_layout);
+
         getOnBackPressedDispatcher().addCallback(this, onBack);
+
         shoppingListViewModel = new ViewModelProvider(
                 this,
                 ViewModelProvider.Factory.from(ShoppingListViewModel.initializer)
@@ -125,6 +127,7 @@ public class ShoppingListActivity extends GenericActivity {
         shoppingItemWithAmountTypeAndCategoriesList = new ArrayList<>();
 //        finding view elements
         ShoppingListActionBar shoppingListActionBar = findViewById(R.id.appBar);
+        shoppingListActionBar.create(this);
         setSupportActionBar(shoppingListActionBar.getToolbar());
 
         RecyclerView categoryRecyclerView = findViewById(R.id.categoryListRecyclerView);
@@ -188,5 +191,6 @@ public class ShoppingListActivity extends GenericActivity {
                 }
             }
         });
+
     }
 }

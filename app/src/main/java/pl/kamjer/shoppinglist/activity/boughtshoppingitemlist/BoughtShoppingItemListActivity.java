@@ -58,7 +58,9 @@ public class BoughtShoppingItemListActivity extends AppCompatActivity {
         setContentView(R.layout.bought_shopping_item_list_activity_layout);
 
         ShoppingListActionBar shoppingListActionBar = findViewById(R.id.appBar);
+        shoppingListActionBar.create(this);
         setSupportActionBar(shoppingListActionBar.getToolbar());
+
         Optional.ofNullable(getSupportActionBar()).ifPresent(actionBar -> actionBar.setDisplayHomeAsUpEnabled(true));
 
         boughtShoppingItemsListViewModel = new ViewModelProvider(

@@ -20,6 +20,7 @@ import lombok.extern.java.Log;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import pl.kamjer.shoppinglist.websocketconnect.funcIntarface.OnClosedAction;
+import pl.kamjer.shoppinglist.websocketconnect.funcIntarface.OnConnectChangeAction;
 import pl.kamjer.shoppinglist.websocketconnect.funcIntarface.OnFailureAction;
 import pl.kamjer.shoppinglist.websocketconnect.funcIntarface.OnMessageAction;
 import pl.kamjer.shoppinglist.websocketconnect.funcIntarface.OnOpenAction;
@@ -45,6 +46,41 @@ public class WebSocket {
     private final OnMessageHolder onMessageHolder;
 
     private okhttp3.WebSocket okHttpWebSocket;
+
+    private OnConnectChangeAction onConnectAction;
+
+    private Observer<HashMap<String, SubscribeMessage>> subscribeMessagesLiveDataObserver = subscribeMessages -> {
+        if (getOpenValue().isPresent()) {
+            sendSavedSubs(subscribeMessages);
+        }
+    };
+
+    private Observer<Message> connectedLiveDataObserver = openMessage -> {
+//        if message is not null it means connection was successful
+        if (openMessage != null) {
+            sendSavedSubs(getSubscribeMessageValue());
+            LinkedList<Message> sendMessages = getStompMessagesValue();
+            while (!sendMessages.isEmpty()) {
+                Message message = sendMessages.poll();
+                message.getHeaders().put(Header.ID, getOpenValue().orElseThrow(() -> new NoSuchElementException(NOT_OPEN_EXCEPTION_MESSAGE)).getHeaders().get(Header.ID));
+                sendMessage(message);
+            }
+        } else {
+//            if received connect message is null unregister all observers
+            unregisterObservers();
+        }
+        onConnectAction.action(openMessage != null);
+    };
+
+    private Observer<LinkedList<Message>> messageQueueLiveDataObserver = sendMessages -> {
+        if (getOpenValue().isPresent()) {
+            while (!sendMessages.isEmpty()) {
+                Message message = sendMessages.poll();
+                message.getHeaders().put(Header.ID, getOpenValue().orElseThrow(() -> new NoSuchElementException(NOT_OPEN_EXCEPTION_MESSAGE)).getHeaders().get(Header.ID));
+                sendMessage(message);
+            }
+        }
+    };
 
     public WebSocket(String baseUrl) {
         this.request = new Request.Builder();
@@ -99,38 +135,6 @@ public class WebSocket {
         request.header(key, value);
         return this;
     }
-
-    private Observer<HashMap<String, SubscribeMessage>> subscribeMessagesLiveDataObserver = subscribeMessages -> {
-        if (getOpenValue().isPresent()) {
-            sendSavedSubs(subscribeMessages);
-        }
-    };
-
-    private Observer<Message> connectedLiveDataObserver = openMessage -> {
-//        if message is not null it means connection was successful
-        if (openMessage != null) {
-            sendSavedSubs(getSubscribeMessageValue());
-            LinkedList<Message> sendMessages = getStompMessagesValue();
-            while (!sendMessages.isEmpty()) {
-                Message message = sendMessages.poll();
-                message.getHeaders().put(Header.ID, getOpenValue().orElseThrow(() -> new NoSuchElementException(NOT_OPEN_EXCEPTION_MESSAGE)).getHeaders().get(Header.ID));
-                sendMessage(message);
-            }
-        } else {
-//            if received connect message is null unregister all observers
-            unregisterObservers();
-        }
-    };
-
-    private Observer<LinkedList<Message>> messageQueueLiveDataObserver = sendMessages -> {
-        if (getOpenValue().isPresent()) {
-            while (!sendMessages.isEmpty()) {
-                Message message = sendMessages.poll();
-                message.getHeaders().put(Header.ID, getOpenValue().orElseThrow(() -> new NoSuchElementException(NOT_OPEN_EXCEPTION_MESSAGE)).getHeaders().get(Header.ID));
-                sendMessage(message);
-            }
-        }
-    };
 
     public WebSocket connect(OkHttpClient okHttpClient) {
 //        makes sure that observers are set on main thread
@@ -246,6 +250,11 @@ public class WebSocket {
         return this;
     }
 
+    public WebSocket onConnectAction(OnConnectChangeAction action) {
+        onConnectAction = action;
+        return this;
+    }
+
     private HashMap<String, SubscribeMessage> getSubscribeMessageValue() {
         return Optional.ofNullable(subscribeMessagesLiveData.getValue()).orElse(new HashMap<>());
     }
@@ -269,5 +278,6 @@ public class WebSocket {
         messages.add(message);
         messageQueueLiveData.postValue(messages);
     }
+
 
 }

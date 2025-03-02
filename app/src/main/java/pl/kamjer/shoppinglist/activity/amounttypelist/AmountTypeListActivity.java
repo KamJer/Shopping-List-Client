@@ -70,8 +70,11 @@ public class AmountTypeListActivity extends GenericActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.amount_type_activity_layout);
+
         ShoppingListActionBar shoppingListActionBar = findViewById(R.id.appBar);
+        shoppingListActionBar.create(this);
         setSupportActionBar(shoppingListActionBar.getToolbar());
+
         Optional.ofNullable(getSupportActionBar()).ifPresent(actionBar -> actionBar.setDisplayHomeAsUpEnabled(true));
 
         amountTypeViewModel = new ViewModelProvider(

@@ -19,7 +19,6 @@ import pl.kamjer.shoppinglist.activity.GenericActivity;
 import pl.kamjer.shoppinglist.activity.ShoppingListActionBar;
 import pl.kamjer.shoppinglist.activity.logindialog.usersrecyclerview.UsersRecyclerViewAdapter;
 import pl.kamjer.shoppinglist.model.User;
-import pl.kamjer.shoppinglist.repository.ShoppingServiceRepository;
 import pl.kamjer.shoppinglist.util.funcinterface.DeleteUserAction;
 import pl.kamjer.shoppinglist.util.validation.UserValidator;
 import pl.kamjer.shoppinglist.viewmodel.LoginDialogViewModel;
@@ -90,7 +89,9 @@ public class LoginDialogOptionalLogin extends GenericActivity {
 
 //        setting action bar
         shoppingListActionBar = findViewById(R.id.appBar);
+        shoppingListActionBar.create(this);
         setSupportActionBar(shoppingListActionBar.getToolbar());
+
         Optional.ofNullable(getSupportActionBar()).ifPresent(actionBar -> actionBar.setDisplayHomeAsUpEnabled(true));
 
         userNameEditText = findViewById(R.id.userNameEditText);
