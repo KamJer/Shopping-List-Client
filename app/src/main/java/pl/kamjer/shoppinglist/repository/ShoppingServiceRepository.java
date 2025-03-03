@@ -67,6 +67,8 @@ public class ShoppingServiceRepository {
     @Setter
     private boolean initializedWithUser;
 
+    private OkHttpClient okHttpClient;
+
     private Gson gson;
 
     public static ShoppingServiceRepository getShoppingServiceRepository() {
@@ -103,7 +105,7 @@ public class ShoppingServiceRepository {
                 .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeSerializer())
                 .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeDeserializer())
                 .create();
-        OkHttpClient okHttpClient = createClient(appContext, user);
+        okHttpClient = createClient(appContext, user);
 
         webSocket = new WebSocket(websocketBaseUrl + ip + "/ws")
                 .basicWebsocketHeader()
@@ -130,6 +132,14 @@ public class ShoppingServiceRepository {
                     log.info("lost");
                     webSocket.disconnect();
                 });
+    }
+
+    public boolean isConnected() {
+        return webSocket.isConnected();
+    }
+
+    public void reconnectWebsocket() {
+        webSocket.connect(okHttpClient);
     }
 
     public void websocketSynchronize(AllDto allDto, User user) {

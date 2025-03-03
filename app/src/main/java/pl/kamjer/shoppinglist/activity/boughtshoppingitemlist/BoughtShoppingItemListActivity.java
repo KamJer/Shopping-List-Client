@@ -60,6 +60,7 @@ public class BoughtShoppingItemListActivity extends AppCompatActivity {
         ShoppingListActionBar shoppingListActionBar = findViewById(R.id.appBar);
         shoppingListActionBar.create(this);
         setSupportActionBar(shoppingListActionBar.getToolbar());
+        Optional.ofNullable(getSupportActionBar()).ifPresent(actionBar -> actionBar.setDisplayShowTitleEnabled(false));
 
         Optional.ofNullable(getSupportActionBar()).ifPresent(actionBar -> actionBar.setDisplayHomeAsUpEnabled(true));
 

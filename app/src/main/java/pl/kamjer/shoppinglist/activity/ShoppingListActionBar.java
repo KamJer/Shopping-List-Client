@@ -49,6 +49,8 @@ public class ShoppingListActionBar extends AppBarLayout {
         this.getContext().startActivity(loginDialogIntent);
     };
 
+    private OnClickListener connectionButtonIndicatorAction = v -> shoppingListActionBarViewModel.reconnectWebsocket();
+
     public ShoppingListActionBar(@NonNull Context context) {
         super(context);
         init();
@@ -76,6 +78,8 @@ public class ShoppingListActionBar extends AppBarLayout {
         loginDialogButton = findViewById(R.id.loginDialogButton);
         loginDialogButton.setOnClickListener(loginDialogButtonAction);
         connectionButtonIndicator = findViewById(R.id.connectionIndicationImageButton);
+
+        connectionButtonIndicator.setOnClickListener(connectionButtonIndicatorAction);
     }
 
     public void create(AppCompatActivity activity) {
@@ -84,12 +88,19 @@ public class ShoppingListActionBar extends AppBarLayout {
                 ViewModelProvider.Factory.from(ShoppingListActionBarViewModel.initializer)
         ).get(ShoppingListActionBarViewModel.class);
 
+        Drawable drawable = connectionButtonIndicator.getBackground().mutate();
+        if (shoppingListActionBarViewModel.isConnected()) {
+            drawable.setTint(Color.GREEN);
+        } else {
+            drawable.setTint(Color.RED);
+        }
+
         shoppingListActionBarViewModel.setOnOpenConnectionAction((connected) -> {
-            Drawable drawable = connectionButtonIndicator.getBackground().mutate();
+            Drawable drawable1 = connectionButtonIndicator.getBackground().mutate();
             if (connected) {
-                drawable.setTint(Color.GREEN);
+                drawable1.setTint(Color.GREEN);
             } else {
-                drawable.setTint(Color.RED);
+                drawable1.setTint(Color.RED);
             }
         });
     }

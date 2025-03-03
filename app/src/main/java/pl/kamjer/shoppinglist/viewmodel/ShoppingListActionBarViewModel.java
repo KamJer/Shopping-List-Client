@@ -23,4 +23,12 @@ public class ShoppingListActionBarViewModel extends CustomViewModel{
     public void setOnOpenConnectionAction(OnConnectChangeAction action) {
         shoppingServiceRepository.setOnConnectChangeAction(action);
     }
+
+    public boolean isConnected() {
+        return shoppingServiceRepository.isConnected();
+    }
+
+    public void reconnectWebsocket() {
+        shoppingServiceRepository.reconnectWebsocket();
+    }
 }

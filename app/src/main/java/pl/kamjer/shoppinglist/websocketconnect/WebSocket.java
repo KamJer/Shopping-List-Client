@@ -255,6 +255,10 @@ public class WebSocket {
         return this;
     }
 
+    public boolean isConnected() {
+        return Optional.ofNullable(connectedLiveData.getValue()).isPresent();
+    }
+
     private HashMap<String, SubscribeMessage> getSubscribeMessageValue() {
         return Optional.ofNullable(subscribeMessagesLiveData.getValue()).orElse(new HashMap<>());
     }
