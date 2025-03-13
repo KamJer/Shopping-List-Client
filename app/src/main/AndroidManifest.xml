@@ -9,7 +9,7 @@
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/baseline_shopping_cart_24_logo"
         android:label="@string/app_name"
         android:roundIcon="@drawable/baseline_shopping_cart_24_logo"
         android:supportsRtl="true"

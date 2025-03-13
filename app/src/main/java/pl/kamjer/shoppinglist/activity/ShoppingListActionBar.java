@@ -88,10 +88,11 @@ public class ShoppingListActionBar extends AppBarLayout {
                 ViewModelProvider.Factory.from(ShoppingListActionBarViewModel.initializer)
         ).get(ShoppingListActionBarViewModel.class);
 
+        shoppingListActionBarViewModel.loadUser();
+
         Drawable drawable = connectionButtonIndicator.getBackground().mutate();
         if (shoppingListActionBarViewModel.isConnected()) {
             drawable.setTint(Color.GREEN);
-            shoppingListActionBarViewModel.synchronizeData();
         } else {
             drawable.setTint(Color.RED);
         }

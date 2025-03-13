@@ -30,5 +30,6 @@ public class ShoppingListActionBarViewModel extends CustomViewModel{
 
     public void reconnectWebsocket() {
         shoppingServiceRepository.reconnectWebsocket();
+        synchronizeData();
     }
 }

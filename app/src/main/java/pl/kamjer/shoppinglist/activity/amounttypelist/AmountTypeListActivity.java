@@ -72,7 +72,6 @@ public class AmountTypeListActivity extends GenericActivity {
         setContentView(R.layout.amount_type_activity_layout);
 
         ShoppingListActionBar shoppingListActionBar = findViewById(R.id.appBar);
-        shoppingListActionBar.create(this);
         setSupportActionBar(shoppingListActionBar.getToolbar());
         Optional.ofNullable(getSupportActionBar()).ifPresent(actionBar -> actionBar.setDisplayShowTitleEnabled(false));
 
@@ -86,6 +85,8 @@ public class AmountTypeListActivity extends GenericActivity {
 //        loading data
         amountTypeViewModel.loadUser();
         amountTypeViewModel.loadAllAmountType();
+
+        shoppingListActionBar.create(this);
 
 //        finding views
         amountTypeRecyclerView = findViewById(R.id.amountTypeRecyclerView);

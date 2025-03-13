@@ -58,7 +58,6 @@ public class BoughtShoppingItemListActivity extends AppCompatActivity {
         setContentView(R.layout.bought_shopping_item_list_activity_layout);
 
         ShoppingListActionBar shoppingListActionBar = findViewById(R.id.appBar);
-        shoppingListActionBar.create(this);
         setSupportActionBar(shoppingListActionBar.getToolbar());
         Optional.ofNullable(getSupportActionBar()).ifPresent(actionBar -> actionBar.setDisplayShowTitleEnabled(false));
 
@@ -73,6 +72,8 @@ public class BoughtShoppingItemListActivity extends AppCompatActivity {
         boughtShoppingItemsListViewModel.loadUser();
         boughtShoppingItemsListViewModel.loadAllShoppingItemWithAmountTypeAndCategoryLiveData();
         boughtShoppingItemsListViewModel.loadAllCategory();
+
+        shoppingListActionBar.create(this);
 
         boughtShoppingItemsListRecyclerView = findViewById(R.id.boughtShoppingItemsListRecyclerView);
         boughtShoppingItemsListRecyclerView.setLayoutManager(new LinearLayoutManager(this));
