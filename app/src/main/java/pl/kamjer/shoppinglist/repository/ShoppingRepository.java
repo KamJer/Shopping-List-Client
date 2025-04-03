@@ -52,6 +52,8 @@ public class ShoppingRepository {
 
     private final MutableLiveData<User> userLiveData;
 
+    private boolean userTest = true;
+
     @Setter
     @Getter
     private ExecutorService executorService;
@@ -71,6 +73,7 @@ public class ShoppingRepository {
 
     /**
      * Method for initializing shopping database repository
+     *
      * @param appContext                - context of an app
      * @param shoppingServiceRepository - initialized repository for a server, necessary for sending exceptions to the server
      */
@@ -95,10 +98,16 @@ public class ShoppingRepository {
             LiveData<User> userRoomLifeData = userDao.findUserByUserName(userName);
 //        creating observer, if found user is the same as one logged (saved in userLifeData) don't load user from database,
 //        if new user was passed set new user to be logged
-            Observer<User> userObserver = new Observer<User>() {
+            Observer<User> userObserver = new Observer<>() {
                 @Override
                 public void onChanged(User user) {
-                    setLoggedUser(user);
+                    if (user != null || userLiveData.getValue() != null) {
+                        userTest = true;
+                    }
+                    if (userTest) {
+                        setLoggedUser(user);
+                        userTest = false;
+                    }
                     userRoomLifeData.removeObserver(this);
                 }
             };

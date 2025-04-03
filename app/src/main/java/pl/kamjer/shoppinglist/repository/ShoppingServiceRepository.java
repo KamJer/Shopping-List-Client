@@ -135,6 +135,10 @@ public class ShoppingServiceRepository {
     }
 
     public boolean isConnected() {
+//        fast and dirty fix think about it later
+        if (webSocket == null) {
+            return false;
+        }
         return webSocket.isConnected();
     }
 

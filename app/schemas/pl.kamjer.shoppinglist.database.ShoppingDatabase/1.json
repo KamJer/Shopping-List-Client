@@ -1,0 +1,296 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 1,
+    "identityHash": "cd622bb897bf5ee956d3443b7852c5a0",
+    "entities": [
+      {
+        "tableName": "SHOPPING_ITEM",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`local_shopping_item_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `shopping_item_id` INTEGER NOT NULL, `item_amount_type_id` INTEGER NOT NULL, `item_category_id` INTEGER NOT NULL, `local_item_amount_type_id` INTEGER NOT NULL, `local_item_category_id` INTEGER NOT NULL, `item_name` TEXT, `amount` REAL, `bought` INTEGER NOT NULL, `moved_to_bought` INTEGER NOT NULL, `user_name` TEXT, `updated` INTEGER NOT NULL, `deleted` INTEGER NOT NULL, FOREIGN KEY(`local_item_amount_type_id`) REFERENCES `AMOUNT_TYPE`(`local_amount_type_id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`local_item_category_id`) REFERENCES `CATEGORY`(`local_category_id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`user_name`) REFERENCES `USER`(`user_name`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "localShoppingItemId",
+            "columnName": "local_shopping_item_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "shoppingItemId",
+            "columnName": "shopping_item_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "itemAmountTypeId",
+            "columnName": "item_amount_type_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "itemCategoryId",
+            "columnName": "item_category_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "localItemAmountTypeId",
+            "columnName": "local_item_amount_type_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "localItemCategoryId",
+            "columnName": "local_item_category_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "itemName",
+            "columnName": "item_name",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "amount",
+            "columnName": "amount",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "bought",
+            "columnName": "bought",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "movedToBought",
+            "columnName": "moved_to_bought",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "userName",
+            "columnName": "user_name",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "updated",
+            "columnName": "updated",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "deleted",
+            "columnName": "deleted",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "local_shopping_item_id"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": [
+          {
+            "table": "AMOUNT_TYPE",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "local_item_amount_type_id"
+            ],
+            "referencedColumns": [
+              "local_amount_type_id"
+            ]
+          },
+          {
+            "table": "CATEGORY",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "local_item_category_id"
+            ],
+            "referencedColumns": [
+              "local_category_id"
+            ]
+          },
+          {
+            "table": "USER",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "user_name"
+            ],
+            "referencedColumns": [
+              "user_name"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "AMOUNT_TYPE",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`local_amount_type_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `amount_type_id` INTEGER NOT NULL, `type_name` TEXT, `user_name` TEXT, `updated` INTEGER NOT NULL, `deleted` INTEGER NOT NULL, FOREIGN KEY(`user_name`) REFERENCES `USER`(`user_name`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "localAmountTypeId",
+            "columnName": "local_amount_type_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "amountTypeId",
+            "columnName": "amount_type_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "typeName",
+            "columnName": "type_name",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "userName",
+            "columnName": "user_name",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "updated",
+            "columnName": "updated",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "deleted",
+            "columnName": "deleted",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "local_amount_type_id"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": [
+          {
+            "table": "USER",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "user_name"
+            ],
+            "referencedColumns": [
+              "user_name"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "CATEGORY",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`local_category_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `category_id` INTEGER NOT NULL, `category_name` TEXT, `user_name` TEXT, `updated` INTEGER NOT NULL, `deleted` INTEGER NOT NULL, FOREIGN KEY(`user_name`) REFERENCES `USER`(`user_name`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "localCategoryId",
+            "columnName": "local_category_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "categoryId",
+            "columnName": "category_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "categoryName",
+            "columnName": "category_name",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "userName",
+            "columnName": "user_name",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "updated",
+            "columnName": "updated",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "deleted",
+            "columnName": "deleted",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "local_category_id"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": [
+          {
+            "table": "USER",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "user_name"
+            ],
+            "referencedColumns": [
+              "user_name"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "USER",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`user_name` TEXT NOT NULL, `password` TEXT, `saved_time` TEXT, PRIMARY KEY(`user_name`))",
+        "fields": [
+          {
+            "fieldPath": "userName",
+            "columnName": "user_name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "password",
+            "columnName": "password",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "savedTime",
+            "columnName": "saved_time",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "user_name"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'cd622bb897bf5ee956d3443b7852c5a0')"
+    ]
+  }
+}
