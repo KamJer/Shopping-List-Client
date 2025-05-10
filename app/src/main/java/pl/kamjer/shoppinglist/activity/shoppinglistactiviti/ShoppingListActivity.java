@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 
 import androidx.activity.OnBackPressedCallback;
@@ -14,6 +15,8 @@ import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,6 +35,7 @@ import pl.kamjer.shoppinglist.activity.shoppinglistactiviti.shoppingcategoryrecy
 import pl.kamjer.shoppinglist.model.Category;
 import pl.kamjer.shoppinglist.model.ShoppingItem;
 import pl.kamjer.shoppinglist.model.ShoppingItemWithAmountTypeAndCategory;
+import pl.kamjer.shoppinglist.util.TutorialManager;
 import pl.kamjer.shoppinglist.util.exception.NoResourceFoundException;
 import pl.kamjer.shoppinglist.util.funcinterface.AddShoppingItemAction;
 import pl.kamjer.shoppinglist.util.funcinterface.ModifyShoppingItemAction;
@@ -92,7 +96,7 @@ public class ShoppingListActivity extends GenericActivity {
 
     private final ModifyShoppingItemAction deleteShoppingItemAction = shoppingItemWithAmountTypeAndCategory ->
             shoppingListViewModel.deleteShoppingItem(shoppingItemWithAmountTypeAndCategory.getShoppingItem(),
-            connectionFailedAction);
+                    connectionFailedAction);
     private final ModifyShoppingItemAction modifyShoppingItemAction = shoppingItemWithAmountTypeAndCategory -> {
         Intent updateShoppingItemIntent = new Intent(this, UpdateShoppingItemDialog.class);
         updateShoppingItemIntent.putExtra(NewShoppingItemDialog.CATEGORY_FIELD_NAME, shoppingItemWithAmountTypeAndCategory.getCategory());
@@ -122,6 +126,13 @@ public class ShoppingListActivity extends GenericActivity {
 
 //        loading data
         shoppingListViewModel.initialize();
+
+//        initliazing tutorial
+        TutorialManager tutorialManager = new TutorialManager(
+                shoppingListViewModel,
+                new FrameLayout[]{findViewById(R.id.first_tutorial_overlay), findViewById(R.id.second_tutorial_overlay)},
+                new FloatingActionButton[]{findViewById(R.id.nextOverlayButton), findViewById(R.id.okButton)});
+        tutorialManager.runOverlayTutorial();
 
         categoryList = new ArrayList<>();
         shoppingItemWithAmountTypeAndCategoriesList = new ArrayList<>();

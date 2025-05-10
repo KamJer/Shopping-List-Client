@@ -12,6 +12,7 @@ import lombok.extern.java.Log;
 import pl.kamjer.shoppinglist.R;
 import pl.kamjer.shoppinglist.activity.logindialog.LoginDialogForcedLogin;
 import pl.kamjer.shoppinglist.activity.shoppinglistactiviti.ShoppingListActivity;
+import pl.kamjer.shoppinglist.model.User;
 import pl.kamjer.shoppinglist.repository.ShoppingServiceRepository;
 import pl.kamjer.shoppinglist.viewmodel.InitializerViewModel;
 
@@ -36,26 +37,38 @@ public class InitializerActivity extends GenericActivity {
 
 //        initialize all of a necessary components of an app
         initializerViewModel.initialize(getApplicationContext());
+        initializerViewModel.loadUser();
 
         initializertextView = findViewById(R.id.initializerLabel);
-
-        initializerViewModel.loadUser();
+//        set observer for a logged user
         initializerViewModel.setUserLiveDataObserver(user -> {
             initializerViewModel.setInitializerLabelLiveDataValue(getString(R.string.initializing_connection_to_server_label));
 //            if user is null this means no user data was saved, so it needs to be created and inserted,
             if (user != null) {
                 initializerViewModel.initializeOnMessageAction(user,
                         (webSocket, object) -> createToast(object),
-                        (t) -> {
-                            createToast(t.getMessage());
+                        (webSocket, t, response) -> {
+                            if (response != null) {
+                                if (response.code() == 401) {
+//                                if logged user does not exists for whatever reason inform user about that and logged them out
+                                    initializerViewModel.logUserOff(user);
+                                    createToast(getString(R.string.no_such_user_exists_message));
+                                } else {
+//                                inform user about error
+                                    createToast(t.getMessage());
+                                }
+                            } else {
+                                createToast(t.getMessage());
+                            }
                         });
-                ShoppingServiceRepository.getShoppingServiceRepository().reInitializeWithUser(this.getApplicationContext(), user);
-                initializerViewModel.synchronizeData(user);
-                startShoppingListActivity();
+//                if everything went well start shopping list activity (
+                actOnSuccessOrOffline(user);
             } else {
+//                force user to log in
                 startLogDialog();
             }
         });
+//        initialize observer for a label on a screen
         initializerViewModel.setInitializerLabelLiveDataObserver(this, initializerLabelObserver);
     }
 
@@ -67,5 +80,11 @@ public class InitializerActivity extends GenericActivity {
     private void startShoppingListActivity() {
         Intent shoppingListActivity = new Intent(this, ShoppingListActivity.class);
         this.startActivity(shoppingListActivity);
+    }
+
+    private void actOnSuccessOrOffline(User user) {
+        ShoppingServiceRepository.getShoppingServiceRepository().reInitializeWithUser(this.getApplicationContext(), user);
+        initializerViewModel.synchronizeData(user);
+        startShoppingListActivity();
     }
 }

@@ -16,6 +16,7 @@ import pl.kamjer.shoppinglist.model.User;
 public class SharedRepository {
 
     private static final String USER_NAME_FIELD_NAME = "userName";
+    private static final String TUTORIAL_SEEN_FIELD_NAME = "tutorialSeen";
 
     private static SharedRepository sharedRepository;
 
@@ -64,5 +65,15 @@ public class SharedRepository {
         sharedPref.edit()
                 .putString(USER_NAME_FIELD_NAME, "")
                 .apply();
+    }
+
+    public void tutorialSeen(boolean seen) {
+        sharedPref.edit()
+                .putBoolean(TUTORIAL_SEEN_FIELD_NAME, seen)
+                .apply();
+    }
+
+    public boolean isTutorialSeen() {
+        return sharedPref.getBoolean(TUTORIAL_SEEN_FIELD_NAME, false);
     }
 }

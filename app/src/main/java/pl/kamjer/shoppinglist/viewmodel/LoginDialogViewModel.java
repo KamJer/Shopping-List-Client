@@ -16,7 +16,6 @@ import pl.kamjer.shoppinglist.repository.SharedRepository;
 import pl.kamjer.shoppinglist.repository.ShoppingRepository;
 import pl.kamjer.shoppinglist.repository.ShoppingServiceRepository;
 import pl.kamjer.shoppinglist.util.exception.NotOkHttpResponseException;
-import pl.kamjer.shoppinglist.util.funcinterface.OnConnectAction;
 import pl.kamjer.shoppinglist.util.funcinterface.OnFailureAction;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -73,7 +72,11 @@ public class LoginDialogViewModel extends CustomViewModel {
         shoppingRepository.deleteUser(user);
     }
 
-    public void initialzeshoppingservicerepository(Context applicationContext) {
+    public void initializeShoppingServiceRepository(Context applicationContext) {
         shoppingServiceRepository.initialize(applicationContext);
+    }
+
+    public void isUserCorrect(User user, Callback<Boolean> callback) {
+        shoppingServiceRepository.isUserCorrect(user, callback);
     }
 }

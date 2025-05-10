@@ -37,4 +37,13 @@
     <string name="modify_item_dialog_title">Zmień istniejący produkt</string>"
     <string name="new_category_dialog_title">Dodaj nową kategorię</string>"
     <string name="modify_category_dialog_title">Zmień istniejącą kategorię</string>"
+    <string name="no_such_user_exists_message">Użytkownik o takiej nazwie nie istnieje lub hasło jest nie poprawne</string>"
+    <string name="no_internet_connection_message">Brak połączenia z internetem, pierwsze logowanie lub rejestracja muszą być wykonane w trybie online</string>
+    <string name="add_category_tutorial_exp">Kliknij ten przycisk, aby dodać kategorię produktu, to w niej dodajesz produkty do zakupu</string>
+    <string name="send_bought_items_tutorial_exp">Kliknii by odesłać kupione przedmioty do listy przedmiotów zakupionych</string>
+    <string name="user_activity_tutorial_exp">Przenosi cię do okna logowania lub rejestracji</string>
+    <string name="amount_type_activity_tutorial_exp">Przenosi do okna definiowania jednostek (l, kg itp.)</string>
+    <string name="bought_activity_tutorial_exp">Przenosi do listy zakupionych przedmiotów</string>
+    <string name="connector_indicator_tutorial_exp">Indykator połączenia z internetem, kolor czerwony oznacza brak połaczenia, kliknji by spróbować nawiązać połączenie</string>
+    <string name="indicator_green_tutorial_exp">Kolor zielony oznacza że wszystko w porzadku z połączeniem</string>
 </resources>

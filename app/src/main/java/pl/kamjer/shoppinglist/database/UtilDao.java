@@ -41,13 +41,13 @@ public interface UtilDao {
     List<ShoppingItem> loadAllShoppingItems();
 
     @Insert
-    Long insertAmountTypes(AmountType amountType);
+    Long insertAmountType(AmountType amountType);
 
     @Insert
-    Long insertCategories(Category category);
+    Long insertCategory(Category category);
 
     @Insert
-    Long insertShoppingItems(ShoppingItem shoppingItem);
+    Long insertShoppingItem(ShoppingItem shoppingItem);
 
     @Delete
     void deleteListAmountType(List<AmountType> amountType);
@@ -83,13 +83,13 @@ public interface UtilDao {
 
             amountTypes.forEach(amountType -> {
                 if (!amountTypesFromDb.stream().map(AmountType::getAmountTypeId).collect(Collectors.toList()).contains(amountType.getAmountTypeId())) {
-                    amountType.setLocalAmountTypeId(insertAmountTypes(amountType));
+                    amountType.setLocalAmountTypeId(insertAmountType(amountType));
                     amountTypesFromDb.add(amountType);
                 }
             });
             categories.forEach(category -> {
                 if (!categoriesFromDb.stream().map(Category::getCategoryId).collect(Collectors.toList()).contains(category.getCategoryId())) {
-                    category.setLocalCategoryId(insertCategories(category));
+                    category.setLocalCategoryId(insertCategory(category));
                     categoriesFromDb.add(category);
                 }
             });
@@ -99,7 +99,7 @@ public interface UtilDao {
                         shoppingItem.setLocalItemAmountTypeId(getLocalAmountTypeIdForShoppingItem(amountTypesFromDb, shoppingItem));
                         shoppingItem.setLocalItemCategoryId(getLocalCategoryIdForShoppingItem(categoriesFromDb, shoppingItem));
                         if (!shoppingItemsFromDb.stream().map(ShoppingItem::getShoppingItemId).collect(Collectors.toList()).contains(shoppingItem.getShoppingItemId())) {
-                            shoppingItem.setLocalShoppingItemId(insertShoppingItems(shoppingItem));
+                            shoppingItem.setLocalShoppingItemId(insertShoppingItem(shoppingItem));
                         }
                     });
         } finally {
@@ -121,13 +121,11 @@ public interface UtilDao {
                 shoppingItem.setLocalShoppingItemId(getLocalShoppingItemIdForShoppingItem(shoppingItemsFromDb, shoppingItem));
             });
             deleteListShoppingItem(shoppingItems);
-            amountTypes.forEach(amountType -> {
-                amountType.setLocalAmountTypeId(getLocalAmountTypeId(amountTypesFromDb, amountType));
-            });
+            amountTypes.forEach(amountType ->
+                    amountType.setLocalAmountTypeId(getLocalAmountTypeId(amountTypesFromDb, amountType)));
             deleteListAmountType(amountTypes);
-            categories.forEach(category -> {
-                category.setLocalCategoryId(getLocalCategoryId(categoriesFromDb, category));
-            });
+            categories.forEach(category ->
+                    category.setLocalCategoryId(getLocalCategoryId(categoriesFromDb, category)));
             deleteListCategory(categories);
         } finally {
             lock.unlock();
@@ -223,7 +221,8 @@ public interface UtilDao {
                 .filter(amountTypeFromDb -> amountTypeFromDb.getAmountTypeId() == amountType.getAmountTypeId())
                 .findFirst()
                 .map(AmountType::getLocalAmountTypeId)
-                .orElseThrow(() -> new NoUserFoundException("No AmountType found for that id: " + amountType.getAmountTypeId()));
+//                if element does not exist in database it will insert it to it androidx return it local id
+                .orElseGet(() -> insertAmountType(amountType));
     }
 
     default Long getLocalCategoryId(List<Category> categories, Category category) {

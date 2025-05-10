@@ -8,6 +8,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -28,6 +30,7 @@ import pl.kamjer.shoppinglist.util.ServiceUtil;
 import pl.kamjer.shoppinglist.util.funcinterface.OnConnectAction;
 import pl.kamjer.shoppinglist.websocketconnect.WebSocket;
 import pl.kamjer.shoppinglist.websocketconnect.funcIntarface.OnConnectChangeAction;
+import pl.kamjer.shoppinglist.websocketconnect.funcIntarface.OnFailureAction;
 import pl.kamjer.shoppinglist.websocketconnect.funcIntarface.OnMessageAction;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -59,9 +62,9 @@ public class ShoppingServiceRepository {
     @Setter
     private OnMessageAction<String> onErrorAction;
     @Setter
-    private OnMessageAction<Throwable> onFailureAction;
-    @Setter
-    private OnConnectChangeAction onConnectChangeAction;
+    private OnFailureAction onFailureAction;
+
+    private final List<OnConnectChangeAction> onConnectChangeAction = new ArrayList<>();
 
     @Getter
     @Setter
@@ -109,8 +112,8 @@ public class ShoppingServiceRepository {
 
         webSocket = new WebSocket(websocketBaseUrl + ip + "/ws")
                 .basicWebsocketHeader()
-                .onConnectAction((connected) -> onConnectChangeAction.action(connected))
-                .onFailure((webSocket1, t, response) -> onFailureAction.action(webSocket1, t))
+                .onConnectAction((connected) -> onConnectChangeAction.forEach(onConnectChangeAction1 -> onConnectChangeAction1.action(connected)))
+                .onFailure((webSocket1, t, response) -> onFailureAction.action(webSocket1, t, response))
                 .onError((webSocket1, errorMessage) -> onErrorAction.action(webSocket1, errorMessage))
                 .subscribe(gson, "/synchronizeData", AllDto.class, onMessageActionSynchronize)
                 .subscribe(gson, "/{username}/pip", String.class, onMessageActionPip, user.getUserName());
@@ -135,7 +138,7 @@ public class ShoppingServiceRepository {
     }
 
     public boolean isConnected() {
-//        fast and dirty fix think about it later
+//       TODO: fast and dirty fix think about it later
         if (webSocket == null) {
             return false;
         }
@@ -174,7 +177,7 @@ public class ShoppingServiceRepository {
 
     public void sendLog(ExceptionDto e, OnConnectAction action) {
         Call<Void> call = utilService.sendLog(e);
-        call.enqueue(new Callback<Void>() {
+        call.enqueue(new Callback<>() {
             @Override
             public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
                 action.action();
@@ -185,6 +188,19 @@ public class ShoppingServiceRepository {
                 action.action();
             }
         });
+    }
+
+    public void addOnConnectionChangedAction(OnConnectChangeAction action) {
+        onConnectChangeAction.add(action);
+    }
+
+    public void removeOnConnectionChangedAction(OnConnectChangeAction action) {
+        onConnectChangeAction.remove(action);
+    }
+
+    public void isUserCorrect(User user, Callback<Boolean> callback) {
+        Call<Boolean> call = userService.logUser(ServiceUtil.userToUserDto(user));
+        call.enqueue(callback);
     }
 }
 

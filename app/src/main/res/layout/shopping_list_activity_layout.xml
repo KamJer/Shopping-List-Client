@@ -57,7 +57,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.97" />
+        app:layout_constraintGuide_percent="1.0" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline3"
@@ -79,5 +79,13 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         app:layout_constraintGuide_percent="0.85" />
+
+    <include
+        android:id="@+id/first_tutorial_overlay"
+        layout="@layout/tutorial_overlay_shopping_list" />
+
+    <include
+        android:id="@+id/second_tutorial_overlay"
+        layout="@layout/tutorial_overlay_shopping_list_action_bar" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

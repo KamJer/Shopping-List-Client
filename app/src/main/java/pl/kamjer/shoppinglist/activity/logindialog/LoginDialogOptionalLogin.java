@@ -5,6 +5,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -22,6 +23,9 @@ import pl.kamjer.shoppinglist.model.User;
 import pl.kamjer.shoppinglist.util.funcinterface.DeleteUserAction;
 import pl.kamjer.shoppinglist.util.validation.UserValidator;
 import pl.kamjer.shoppinglist.viewmodel.LoginDialogViewModel;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 @Log
 public class LoginDialogOptionalLogin extends GenericActivity {
@@ -47,7 +51,23 @@ public class LoginDialogOptionalLogin extends GenericActivity {
             return;
         }
 
-        logUserInAndInitialize(user);
+        loginDialogViewModel.isUserCorrect(user, new Callback<>() {
+            @Override
+            public void onResponse(@NonNull Call<Boolean> call, @NonNull Response<Boolean> response) {
+                Optional.ofNullable(response).ifPresent(booleanResponse -> {
+                    if (Boolean.TRUE.equals(booleanResponse.body())) {
+                        logUserInAndInitialize(user);
+                    } else {
+                        actOnErrorLogin();
+                    }
+                });
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<Boolean> call, @NonNull Throwable t) {
+                actOnErrorLogin();
+            }
+        });
     };
 
     protected final View.OnClickListener onRegisterButtonAction = (v) -> {
@@ -61,7 +81,7 @@ public class LoginDialogOptionalLogin extends GenericActivity {
             createToast(getString(R.string.user_name_can_not_be_empty_message));
             return;
         }
-        loginDialogViewModel.initialzeshoppingservicerepository(getApplicationContext());
+        loginDialogViewModel.initializeShoppingServiceRepository(getApplicationContext());
         loginDialogViewModel.insertUser(
                 user,
                 connectionFailedAction);
@@ -112,5 +132,9 @@ public class LoginDialogOptionalLogin extends GenericActivity {
         ));
 
         loginDialogViewModel.setOnUsersObserver(this, users -> usersRecyclerViewAdapter.setUsers(users));
+    }
+
+    private void actOnErrorLogin() {
+        createToast(getString(R.string.no_such_user_exists_message));
     }
 }

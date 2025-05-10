@@ -21,7 +21,7 @@ public class ShoppingListActionBarViewModel extends CustomViewModel{
                     SharedRepository.getSharedRepository()));
 
     public void setOnOpenConnectionAction(OnConnectChangeAction action) {
-        shoppingServiceRepository.setOnConnectChangeAction(action);
+        shoppingServiceRepository.addOnConnectionChangedAction(action);
     }
 
     public boolean isConnected() {

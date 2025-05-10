@@ -13,4 +13,5 @@
     <color name="gray">#FF808080</color>s
     <color name="dark_gray">#FF545454</color>
     <color name="category_tag_color">@color/light_gray</color>
+    <color name="green">#FF00FF00</color>
 </resources>

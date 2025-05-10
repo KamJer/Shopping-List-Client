@@ -87,4 +87,12 @@ public class ShoppingListViewModel extends CustomViewModel {
     public void updateCategory(Category category, OnFailureAction action) {
         shoppingRepository.updateCategoryFlag(category, () -> synchronizeData());
     }
+
+    public boolean isTutorialSeen() {
+       return sharedRepository.isTutorialSeen();
+    }
+
+    public void tutorialSeen(boolean seen) {
+        sharedRepository.tutorialSeen(seen);
+    }
 }

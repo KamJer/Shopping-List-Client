@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/tutorial_overlay"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#88000000"
+    android:clickable="true"
+    android:visibility="visible">
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginBottom="55dp">
+
+        <TextView
+            android:id="@+id/category_tutorial_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:gravity="center"
+            android:padding="12dp"
+            android:text="@string/add_category_tutorial_exp"
+            android:textSize="18sp" />
+
+        <ImageView
+            android:id="@+id/add_category_arrow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/category_tutorial_text"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentEnd="true"
+            app:tint="@color/light_gray"
+            android:contentDescription="@string/todo"
+            android:padding="50dp"
+            android:scaleX="4.0"
+            android:scaleY="4.0"
+            android:src="@drawable/baseline_arrow_downward_24" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|center_horizontal"
+        android:layout_marginTop="100dp">
+
+        <ImageView
+            android:id="@+id/send_bought_arrow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentEnd="true"
+            android:contentDescription="@string/todo"
+            app:tint="@color/light_gray"
+            android:padding="50dp"
+            android:scaleX="4.0"
+            android:scaleY="4.0"
+            android:rotation="180"
+            android:src="@drawable/baseline_arrow_downward_24" />
+
+        <TextView
+            android:id="@+id/bought_list_send_tutorial_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/send_bought_arrow"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentEnd="true"
+            android:gravity="center"
+            android:padding="12dp"
+            android:text="@string/send_bought_items_tutorial_exp"
+            android:textSize="18sp" />
+
+    </RelativeLayout>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/nextOverlayButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/light_gray"
+        android:contentDescription="@string/todo"
+        android:src="@drawable/baseline_arrow_right_alt_24"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="25dp"
+        />
+
+</FrameLayout>

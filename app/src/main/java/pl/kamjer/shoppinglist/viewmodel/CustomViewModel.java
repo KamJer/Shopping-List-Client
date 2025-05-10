@@ -30,7 +30,6 @@ import pl.kamjer.shoppinglist.repository.ShoppingServiceRepository;
 import pl.kamjer.shoppinglist.util.ServiceUtil;
 import pl.kamjer.shoppinglist.util.exception.NoUserFoundException;
 import pl.kamjer.shoppinglist.util.exception.NotOkHttpResponseException;
-import pl.kamjer.shoppinglist.util.exception.WebSocketErrorConnection;
 import pl.kamjer.shoppinglist.util.funcinterface.OnConnectAction;
 import pl.kamjer.shoppinglist.util.funcinterface.OnFailureAction;
 import pl.kamjer.shoppinglist.websocketconnect.funcIntarface.OnMessageAction;
@@ -186,18 +185,6 @@ public class CustomViewModel extends ViewModel {
                 })
                 .filter(s -> !s.isEmpty())
                 .orElse(ShoppingServiceRepository.CONNECTION_FAILED_MESSAGE + response.code());
-    }
-
-    public void initializeOnMessageAction(User user, OnMessageAction<String> onErrorAction, OnFailureAction failure) {
-        shoppingServiceRepository.setOnMessageActionSynchronize((webSocket, allDto) -> synchronizeData(user, allDto));
-
-        shoppingServiceRepository.setOnMessageActionPip((webSocket, pip) -> shoppingRepository.getAllDataAndAct(user, (amountTypeList, categoryList, shoppingItemList) -> shoppingServiceRepository.websocketSynchronize(collectEntitiyToAllDto(user, amountTypeList, categoryList, shoppingItemList), user)));
-
-        shoppingServiceRepository.setOnErrorAction((webSocket, object) ->
-                new Handler(Looper.getMainLooper()).post(() -> onErrorAction.action(webSocket, object)));
-
-        shoppingServiceRepository.setOnFailureAction((webSocket, t) ->
-                failure.action(new WebSocketErrorConnection(t.getMessage())));
     }
 
 
