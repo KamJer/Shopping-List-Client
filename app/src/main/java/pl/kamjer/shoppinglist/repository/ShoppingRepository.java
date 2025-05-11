@@ -234,8 +234,8 @@ public class ShoppingRepository {
     public void getAllDataAndAct(User user, PostNewElements action) {
         executorService.execute(() ->
                 action.action(
-                        amountTypeDao.findAllAmountTypeForUser(user.getUserName()),
-                        categoryDao.findAllCategoryForUser(user.getUserName()),
+                        amountTypeDao.findAllAmountTypeForUserToBeUpdated(user.getUserName()),
+                        categoryDao.findAllCategoryForUserToBeUpdated(user.getUserName()),
                         shoppingItemDao.findAllShoppingItemsForUser(user.getUserName())));
     }
 
@@ -259,7 +259,7 @@ public class ShoppingRepository {
     }
 
     public LiveData<List<ShoppingItem>> loadAllShoppingItemsForAmountType(User user, AmountType amountType) {
-        return shoppingItemDao.loadShoppingItemByAmountTypeId(user.getUserName(), amountType.getLocalAmountTypeId());
+        return shoppingItemDao.loadShoppingItemByAmountTypeIdToBeUpdated(user.getUserName(), amountType.getLocalAmountTypeId());
     }
 
 

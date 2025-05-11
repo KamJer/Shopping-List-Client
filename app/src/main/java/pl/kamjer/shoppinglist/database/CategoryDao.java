@@ -43,5 +43,5 @@ public interface CategoryDao {
 
     @Transaction
     @Query("SELECT * FROM CATEGORY WHERE user_name=:userName")
-    List<Category> findAllCategoryForUser(String userName);
+    List<Category> findAllCategoryForUserToBeUpdated(String userName);
 }

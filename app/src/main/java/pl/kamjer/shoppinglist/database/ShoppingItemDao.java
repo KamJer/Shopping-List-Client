@@ -70,7 +70,7 @@ public interface ShoppingItemDao {
 
     @Transaction
     @Query("SELECT * FROM SHOPPING_ITEM WHERE deleted=0 AND user_name=:userName AND local_item_amount_type_id=:localAmountTypeId")
-    LiveData<List<ShoppingItem>> loadShoppingItemByAmountTypeId(String userName, long localAmountTypeId);
+    LiveData<List<ShoppingItem>> loadShoppingItemByAmountTypeIdToBeUpdated(String userName, long localAmountTypeId);
 
     @Query("SELECT * FROM SHOPPING_ITEM WHERE local_item_amount_type_id=:localAmountTypeId")
     List<ShoppingItem> findAllShoppingItemsForUser(Long localAmountTypeId);

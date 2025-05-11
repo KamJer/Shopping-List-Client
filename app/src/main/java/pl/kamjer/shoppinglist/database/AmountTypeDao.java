@@ -39,7 +39,7 @@ public interface AmountTypeDao {
 
     @Transaction
     @Query("SELECT * FROM AMOUNT_TYPE WHERE user_name=:userName")
-    List<AmountType> findAllAmountTypeForUser(String userName);
+    List<AmountType> findAllAmountTypeForUserToBeUpdated(String userName);
 
 
 }
