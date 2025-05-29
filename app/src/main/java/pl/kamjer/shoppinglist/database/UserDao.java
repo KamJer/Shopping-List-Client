@@ -5,7 +5,6 @@ import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.Query;
-import androidx.room.Update;
 
 import java.util.List;
 
@@ -15,9 +14,6 @@ import pl.kamjer.shoppinglist.model.User;
 public interface UserDao {
     @Insert
     void insertUser(User user);
-
-    @Update
-    void updateUser(User user);
 
     @Query("SELECT * FROM USER WHERE user_name=:userName")
     LiveData<User> findUserByUserName(String userName);

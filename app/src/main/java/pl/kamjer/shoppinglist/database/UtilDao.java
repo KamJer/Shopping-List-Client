@@ -56,9 +56,6 @@ public interface UtilDao {
     void deleteListCategory(List<Category> category);
 
     @Delete
-    void deleteCategory(Category category);
-
-    @Delete
     void deleteListShoppingItem(List<ShoppingItem> shoppingItem);
 
     @Update
@@ -233,34 +230,4 @@ public interface UtilDao {
                 .map(Category::getLocalCategoryId)
                 .orElse(0L);
     }
-
-    @Query("SELECT * FROM SHOPPING_ITEM WHERE local_item_amount_type_id=:localAmountTypeId")
-    List<ShoppingItem> findAllShoppingItemsForAmountType(Long localAmountTypeId);
-
-    @Transaction
-    default void deleteShoppingItemsForAmountTypeAndAmountType(AmountType amountType) {
-        findAllShoppingItemsForAmountType(amountType.getLocalAmountTypeId()).forEach(shoppingItem -> {
-            shoppingItem.setDeleted(true);
-            updateShoppingItem(shoppingItem);
-        });
-        amountType.setDeleted(true);
-        updateAmountType(amountType);
-    }
-
-    @Transaction
-    default void deleteCategorySoft(Category category) {
-        findAllShoppingItemsForCategory(category.getLocalCategoryId()).forEach(shoppingItem -> {
-            shoppingItem.setDeleted(true);
-            updateShoppingItem(shoppingItem);
-        });
-        if (category.getCategoryId() != 0) {
-            category.setDeleted(true);
-            updateCategory(category);
-        } else {
-            deleteCategory(category);
-        }
-    }
-
-    @Query("SELECT * FROM SHOPPING_ITEM WHERE local_item_category_id=:localCategoryId")
-    List<ShoppingItem> findAllShoppingItemsForCategory(long localCategoryId);
 }

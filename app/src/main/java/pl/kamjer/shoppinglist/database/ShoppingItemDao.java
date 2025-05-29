@@ -29,13 +29,13 @@ public interface ShoppingItemDao {
     void updateShoppingItems(List<ShoppingItem> shoppingItems);
 
     @Transaction
-    default void deleteShoppingItemSoftDelete(ShoppingItem shoppingItem) {
+    default void deleteShoppingItemSoft(ShoppingItem shoppingItem) {
         shoppingItem.setDeleted(true);
         updateShoppingItem(shoppingItem);
     }
 
     @Transaction
-    default void deleteShoppingItemsSoftDelete(List<ShoppingItem> shoppingItems) {
+    default void deleteShoppingItemsSoft(List<ShoppingItem> shoppingItems) {
         shoppingItems.forEach(shoppingItem -> {
             shoppingItem.setDeleted(true);
             updateShoppingItem(shoppingItem);
@@ -49,7 +49,6 @@ public interface ShoppingItemDao {
         }
         updateShoppingItem(shoppingItem);
     }
-
 
     default void updateShoppingItemsAmountTypeAndDeleteAmountType(AmountType amountTypeToDelete, AmountType amountTypeToChange) {
         findAllShoppingItemsForUser(amountTypeToDelete.getLocalAmountTypeId()).forEach(shoppingItem -> {

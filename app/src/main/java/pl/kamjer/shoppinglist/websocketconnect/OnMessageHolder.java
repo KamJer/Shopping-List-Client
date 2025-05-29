@@ -10,16 +10,31 @@ import lombok.Setter;
 import pl.kamjer.shoppinglist.websocketconnect.funcIntarface.OnMessageAction;
 
 @AllArgsConstructor
-@Getter
 @Setter
 public class OnMessageHolder {
 
     private HashMap<String, Gson> gsonsForSubs;
     private HashMap<String, OnMessageAction<?>> onMessageActionsForSubs;
+    @Getter
     private OnMessageAction<String> onErrorAction;
 
     void addOnMessageAction(String subsUrl, OnMessageAction<?> onMessageAction) {
         onMessageActionsForSubs.put(subsUrl, onMessageAction);
+    }
 
+    void putGsonForSubs(String subsUrl, Gson gson) {
+        gsonsForSubs.put(subsUrl, gson);
+    }
+
+    void removeOnMessageAction(String subsUrl) {
+        onMessageActionsForSubs.remove(subsUrl);
+    }
+
+    Gson getGsonForSubs(String subsUrl) {
+        return gsonsForSubs.get(subsUrl);
+    }
+
+    OnMessageAction<?> getOnMessageAction(String subsUrl) {
+        return onMessageActionsForSubs.get(subsUrl);
     }
 }

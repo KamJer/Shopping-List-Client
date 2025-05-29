@@ -12,7 +12,6 @@ import pl.kamjer.shoppinglist.model.ShoppingItem;
 import pl.kamjer.shoppinglist.repository.SharedRepository;
 import pl.kamjer.shoppinglist.repository.ShoppingRepository;
 import pl.kamjer.shoppinglist.repository.ShoppingServiceRepository;
-import pl.kamjer.shoppinglist.util.funcinterface.OnFailureAction;
 
 public class AmountTypeViewModel extends CustomViewModel {
 
@@ -40,7 +39,7 @@ public class AmountTypeViewModel extends CustomViewModel {
     }
 
     public void deleteAmountType(AmountType amountType) {
-        shoppingRepository.deleteAmountTypeSoft(amountType, () -> synchronizeData());
+        shoppingRepository.deleteAmountTypeSoft(amountType, this::synchronizeData);
     }
 
     public void loadAllShoppingItemsForAmountType(AmountType amountType) {

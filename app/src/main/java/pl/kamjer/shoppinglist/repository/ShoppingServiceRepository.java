@@ -20,6 +20,7 @@ import pl.kamjer.shoppinglist.gsonconverter.LocalDateTimeDeserializer;
 import pl.kamjer.shoppinglist.gsonconverter.LocalDateTimeSerializer;
 import pl.kamjer.shoppinglist.model.User;
 import pl.kamjer.shoppinglist.model.dto.AllDto;
+import pl.kamjer.shoppinglist.model.dto.AmountTypeDto;
 import pl.kamjer.shoppinglist.model.dto.ExceptionDto;
 import pl.kamjer.shoppinglist.service.BasicAuthInterceptor;
 import pl.kamjer.shoppinglist.service.SSLUtil;
@@ -28,6 +29,7 @@ import pl.kamjer.shoppinglist.service.service.UtilService;
 import pl.kamjer.shoppinglist.util.NetworkReceiver;
 import pl.kamjer.shoppinglist.util.ServiceUtil;
 import pl.kamjer.shoppinglist.util.funcinterface.OnConnectAction;
+import pl.kamjer.shoppinglist.util.loadManager.ServerMessageCoordinator;
 import pl.kamjer.shoppinglist.websocketconnect.WebSocket;
 import pl.kamjer.shoppinglist.websocketconnect.funcIntarface.OnConnectChangeAction;
 import pl.kamjer.shoppinglist.websocketconnect.funcIntarface.OnFailureAction;
@@ -60,6 +62,10 @@ public class ShoppingServiceRepository {
     @Setter
     private OnMessageAction<String> onMessageActionPip;
     @Setter
+    private OnMessageAction<AmountTypeDto> onMessageActionAddAmountType;
+    @Setter
+    private OnMessageAction<AmountTypeDto> onMessageActionUpdateAmountType;
+    @Setter
     private OnMessageAction<String> onErrorAction;
     @Setter
     private OnFailureAction onFailureAction;
@@ -69,6 +75,8 @@ public class ShoppingServiceRepository {
     @Getter
     @Setter
     private boolean initializedWithUser;
+
+    private ServerMessageCoordinator loadManager;
 
     private OkHttpClient okHttpClient;
 
@@ -116,7 +124,9 @@ public class ShoppingServiceRepository {
                 .onFailure((webSocket1, t, response) -> onFailureAction.action(webSocket1, t, response))
                 .onError((webSocket1, errorMessage) -> onErrorAction.action(webSocket1, errorMessage))
                 .subscribe(gson, "/synchronizeData", AllDto.class, onMessageActionSynchronize)
-                .subscribe(gson, "/{username}/pip", String.class, onMessageActionPip, user.getUserName());
+                .subscribe(gson, "/{username}/pip", String.class, onMessageActionPip, user.getUserName())
+                .subscribe(gson, "/{userName}/putAmountType", AmountTypeDto.class, onMessageActionAddAmountType, user.getUserName())
+                .subscribe(gson, "/{userName}/postAmountType", AmountTypeDto.class, onMessageActionUpdateAmountType, user.getUserName());
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(baseUrl + ip)
                 .client(okHttpClient)
@@ -152,6 +162,11 @@ public class ShoppingServiceRepository {
     public void websocketSynchronize(AllDto allDto, User user) {
         webSocket.send(gson, "/synchronizeData", allDto, user.getUserName());
     }
+
+    public void websocketPutAmountType(AmountTypeDto amountTypeDto, User user) {
+        webSocket.send(gson, "/{userName}/putAmountType", amountTypeDto, user.getUserName());
+    }
+
 
     private OkHttpClient createClientWithOutUser(Context context) {
         OkHttpClient.Builder okHttpClientBuilder = SSLUtil.getSSLContext(context);

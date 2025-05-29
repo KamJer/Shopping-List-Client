@@ -49,13 +49,13 @@ public class WebSocket {
 
     private OnConnectChangeAction onConnectAction;
 
-    private Observer<HashMap<String, SubscribeMessage>> subscribeMessagesLiveDataObserver = subscribeMessages -> {
+    private final Observer<HashMap<String, SubscribeMessage>> subscribeMessagesLiveDataObserver = subscribeMessages -> {
         if (getOpenValue().isPresent()) {
             sendSavedSubs(subscribeMessages);
         }
     };
 
-    private Observer<Message> connectedLiveDataObserver = openMessage -> {
+    private final Observer<Message> connectedLiveDataObserver = openMessage -> {
 //        if message is not null it means connection was successful
         if (openMessage != null) {
             sendSavedSubs(getSubscribeMessageValue());
@@ -104,7 +104,7 @@ public class WebSocket {
                                     subscribeMessage.setSend(false);
                                     subscribeMessage.setUnsubscribed(true);
                                     subscribeMessages.remove(subscribeMessage);
-                                    getOnMessageHolder().getOnMessageActionsForSubs().remove(subscribeMessage.getBaseUrl());
+                                    getOnMessageHolder().removeOnMessageAction(subscribeMessage.getBaseUrl());
                                 }
                             } else if (!subscribeMessage.isSend()) {
                                 log.info("Sending message by websocket connection:\n" +
@@ -215,13 +215,11 @@ public class WebSocket {
      */
     public WebSocket subscribe(Gson gson, String subscribeUrl, Type type, OnMessageAction<?> onMassageAction, String... parameters) {
         SubscribeMessage subscribeMessage = new SubscribeMessage(subscribeUrl, type, false, false, parameters);
-        if (parameters.length > 0) {
-            getOnMessageHolder().addOnMessageAction(subscribeMessage.getParameterUrl(), onMassageAction);
-            getOnMessageHolder().getGsonsForSubs().put(subscribeMessage.getParameterUrl(), gson);
-        } else {
-            getOnMessageHolder().addOnMessageAction(subscribeMessage.getBaseUrl(), onMassageAction);
-            getOnMessageHolder().getGsonsForSubs().put(subscribeMessage.getBaseUrl(), gson);
+        if (subscribeUrl.length() - subscribeUrl.replace("}", "").length() != parameters.length) {
+            throw new IllegalStateException("Wrong number of parameters");
         }
+        getOnMessageHolder().addOnMessageAction(subscribeMessage.getBaseUrl(), onMassageAction);
+        getOnMessageHolder().putGsonForSubs(subscribeMessage.getBaseUrl(), gson);
         addSubscribeMessagesValue(subscribeMessage);
         return this;
     }

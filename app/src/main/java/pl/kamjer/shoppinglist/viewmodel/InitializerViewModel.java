@@ -1,8 +1,6 @@
 package pl.kamjer.shoppinglist.viewmodel;
 
 import android.content.Context;
-import android.os.Handler;
-import android.os.Looper;
 
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.MutableLiveData;
@@ -16,6 +14,7 @@ import pl.kamjer.shoppinglist.repository.SharedRepository;
 import pl.kamjer.shoppinglist.repository.ShoppingRepository;
 import pl.kamjer.shoppinglist.repository.ShoppingServiceRepository;
 import pl.kamjer.shoppinglist.util.exception.handler.ShoppingListExceptionHandler;
+import pl.kamjer.shoppinglist.util.loadManager.ServerMessageCoordinator;
 import pl.kamjer.shoppinglist.websocketconnect.funcIntarface.OnMessageAction;
 
 @Log
@@ -72,16 +71,22 @@ public class InitializerViewModel extends CustomViewModel {
     }
 
     public void initializeOnMessageAction(User user, OnMessageAction<String> onErrorAction, pl.kamjer.shoppinglist.websocketconnect.funcIntarface.OnFailureAction failure) {
-        shoppingServiceRepository.setOnMessageActionSynchronize((webSocket, allDto) -> synchronizeData(user, allDto));
-
-        shoppingServiceRepository.setOnMessageActionPip((webSocket, pip) ->
-                shoppingRepository.getAllDataAndAct(user,
-                        (amountTypeList, categoryList, shoppingItemList) ->
-                                shoppingServiceRepository.websocketSynchronize(collectEntitiyToAllDto(user, amountTypeList, categoryList, shoppingItemList), user)));
-
-        shoppingServiceRepository.setOnErrorAction((webSocket, object) ->
-                new Handler(Looper.getMainLooper()).post(() -> onErrorAction.action(webSocket, object)));
-
-        shoppingServiceRepository.setOnFailureAction(failure);
+        ServerMessageCoordinator serverMessageCoordinator = new ServerMessageCoordinator(shoppingRepository, shoppingServiceRepository);
+        serverMessageCoordinator.register(user, onErrorAction, failure);
+//        shoppingServiceRepository.setOnMessageActionSynchronize((webSocket, allDto) -> synchronizeData(user, allDto));
+//
+//        shoppingServiceRepository.setOnMessageActionPip((webSocket, pip) ->
+//                shoppingRepository.getAllDataAndAct(user,
+//                        (amountTypeList, categoryList, shoppingItemList) ->
+//                                shoppingServiceRepository.websocketSynchronize(collectEntitiyToAllDto(user, amountTypeList, categoryList, shoppingItemList), user)));
+//
+//        shoppingServiceRepository.setOnMessageActionAddAmountType((webSocket, amountTypeDto) -> {
+//            shoppingRepository.updateAmountTypeFinal(amountTypeDto, getUserValue());
+//        });
+//
+//        shoppingServiceRepository.setOnErrorAction((webSocket, object) ->
+//                new Handler(Looper.getMainLooper()).post(() -> onErrorAction.action(webSocket, object)));
+//
+//        shoppingServiceRepository.setOnFailureAction(failure);
     }
 }

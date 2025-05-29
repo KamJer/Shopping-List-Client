@@ -15,6 +15,6 @@ public class Message {
     private HashMap<Header, String> headers;
 
     public String jsonyfy() {
-        return new Gson().toJson(this);
+        return new Gson().toJson(this) + "\0";
     }
 }

@@ -24,7 +24,7 @@ public class NewAmountTypeDialogViewModel extends CustomViewModel{
     }
 
     public void insertAmountType(AmountType amountType, OnFailureAction action) {
-        shoppingRepository.insertAmountType(getUserValue(), amountType, this::synchronizeData);
+        shoppingRepository.insertAmountType(getUserValue(), amountType, () -> putAmountType(amountType));
     }
 
     public void updateAmountType(AmountType amountType, OnFailureAction action) {

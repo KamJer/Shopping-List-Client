@@ -1,10 +1,14 @@
 package pl.kamjer.shoppinglist.util;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import pl.kamjer.shoppinglist.model.AmountType;
 import pl.kamjer.shoppinglist.model.Category;
 import pl.kamjer.shoppinglist.model.ModifyState;
 import pl.kamjer.shoppinglist.model.ShoppingItem;
 import pl.kamjer.shoppinglist.model.User;
+import pl.kamjer.shoppinglist.model.dto.AllDto;
 import pl.kamjer.shoppinglist.model.dto.AmountTypeDto;
 import pl.kamjer.shoppinglist.model.dto.CategoryDto;
 import pl.kamjer.shoppinglist.model.dto.ExceptionDto;
@@ -36,6 +40,7 @@ public class ServiceUtil {
                 .amountTypeId(amountType.getAmountTypeId())
                 .userName(user.getUserName())
                 .localAmountTypeId(amountType.getLocalId())
+                .deleted(amountType.isDeleted())
                 .build();
     }
 
@@ -55,6 +60,7 @@ public class ServiceUtil {
                 .categoryName(category.getCategoryName())
                 .userName(user.getUserName())
                 .localCategoryId(category.getLocalId())
+                .deleted(category.isDeleted())
                 .build();
     }
 
@@ -83,6 +89,7 @@ public class ServiceUtil {
                 .amount(shoppingItem.getAmount())
                 .bought(shoppingItem.isBought())
                 .userName(user.getUserName())
+                .deleted(shoppingItem.isDeleted())
                 .localShoppingItemId(shoppingItem.getLocalId())
                 .localItemAmountTypeId(shoppingItem.getLocalAmountTypeId())
                 .localItemCategoryId(shoppingItem.getLocalCategoryId())
@@ -91,5 +98,59 @@ public class ServiceUtil {
 
     public static ExceptionDto toExceptionDto(Throwable e) {
         return ExceptionDto.builder().massage(e.getMessage()).stackTrace(e.getStackTrace()).build();
+    }
+
+    public static AllDto collectEntitiyToAllDto(User user, List<AmountType> amountTypes, List<Category> categories, List<ShoppingItem> shoppingItems) {
+        List<AmountTypeDto> amountTypesToSend = amountTypes
+                .stream()
+                .map(amountType -> {
+                    if (amountType.isUpdated()) {
+                        return ServiceUtil.amountTypeToAmountTypeDto(amountType, ModifyState.UPDATE);
+                    } else if (amountType.isDeleted()) {
+                        return ServiceUtil.amountTypeToAmountTypeDto(amountType, ModifyState.DELETE);
+                    } else if (amountType.getAmountTypeId() == 0) {
+                        return ServiceUtil.amountTypeToAmountTypeDto(amountType, ModifyState.INSERT);
+                    } else {
+                        return ServiceUtil.amountTypeToAmountTypeDto(amountType, ModifyState.NONE);
+                    }
+                })
+                .collect(Collectors.toList());
+
+        List<CategoryDto> categoriesToSend = categories
+                .stream()
+                .map(category -> {
+                    if (category.isUpdated()) {
+                        return ServiceUtil.categoryToCategoryDto(category, ModifyState.UPDATE);
+                    } else if (category.isDeleted()) {
+                        return ServiceUtil.categoryToCategoryDto(category, ModifyState.DELETE);
+                    } else if (category.getCategoryId() == 0) {
+                        return ServiceUtil.categoryToCategoryDto(category, ModifyState.INSERT);
+                    } else {
+                        return ServiceUtil.categoryToCategoryDto(category, ModifyState.NONE);
+                    }
+                })
+                .collect(Collectors.toList());
+
+        List<ShoppingItemDto> shoppingItemsToSend = shoppingItems
+                .stream()
+                .map(shoppingItem -> {
+                    if (shoppingItem.isUpdated()) {
+                        return ServiceUtil.shoppingItemToShoppingItemDto(shoppingItem, ModifyState.UPDATE);
+                    } else if (shoppingItem.isDeleted()) {
+                        return ServiceUtil.shoppingItemToShoppingItemDto(shoppingItem, ModifyState.DELETE);
+                    } else if (shoppingItem.getShoppingItemId() == 0) {
+                        return ServiceUtil.shoppingItemToShoppingItemDto(shoppingItem, ModifyState.INSERT);
+                    } else {
+                        return ServiceUtil.shoppingItemToShoppingItemDto(shoppingItem, ModifyState.NONE);
+                    }
+                })
+                .collect(Collectors.toList());
+
+        return AllDto.builder()
+                .amountTypeDtoList(amountTypesToSend)
+                .categoryDtoList(categoriesToSend)
+                .shoppingItemDtoList(shoppingItemsToSend)
+                .savedTime(user.getSavedTime())
+                .build();
     }
 }

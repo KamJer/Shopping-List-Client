@@ -2,6 +2,7 @@ package pl.kamjer.shoppinglist.database;
 
 import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
+import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.Query;
 import androidx.room.Transaction;
@@ -10,16 +11,35 @@ import androidx.room.Update;
 import java.util.List;
 
 import pl.kamjer.shoppinglist.model.Category;
+import pl.kamjer.shoppinglist.model.ShoppingItem;
 
 @Dao
 public interface CategoryDao {
 
     @Insert
     Long insertCategory(Category category);
+
+    @Query("SELECT * FROM SHOPPING_ITEM WHERE local_item_category_id=:localCategoryId")
+    List<ShoppingItem> findAllShoppingItemsForCategory(long localCategoryId);
+
+    @Update
+    void updateShoppingItem(ShoppingItem shoppingItems);
+
+    @Delete
+    void deleteCategory(Category category);
+
     @Transaction
     default void deleteCategorySoft(Category category) {
-        category.setDeleted(true);
-        updateCategory(category);
+        findAllShoppingItemsForCategory(category.getLocalCategoryId()).forEach(shoppingItem -> {
+            shoppingItem.setDeleted(true);
+            updateShoppingItem(shoppingItem);
+        });
+        if (category.getCategoryId() != 0) {
+            category.setDeleted(true);
+            updateCategory(category);
+        } else {
+            deleteCategory(category);
+        }
     }
 
     @Transaction
@@ -36,10 +56,6 @@ public interface CategoryDao {
     @Transaction
     @Query("SELECT * FROM CATEGORY WHERE deleted=0 AND user_name=:userName")
     LiveData<List<Category>> findAllCategory(String userName);
-
-    @Transaction
-    @Insert
-    long[] insertCategories(List<Category> categories);
 
     @Transaction
     @Query("SELECT * FROM CATEGORY WHERE user_name=:userName")

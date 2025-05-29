@@ -8,11 +8,13 @@ import androidx.lifecycle.Observer;
 import androidx.room.Room;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -32,6 +34,11 @@ import pl.kamjer.shoppinglist.model.ModifyState;
 import pl.kamjer.shoppinglist.model.ShoppingItem;
 import pl.kamjer.shoppinglist.model.ShoppingItemWithAmountTypeAndCategory;
 import pl.kamjer.shoppinglist.model.User;
+import pl.kamjer.shoppinglist.model.dto.AllDto;
+import pl.kamjer.shoppinglist.model.dto.AmountTypeDto;
+import pl.kamjer.shoppinglist.model.dto.CategoryDto;
+import pl.kamjer.shoppinglist.model.dto.ShoppingItemDto;
+import pl.kamjer.shoppinglist.util.ServiceUtil;
 import pl.kamjer.shoppinglist.util.exception.handler.DatabaseAndServiceOperationExceptionHandler;
 import pl.kamjer.shoppinglist.util.funcinterface.LoadToServerAction;
 import pl.kamjer.shoppinglist.util.funcinterface.PostNewElements;
@@ -157,14 +164,14 @@ public class ShoppingRepository {
 
     public void deleteShoppingItemSoftDelete(ShoppingItem shoppingItem, LoadToServerAction action) {
         executorService.execute(() -> {
-            shoppingItemDao.deleteShoppingItemSoftDelete(shoppingItem);
+            shoppingItemDao.deleteShoppingItemSoft(shoppingItem);
             action.action();
         });
     }
 
     public void deleteShoppingItemsSoftDeleteAndDeleteAmountType(AmountType amountType, LoadToServerAction action) {
         executorService.execute(() -> {
-            utilDao.deleteShoppingItemsForAmountTypeAndAmountType(amountType);
+            amountTypeDao.deleteAmountTypeSoft(amountType);
             action.action();
         });
     }
@@ -191,7 +198,7 @@ public class ShoppingRepository {
 
     public void deleteCategorySoft(Category category, LoadToServerAction action) {
         executorService.execute(() -> {
-            utilDao.deleteCategorySoft(category);
+            categoryDao.deleteCategorySoft(category);
             action.action();
         });
     }
@@ -230,6 +237,15 @@ public class ShoppingRepository {
         });
     }
 
+    public void updateAmountTypeFinal(AmountTypeDto amountTypeDto, User user) {
+        executorService.execute(() ->
+                amountTypeDao.updateAmountType(ServiceUtil.amountTypeDtoToAmountType(user, amountTypeDto)));
+    }
+
+    public void deleteAmountTypeFinal(AmountTypeDto amountTypeDto, User user) {
+
+    }
+
     //util
     public void getAllDataAndAct(User user, PostNewElements action) {
         executorService.execute(() ->
@@ -245,6 +261,33 @@ public class ShoppingRepository {
                                 User user,
                                 LocalDateTime savedTime) {
         executorService.execute(() -> utilDao.synchronizeData(amountTypes, categories, shoppingItems, user, savedTime));
+    }
+
+    public void synchronizeData(User user, AllDto responseAllDto) {
+        Map<ModifyState, List<AmountType>> amountTypeListFiltered = Optional.ofNullable(responseAllDto.getAmountTypeDtoList()).orElse(new ArrayList<>())
+                .stream()
+                .collect(Collectors.groupingBy(
+                        AmountTypeDto::getModifyState,
+                        Collectors.mapping(dto -> ServiceUtil.amountTypeDtoToAmountType(user, dto), Collectors.toList())));
+
+        Map<ModifyState, List<Category>> categoryListFiltered = Optional.ofNullable(responseAllDto.getCategoryDtoList()).orElse(new ArrayList<>())
+                .stream()
+                .collect(Collectors.groupingBy(
+                        CategoryDto::getModifyState,
+                        Collectors.mapping(dto -> ServiceUtil.categoryDtoToCategory(user, dto), Collectors.toList())));
+
+        Map<ModifyState, List<ShoppingItem>> shoppingItemListFiltered = Optional.ofNullable(responseAllDto.getShoppingItemDtoList()).orElse(new ArrayList<>())
+                .stream()
+                .collect(Collectors.groupingBy(
+                        ShoppingItemDto::getModifyState,
+                        Collectors.mapping(dto -> ServiceUtil.shoppingItemDtoToShoppingItem(user, dto), Collectors.toList())));
+
+        synchronizeData(
+                amountTypeListFiltered,
+                categoryListFiltered,
+                shoppingItemListFiltered,
+                user,
+                responseAllDto.getSavedTime());
     }
 
     public LiveData<List<User>> loadAllUsers() {

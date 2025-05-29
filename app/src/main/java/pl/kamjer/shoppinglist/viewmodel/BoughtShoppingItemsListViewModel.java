@@ -6,7 +6,6 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.viewmodel.ViewModelInitializer;
 
 import java.util.List;
-import java.util.Optional;
 
 import pl.kamjer.shoppinglist.model.Category;
 import pl.kamjer.shoppinglist.model.ShoppingItem;
@@ -15,8 +14,6 @@ import pl.kamjer.shoppinglist.model.User;
 import pl.kamjer.shoppinglist.repository.SharedRepository;
 import pl.kamjer.shoppinglist.repository.ShoppingRepository;
 import pl.kamjer.shoppinglist.repository.ShoppingServiceRepository;
-import pl.kamjer.shoppinglist.util.exception.NoUserFoundException;
-import pl.kamjer.shoppinglist.util.funcinterface.OnFailureAction;
 
 public class BoughtShoppingItemsListViewModel extends CustomViewModel {
 
@@ -59,13 +56,5 @@ public class BoughtShoppingItemsListViewModel extends CustomViewModel {
 
     public void setAllCategoryLiveDataObserver(LifecycleOwner owner, Observer<List<Category>> observer) {
         allCategoryLiveData.observe(owner, observer);
-    }
-
-    public void loadUser() {
-        userLiveData = shoppingRepository.loadUser(sharedRepository.loadUser());
-    }
-
-    public User getUserValue() throws NoUserFoundException {
-        return Optional.ofNullable(userLiveData.getValue()).orElseThrow(() -> new NoUserFoundException("No user is logged"));
     }
 }

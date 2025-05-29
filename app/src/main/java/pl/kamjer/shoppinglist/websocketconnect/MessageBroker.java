@@ -41,9 +41,9 @@ public class MessageBroker {
     private void handleMessage(okhttp3.WebSocket webSocket, Message message) {
         Optional.ofNullable(subscribeMessages).ifPresent(subscribeMessages -> {
             SubscribeMessage subscribeMessage = subscribeMessages.get(message.getHeaders().get(Header.DEST));
-            Gson gson = onMessageHolder.getGsonsForSubs().get(subscribeMessage.getSubscribeUrl());
+            Gson gson = onMessageHolder.getGsonForSubs(subscribeMessage.getSubscribeUrl());
             String messageBody = message.getHeaders().get(Header.BODY);
-            onMessageHolder.getOnMessageActionsForSubs().get(subscribeMessage.getSubscribeUrl()).action(webSocket, gson.fromJson(messageBody, subscribeMessage.getType()));
+            onMessageHolder.getOnMessageAction(subscribeMessage.getSubscribeUrl()).action(webSocket, gson.fromJson(messageBody, subscribeMessage.getType()));
         });
     }
 

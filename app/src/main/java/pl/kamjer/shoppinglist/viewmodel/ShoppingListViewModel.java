@@ -61,11 +61,11 @@ public class ShoppingListViewModel extends CustomViewModel {
     }
 
     public void updateShoppingItem(ShoppingItem shoppingItem, OnFailureAction action) {
-        shoppingRepository.updateShoppingItemFlag(shoppingItem, () -> synchronizeData());
+        shoppingRepository.updateShoppingItemFlag(shoppingItem, this::synchronizeData);
     }
 
     public void deleteShoppingItem(ShoppingItem shoppingItem, OnFailureAction action) {
-        shoppingRepository.deleteShoppingItemSoftDelete(shoppingItem, () -> synchronizeData());
+        shoppingRepository.deleteShoppingItemSoftDelete(shoppingItem, this::synchronizeData);
     }
 
     public void loadAllCategory() {
@@ -77,15 +77,15 @@ public class ShoppingListViewModel extends CustomViewModel {
     }
 
     public void deleteCategory(Category category, OnFailureAction action) {
-        shoppingRepository.deleteCategorySoft(category, () -> synchronizeData());
+        shoppingRepository.deleteCategorySoft(category, this::synchronizeData);
     }
 
     public void insertCategory(Category category, OnFailureAction action) {
-        shoppingRepository.insertCategory(getUserValue(), category, () -> synchronizeData());
+        shoppingRepository.insertCategory(getUserValue(), category, this::synchronizeData);
     }
 
     public void updateCategory(Category category, OnFailureAction action) {
-        shoppingRepository.updateCategoryFlag(category, () -> synchronizeData());
+        shoppingRepository.updateCategoryFlag(category, this::synchronizeData);
     }
 
     public boolean isTutorialSeen() {

@@ -1,7 +1,5 @@
 package pl.kamjer.shoppinglist.websocketconnect.message;
 
-import com.google.gson.Gson;
-
 import java.lang.reflect.Type;
 import java.util.HashMap;
 
@@ -75,18 +73,14 @@ public class SubscribeMessage {
     }
 
     public String getSubscribeMessage() {
-        return new Gson().toJson(subscribeMessage);
+        return subscribeMessage.jsonyfy();
     }
 
     public String getUnsubscribeMessage() {
-        return new Gson().toJson(subscribeMessage);
+        return unsubscribeMessage.jsonyfy();
     }
 
     public String getSubscribeUrl() {
-        if (parameterUrl == null) {
             return baseUrl;
-        } else {
-            return parameterUrl;
-        }
     }
 }

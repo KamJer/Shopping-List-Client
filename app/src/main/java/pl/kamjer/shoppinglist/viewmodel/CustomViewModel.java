@@ -1,9 +1,5 @@
 package pl.kamjer.shoppinglist.viewmodel;
 
-import android.os.Handler;
-import android.os.Looper;
-
-import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModel;
 
@@ -29,12 +25,6 @@ import pl.kamjer.shoppinglist.repository.ShoppingRepository;
 import pl.kamjer.shoppinglist.repository.ShoppingServiceRepository;
 import pl.kamjer.shoppinglist.util.ServiceUtil;
 import pl.kamjer.shoppinglist.util.exception.NoUserFoundException;
-import pl.kamjer.shoppinglist.util.exception.NotOkHttpResponseException;
-import pl.kamjer.shoppinglist.util.funcinterface.OnConnectAction;
-import pl.kamjer.shoppinglist.util.funcinterface.OnFailureAction;
-import pl.kamjer.shoppinglist.websocketconnect.funcIntarface.OnMessageAction;
-import retrofit2.Call;
-import retrofit2.Callback;
 import retrofit2.Response;
 
 @RequiredArgsConstructor
@@ -46,26 +36,26 @@ public class CustomViewModel extends ViewModel {
 
     protected LiveData<User> userLiveData;
 
-    @Deprecated
-    protected Callback<AllDto> synchronizeDataCallback(User user, OnFailureAction connectionFailedAction, OnConnectAction successAction, OnConnectAction failureAction) {
-        return new Callback<AllDto>() {
-            @Override
-            public void onResponse(@NonNull Call<AllDto> call, @NonNull Response<AllDto> response) {
-                if (response.isSuccessful()) {
-                    synchronizeData(user, Optional.ofNullable(response.body()).orElse(AllDto.builder().build()));
-                    successAction.action();
-                } else {
-                    failureAction.action();
-                    connectionFailedAction.action(new NotOkHttpResponseException(decodeErrorMassage(response)));
-                }
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<AllDto> call, @NonNull Throwable t) {
-                connectionFailedAction.action(t);
-            }
-        };
-    }
+//    @Deprecated
+//    protected Callback<AllDto> synchronizeDataCallback(User user, OnFailureAction connectionFailedAction, OnConnectAction successAction, OnConnectAction failureAction) {
+//        return new Callback<AllDto>() {
+//            @Override
+//            public void onResponse(@NonNull Call<AllDto> call, @NonNull Response<AllDto> response) {
+//                if (response.isSuccessful()) {
+//                    synchronizeData(user, Optional.ofNullable(response.body()).orElse(AllDto.builder().build()));
+//                    successAction.action();
+//                } else {
+//                    failureAction.action();
+//                    connectionFailedAction.action(new NotOkHttpResponseException(decodeErrorMassage(response)));
+//                }
+//            }
+//
+//            @Override
+//            public void onFailure(@NonNull Call<AllDto> call, @NonNull Throwable t) {
+//                connectionFailedAction.action(t);
+//            }
+//        };
+//    }
 
     public void loadUser() {
         userLiveData = shoppingRepository.loadUser(sharedRepository.loadUser());
@@ -84,7 +74,7 @@ public class CustomViewModel extends ViewModel {
     }
 
     /**
-     * Method for synchronization for passed user, and act on success or failure
+     * Method for synchronization for passed user
      * @param user - to synchronize for
      */
     public void synchronizeData(User user) {
@@ -92,6 +82,10 @@ public class CustomViewModel extends ViewModel {
             AllDto allDto = collectEntitiyToAllDto(user, amountTypes, categories, shoppingItems);
             shoppingServiceRepository.websocketSynchronize(allDto, user);
         });
+    }
+
+    public void putAmountType(AmountType amountType) {
+        shoppingServiceRepository.websocketPutAmountType(ServiceUtil.amountTypeToAmountTypeDto(amountType, ModifyState.INSERT), getUserValue());
     }
 
     protected AllDto collectEntitiyToAllDto(User user, List<AmountType> amountTypes, List<Category> categories, List<ShoppingItem> shoppingItems) {
