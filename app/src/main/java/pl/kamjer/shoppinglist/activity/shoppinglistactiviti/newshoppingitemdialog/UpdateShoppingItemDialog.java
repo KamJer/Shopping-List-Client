@@ -53,6 +53,6 @@ public class UpdateShoppingItemDialog extends NewShoppingItemDialog{
         shoppingItemToUpdate.setItemCategoryId(shoppingItem.getItemCategoryId());
         shoppingItemToUpdate.setLocalItemAmountTypeId(shoppingItem.getLocalItemAmountTypeId());
         shoppingItemToUpdate.setItemAmountTypeId(shoppingItem.getItemAmountTypeId());
-        newShoppingItemDialogViewModel.updateShoppingItem(shoppingItemToUpdate, connectionFailedAction);
+        newShoppingItemDialogViewModel.updateShoppingItem(shoppingItemToUpdate);
     }
 }

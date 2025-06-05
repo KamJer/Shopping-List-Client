@@ -73,20 +73,9 @@ public class InitializerViewModel extends CustomViewModel {
     public void initializeOnMessageAction(User user, OnMessageAction<String> onErrorAction, pl.kamjer.shoppinglist.websocketconnect.funcIntarface.OnFailureAction failure) {
         ServerMessageCoordinator serverMessageCoordinator = new ServerMessageCoordinator(shoppingRepository, shoppingServiceRepository);
         serverMessageCoordinator.register(user, onErrorAction, failure);
-//        shoppingServiceRepository.setOnMessageActionSynchronize((webSocket, allDto) -> synchronizeData(user, allDto));
-//
-//        shoppingServiceRepository.setOnMessageActionPip((webSocket, pip) ->
-//                shoppingRepository.getAllDataAndAct(user,
-//                        (amountTypeList, categoryList, shoppingItemList) ->
-//                                shoppingServiceRepository.websocketSynchronize(collectEntitiyToAllDto(user, amountTypeList, categoryList, shoppingItemList), user)));
-//
-//        shoppingServiceRepository.setOnMessageActionAddAmountType((webSocket, amountTypeDto) -> {
-//            shoppingRepository.updateAmountTypeFinal(amountTypeDto, getUserValue());
-//        });
-//
-//        shoppingServiceRepository.setOnErrorAction((webSocket, object) ->
-//                new Handler(Looper.getMainLooper()).post(() -> onErrorAction.action(webSocket, object)));
-//
-//        shoppingServiceRepository.setOnFailureAction(failure);
+    }
+
+    public void websocketDisconnect() {
+        shoppingServiceRepository.disconnect();
     }
 }

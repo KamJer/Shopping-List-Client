@@ -25,7 +25,7 @@ public class UpdateAmountTypeDialog extends AddNewAmountTypeDialog {
 
     @Override
     protected void acceptingAmountType(AmountType amountType) {
-        newAmountTypeDialogViewModel.updateAmountType(amountType, connectionFailedAction);
+        newAmountTypeDialogViewModel.updateAmountType(amountType);
     }
 
     @Override

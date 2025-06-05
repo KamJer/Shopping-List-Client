@@ -162,7 +162,7 @@ public class ShoppingRepository {
         executorService.execute(() -> shoppingItemDao.updateShoppingItems(shoppingItems));
     }
 
-    public void deleteShoppingItemSoftDelete(ShoppingItem shoppingItem, LoadToServerAction action) {
+    public void deleteShoppingItemSoft(ShoppingItem shoppingItem, LoadToServerAction action) {
         executorService.execute(() -> {
             shoppingItemDao.deleteShoppingItemSoft(shoppingItem);
             action.action();
@@ -181,6 +181,16 @@ public class ShoppingRepository {
             shoppingItemDao.updateShoppingItemsAmountTypeAndDeleteAmountType(amountTypeToDelete, amountTypeToChange);
             action.action();
         });
+    }
+
+    public void updateShoppingItemFinal(ShoppingItemDto shoppingItemDto, User user) {
+        executorService.execute(() ->
+                shoppingItemDao.updateShoppingItemAndSavedTime(ServiceUtil.shoppingItemDtoToShoppingItem(user, shoppingItemDto), shoppingItemDto.getSavedTime()));
+    }
+
+    public void deleteShoppingItemFinal(ShoppingItemDto shoppingItemDto, User user) {
+        executorService.execute(() ->
+                shoppingItemDao.deleteShoppingItemAndSavedTime(ServiceUtil.shoppingItemDtoToShoppingItem(user, shoppingItemDto), shoppingItemDto.getSavedTime()));
     }
 
     //    category
@@ -210,6 +220,23 @@ public class ShoppingRepository {
         });
     }
 
+    /**
+     * Updates category in database with out setting up a flag
+     *
+     * @param categoryDto dto of a amount type to updates
+     * @param user          - user logged in
+     */
+    public void updateCategoryFinal(CategoryDto categoryDto, User user) {
+        executorService.execute(() ->
+                categoryDao.updateCategoryAndSavedTime(ServiceUtil.categoryDtoToCategory(user, categoryDto), categoryDto.getSavedTime()));
+    }
+
+    public void deleteCategoryFinal(CategoryDto categoryDto, User user) {
+        executorService.execute(() ->
+                categoryDao.deleteCategoryAndSavedTime(ServiceUtil.categoryDtoToCategory(user, categoryDto), categoryDto.getSavedTime()));
+
+    }
+
     //    amountType
     public LiveData<List<AmountType>> loadAllAmountType(User user) {
         return amountTypeDao.findAllAmountType(user.getUserName());
@@ -230,20 +257,33 @@ public class ShoppingRepository {
         });
     }
 
-    public void updateAmountType(AmountType amountType, LoadToServerAction action) {
+    public void updateAmountTypeSoft(AmountType amountType, LoadToServerAction action) {
         executorService.execute(() -> {
             amountTypeDao.updateAmountTypeFlag(amountType);
             action.action();
         });
     }
 
+    /**
+     * Updates amount type in database with out setting up a flag
+     *
+     * @param amountTypeDto dto of a amount type to updates
+     * @param user          - user logged in
+     */
     public void updateAmountTypeFinal(AmountTypeDto amountTypeDto, User user) {
         executorService.execute(() ->
-                amountTypeDao.updateAmountType(ServiceUtil.amountTypeDtoToAmountType(user, amountTypeDto)));
+                amountTypeDao.updateAmountTypeAndSavedTime(ServiceUtil.amountTypeDtoToAmountType(user, amountTypeDto), amountTypeDto.getSavedTime()));
     }
 
+    /**
+     * Deletes amount type in database with out setting up a flag
+     *
+     * @param amountTypeDto - dto of a amount type to delete
+     * @param user          - user logged in
+     */
     public void deleteAmountTypeFinal(AmountTypeDto amountTypeDto, User user) {
-
+        executorService.execute(() ->
+                amountTypeDao.deleteAmountTypeAndSavedTime(ServiceUtil.amountTypeDtoToAmountType(user, amountTypeDto), amountTypeDto.getSavedTime()));
     }
 
     //util
@@ -305,5 +345,8 @@ public class ShoppingRepository {
         return shoppingItemDao.loadShoppingItemByAmountTypeIdToBeUpdated(user.getUserName(), amountType.getLocalAmountTypeId());
     }
 
+    public void updateUserSavedTime(LocalDateTime savedTime, User user) {
+      userDao.updateUsersSavedTime(savedTime, user.getUserName());
+    };
 
 }

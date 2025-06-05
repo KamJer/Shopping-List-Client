@@ -47,7 +47,7 @@ public class BoughtShoppingItemsListViewModel extends CustomViewModel {
     }
 
     public void deleteShoppingItem(ShoppingItem shoppingItem) {
-        shoppingRepository.deleteShoppingItemSoftDelete(shoppingItem, this::synchronizeData);
+        shoppingRepository.deleteShoppingItemSoft(shoppingItem, this::synchronizeData);
     }
 
     public void loadAllCategory() {

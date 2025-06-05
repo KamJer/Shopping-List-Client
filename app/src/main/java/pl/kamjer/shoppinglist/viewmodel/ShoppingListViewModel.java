@@ -12,11 +12,13 @@ import java.util.Optional;
 import lombok.Getter;
 import lombok.extern.java.Log;
 import pl.kamjer.shoppinglist.model.Category;
+import pl.kamjer.shoppinglist.model.ModifyState;
 import pl.kamjer.shoppinglist.model.ShoppingItem;
 import pl.kamjer.shoppinglist.model.ShoppingItemWithAmountTypeAndCategory;
 import pl.kamjer.shoppinglist.repository.SharedRepository;
 import pl.kamjer.shoppinglist.repository.ShoppingRepository;
 import pl.kamjer.shoppinglist.repository.ShoppingServiceRepository;
+import pl.kamjer.shoppinglist.util.ServiceUtil;
 import pl.kamjer.shoppinglist.util.funcinterface.OnFailureAction;
 
 @Getter
@@ -60,12 +62,20 @@ public class ShoppingListViewModel extends CustomViewModel {
         shoppingRepository.updateShoppingItems(shoppingItems);
     }
 
-    public void updateShoppingItem(ShoppingItem shoppingItem, OnFailureAction action) {
-        shoppingRepository.updateShoppingItemFlag(shoppingItem, this::synchronizeData);
+    public void updateShoppingItem(ShoppingItem shoppingItem) {
+        shoppingRepository.updateShoppingItemFlag(shoppingItem, () -> updateShoppingItemServer(shoppingItem));
     }
 
-    public void deleteShoppingItem(ShoppingItem shoppingItem, OnFailureAction action) {
-        shoppingRepository.deleteShoppingItemSoftDelete(shoppingItem, this::synchronizeData);
+    public void updateShoppingItemServer(ShoppingItem shoppingItem) {
+        shoppingServiceRepository.websocketPostShoppingItem(ServiceUtil.shoppingItemToShoppingItemDto(shoppingItem, ModifyState.UPDATE), getUserValue());
+    }
+
+    public void deleteShoppingItem(ShoppingItem shoppingItem) {
+        shoppingRepository.deleteShoppingItemSoft(shoppingItem, () -> deleteShoppingItemServer(shoppingItem));
+    }
+
+    public void deleteShoppingItemServer(ShoppingItem shoppingItem) {
+        shoppingServiceRepository.websocketDeleteShoppingItem(ServiceUtil.shoppingItemToShoppingItemDto(shoppingItem, ModifyState.DELETE), getUserValue());
     }
 
     public void loadAllCategory() {
@@ -76,20 +86,32 @@ public class ShoppingListViewModel extends CustomViewModel {
         allCategoryLiveData.observe(owner, observer);
     }
 
-    public void deleteCategory(Category category, OnFailureAction action) {
-        shoppingRepository.deleteCategorySoft(category, this::synchronizeData);
+    public void deleteCategory(Category category) {
+        shoppingRepository.deleteCategorySoft(category, () -> deleteCategoryServer(category));
     }
 
-    public void insertCategory(Category category, OnFailureAction action) {
-        shoppingRepository.insertCategory(getUserValue(), category, this::synchronizeData);
+    public void insertCategory(Category category) {
+        shoppingRepository.insertCategory(getUserValue(), category, () -> insertCategoryServer(category));
     }
 
     public void updateCategory(Category category, OnFailureAction action) {
-        shoppingRepository.updateCategoryFlag(category, this::synchronizeData);
+        shoppingRepository.updateCategoryFlag(category, () -> updateCategoryServer(category));
+    }
+
+    private void insertCategoryServer(Category category) {
+        shoppingServiceRepository.websocketPutCategory(ServiceUtil.categoryToCategoryDto(category, ModifyState.INSERT), getUserValue());
+    }
+
+    private void updateCategoryServer(Category category) {
+        shoppingServiceRepository.websocketPostCategory(ServiceUtil.categoryToCategoryDto(category, ModifyState.UPDATE), getUserValue());
+    }
+
+    private void deleteCategoryServer(Category category) {
+        shoppingServiceRepository.websocketDeleteCategory(ServiceUtil.categoryToCategoryDto(category, ModifyState.DELETE), getUserValue());
     }
 
     public boolean isTutorialSeen() {
-       return sharedRepository.isTutorialSeen();
+        return sharedRepository.isTutorialSeen();
     }
 
     public void tutorialSeen(boolean seen) {

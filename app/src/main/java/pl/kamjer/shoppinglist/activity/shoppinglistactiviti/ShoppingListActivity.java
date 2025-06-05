@@ -62,8 +62,7 @@ public class ShoppingListActivity extends GenericActivity {
     };
 
     private final RemoveCategoryAction deleteCategoryAction =
-            category -> shoppingListViewModel.deleteCategory(category,
-                    connectionFailedAction);
+            category -> shoppingListViewModel.deleteCategory(category);
 
     private final RemoveCategoryAction updateCategoryAction = (category) -> {
         Intent updatedCategoryIntent = new Intent(this, UpdateCategoryDialog.class);
@@ -90,13 +89,11 @@ public class ShoppingListActivity extends GenericActivity {
     private final UpdateShoppingItemActonCheckBox checkBoxListener = (isChecked, shoppingItemWithAmountTypeAndCategory) -> {
         ShoppingItem shoppingItem = shoppingItemWithAmountTypeAndCategory.getShoppingItem();
         shoppingItem.setBought(isChecked);
-        shoppingListViewModel.updateShoppingItem(shoppingItem,
-                connectionFailedAction);
+        shoppingListViewModel.updateShoppingItem(shoppingItem);
     };
 
     private final ModifyShoppingItemAction deleteShoppingItemAction = shoppingItemWithAmountTypeAndCategory ->
-            shoppingListViewModel.deleteShoppingItem(shoppingItemWithAmountTypeAndCategory.getShoppingItem(),
-                    connectionFailedAction);
+            shoppingListViewModel.deleteShoppingItem(shoppingItemWithAmountTypeAndCategory.getShoppingItem());
     private final ModifyShoppingItemAction modifyShoppingItemAction = shoppingItemWithAmountTypeAndCategory -> {
         Intent updateShoppingItemIntent = new Intent(this, UpdateShoppingItemDialog.class);
         updateShoppingItemIntent.putExtra(NewShoppingItemDialog.CATEGORY_FIELD_NAME, shoppingItemWithAmountTypeAndCategory.getCategory());
@@ -127,7 +124,7 @@ public class ShoppingListActivity extends GenericActivity {
 //        loading data
         shoppingListViewModel.initialize();
 
-//        initliazing tutorial
+//        initializing tutorial
         TutorialManager tutorialManager = new TutorialManager(
                 shoppingListViewModel,
                 new FrameLayout[]{findViewById(R.id.first_tutorial_overlay), findViewById(R.id.second_tutorial_overlay)},
@@ -182,8 +179,7 @@ public class ShoppingListActivity extends GenericActivity {
                 if (data != null) {
                     shoppingListViewModel.insertCategory(Category.builder()
                                     .categoryName(data.getStringExtra(NewCategoryDialog.NEW_CATEGORY_NAME))
-                                    .build(),
-                            connectionFailedAction);
+                                    .build());
                 }
             }
         });

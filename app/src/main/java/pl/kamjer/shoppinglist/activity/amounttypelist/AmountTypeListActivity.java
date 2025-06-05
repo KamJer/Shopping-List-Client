@@ -36,7 +36,7 @@ public class AmountTypeListActivity extends GenericActivity {
 //        loading data for that amountType
         amountTypeViewModel.loadAllShoppingItemsForAmountType(amountType);
 //        observer for data
-        amountTypeViewModel.setAllShoppingItemsForAmountTypeLiveDataObserver(this, new Observer<List<ShoppingItem>>() {
+        amountTypeViewModel.setAllShoppingItemsForAmountTypeLiveDataObserver(this, new Observer<>() {
             @Override
             public void onChanged(List<ShoppingItem> shoppingItems) {
 //            if data for that amountType is empty ust delete amountType if it is not as user what to do with data data

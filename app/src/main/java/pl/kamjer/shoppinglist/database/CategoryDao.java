@@ -8,6 +8,7 @@ import androidx.room.Query;
 import androidx.room.Transaction;
 import androidx.room.Update;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import pl.kamjer.shoppinglist.model.Category;
@@ -25,8 +26,23 @@ public interface CategoryDao {
     @Update
     void updateShoppingItem(ShoppingItem shoppingItems);
 
+    @Transaction
+    default void updateCategoryAndSavedTime(Category category, LocalDateTime savedTime) {
+        updateCategory(category);
+        updateUsersSavedTime(savedTime, category.getUserName());
+    }
+
+    @Query("Update USER SET saved_time = :savedTime WHERE user_name=:userName")
+    void updateUsersSavedTime(LocalDateTime savedTime, String userName);
+
     @Delete
     void deleteCategory(Category category);
+
+    @Transaction
+    default void deleteCategoryAndSavedTime(Category category, LocalDateTime savedTime) {
+        deleteCategory(category);
+        updateUsersSavedTime(savedTime, category.getUserName());
+    }
 
     @Transaction
     default void deleteCategorySoft(Category category) {

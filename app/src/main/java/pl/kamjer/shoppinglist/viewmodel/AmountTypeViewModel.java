@@ -8,10 +8,12 @@ import androidx.lifecycle.viewmodel.ViewModelInitializer;
 import java.util.List;
 
 import pl.kamjer.shoppinglist.model.AmountType;
+import pl.kamjer.shoppinglist.model.ModifyState;
 import pl.kamjer.shoppinglist.model.ShoppingItem;
 import pl.kamjer.shoppinglist.repository.SharedRepository;
 import pl.kamjer.shoppinglist.repository.ShoppingRepository;
 import pl.kamjer.shoppinglist.repository.ShoppingServiceRepository;
+import pl.kamjer.shoppinglist.util.ServiceUtil;
 
 public class AmountTypeViewModel extends CustomViewModel {
 
@@ -39,7 +41,7 @@ public class AmountTypeViewModel extends CustomViewModel {
     }
 
     public void deleteAmountType(AmountType amountType) {
-        shoppingRepository.deleteAmountTypeSoft(amountType, this::synchronizeData);
+        shoppingRepository.deleteAmountTypeSoft(amountType, () -> deleteAmountTypeServer(amountType));
     }
 
     public void loadAllShoppingItemsForAmountType(AmountType amountType) {
@@ -52,5 +54,9 @@ public class AmountTypeViewModel extends CustomViewModel {
 
     public void removeAllShoppingItemsForAmountTypeLiveDataObserver(Observer<List<ShoppingItem>> observer) {
         allShoppingItemsForAmountTypeLiveData.removeObserver(observer);
+    }
+
+    public void deleteAmountTypeServer(AmountType amountType) {
+        shoppingServiceRepository.websocketDeleteAmountType(ServiceUtil.amountTypeToAmountTypeDto(amountType, ModifyState.DELETE), getUserValue());
     }
 }

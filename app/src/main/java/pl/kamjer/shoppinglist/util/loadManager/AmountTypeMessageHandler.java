@@ -17,9 +17,11 @@ public class AmountTypeMessageHandler {
         shoppingServiceRepository.setOnMessageActionAddAmountType((webSocket, amountTypeDto) ->
                 shoppingRepository.updateAmountTypeFinal(amountTypeDto, user));
 
-        shoppingServiceRepository.setOnMessageActionUpdateAmountType((webSocket, amountTypeDto) -> {
-            shoppingRepository.updateAmountTypeFinal(amountTypeDto, user);
-        });
+        shoppingServiceRepository.setOnMessageActionUpdateAmountType((webSocket, amountTypeDto) ->
+                shoppingRepository.updateAmountTypeFinal(amountTypeDto, user));
+
+        shoppingServiceRepository.setOnMessageActionDeleteAmountType((webSocket, amountTypeDto) ->
+                shoppingRepository.deleteAmountTypeFinal(amountTypeDto, user));
 
     }
 }

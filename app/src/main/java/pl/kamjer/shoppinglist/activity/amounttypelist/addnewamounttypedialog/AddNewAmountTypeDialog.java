@@ -30,7 +30,7 @@ public class AddNewAmountTypeDialog extends GenericActivity {
     };
 
     protected void acceptingAmountType(AmountType amountType) {
-        newAmountTypeDialogViewModel.insertAmountType(amountType, connectionFailedAction);
+        newAmountTypeDialogViewModel.insertAmountType(amountType);
     }
 
     @Override

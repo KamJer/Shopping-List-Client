@@ -1,5 +1,7 @@
 package pl.kamjer.shoppinglist.model.dto;
 
+import java.time.LocalDateTime;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -22,4 +24,6 @@ public class ShoppingItemDto extends Dto{
     private long localId;
     private long localAmountTypeId;
     protected long localCategoryId;
+
+    private LocalDateTime savedTime;
 }

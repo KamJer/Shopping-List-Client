@@ -54,7 +54,7 @@ public class LoginDialogOptionalLogin extends GenericActivity {
         loginDialogViewModel.isUserCorrect(user, new Callback<>() {
             @Override
             public void onResponse(@NonNull Call<Boolean> call, @NonNull Response<Boolean> response) {
-                Optional.ofNullable(response).ifPresent(booleanResponse -> {
+                Optional.of(response).ifPresent(booleanResponse -> {
                     if (Boolean.TRUE.equals(booleanResponse.body())) {
                         logUserInAndInitialize(user);
                     } else {

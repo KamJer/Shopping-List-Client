@@ -67,7 +67,7 @@ public class NewShoppingItemDialog extends GenericActivity {
     };
 
     protected void actOnData(ShoppingItem shoppingItem) {
-        newShoppingItemDialogViewModel.insertShoppingItem(shoppingItem, connectionFailedAction);
+        newShoppingItemDialogViewModel.insertShoppingItem(shoppingItem);
     }
 
     @Override

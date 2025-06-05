@@ -21,7 +21,9 @@ import pl.kamjer.shoppinglist.gsonconverter.LocalDateTimeSerializer;
 import pl.kamjer.shoppinglist.model.User;
 import pl.kamjer.shoppinglist.model.dto.AllDto;
 import pl.kamjer.shoppinglist.model.dto.AmountTypeDto;
+import pl.kamjer.shoppinglist.model.dto.CategoryDto;
 import pl.kamjer.shoppinglist.model.dto.ExceptionDto;
+import pl.kamjer.shoppinglist.model.dto.ShoppingItemDto;
 import pl.kamjer.shoppinglist.service.BasicAuthInterceptor;
 import pl.kamjer.shoppinglist.service.SSLUtil;
 import pl.kamjer.shoppinglist.service.service.UserService;
@@ -65,6 +67,20 @@ public class ShoppingServiceRepository {
     private OnMessageAction<AmountTypeDto> onMessageActionAddAmountType;
     @Setter
     private OnMessageAction<AmountTypeDto> onMessageActionUpdateAmountType;
+    @Setter
+    private OnMessageAction<AmountTypeDto> onMessageActionDeleteAmountType;
+    @Setter
+    private OnMessageAction<CategoryDto> onMessageActionAddCategory;
+    @Setter
+    private OnMessageAction<CategoryDto> onMessageActionUpdateCategory;
+    @Setter
+    private OnMessageAction<CategoryDto> onMessageActionDeleteCategory;
+    @Setter
+    private OnMessageAction<ShoppingItemDto> onMessageActionAddShoppingItem;
+    @Setter
+    private OnMessageAction<ShoppingItemDto> onMessageActionUpdateShoppingItem;
+    @Setter
+    private OnMessageAction<ShoppingItemDto> onMessageActionDeleteShoppingItem;
     @Setter
     private OnMessageAction<String> onErrorAction;
     @Setter
@@ -123,10 +139,22 @@ public class ShoppingServiceRepository {
                 .onConnectAction((connected) -> onConnectChangeAction.forEach(onConnectChangeAction1 -> onConnectChangeAction1.action(connected)))
                 .onFailure((webSocket1, t, response) -> onFailureAction.action(webSocket1, t, response))
                 .onError((webSocket1, errorMessage) -> onErrorAction.action(webSocket1, errorMessage))
+//                registering util endpoints
                 .subscribe(gson, "/synchronizeData", AllDto.class, onMessageActionSynchronize)
-                .subscribe(gson, "/{username}/pip", String.class, onMessageActionPip, user.getUserName())
+                .subscribe(gson, "/{userName}/pip", String.class, onMessageActionPip, user.getUserName())
+//                registering amount type endpoints
                 .subscribe(gson, "/{userName}/putAmountType", AmountTypeDto.class, onMessageActionAddAmountType, user.getUserName())
-                .subscribe(gson, "/{userName}/postAmountType", AmountTypeDto.class, onMessageActionUpdateAmountType, user.getUserName());
+                .subscribe(gson, "/{userName}/postAmountType", AmountTypeDto.class, onMessageActionUpdateAmountType, user.getUserName())
+                .subscribe(gson, "/{userName}/deleteAmountType", AmountTypeDto.class, onMessageActionDeleteAmountType, user.getUserName())
+//                registering category endpoints
+                .subscribe(gson, "/{userName}/putCategory", CategoryDto.class, onMessageActionAddCategory, user.getUserName())
+                .subscribe(gson, "/{userName}/postCategory", CategoryDto.class, onMessageActionUpdateCategory, user.getUserName())
+                .subscribe(gson, "/{userName}/deleteCategory", CategoryDto.class, onMessageActionDeleteCategory, user.getUserName())
+//                registering shopping item endpoints
+                .subscribe(gson, "/{userName}/putShoppingItem", ShoppingItemDto.class, onMessageActionAddShoppingItem, user.getUserName())
+                .subscribe(gson, "/{userName}/postShoppingItem", ShoppingItemDto.class, onMessageActionUpdateShoppingItem, user.getUserName())
+                .subscribe(gson, "/{userName}/deleteShoppingItem", ShoppingItemDto.class, onMessageActionDeleteShoppingItem, user.getUserName())
+                ;
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(baseUrl + ip)
                 .client(okHttpClient)
@@ -155,6 +183,13 @@ public class ShoppingServiceRepository {
         return webSocket.isConnected();
     }
 
+    public void disconnect() {
+        if (webSocket == null) {
+            return;
+        }
+        webSocket.disconnect();
+    }
+
     public void reconnectWebsocket() {
         webSocket.connect(okHttpClient);
     }
@@ -167,6 +202,37 @@ public class ShoppingServiceRepository {
         webSocket.send(gson, "/{userName}/putAmountType", amountTypeDto, user.getUserName());
     }
 
+    public void websocketPostAmountType(AmountTypeDto amountTypeDto, User user) {
+        webSocket.send(gson, "/{userName}/postAmountType", amountTypeDto, user.getUserName());
+    }
+
+    public void websocketDeleteAmountType(AmountTypeDto amountTypeDto, User user) {
+        webSocket.send(gson, "/{userName}/deleteAmountType", amountTypeDto, user.getUserName());
+    }
+
+    public void websocketPutCategory(CategoryDto categoryDto, User user) {
+        webSocket.send(gson, "/{userName}/putCategory", categoryDto, user.getUserName());
+    }
+
+    public void websocketPostCategory(CategoryDto categoryDto, User userValue) {
+        webSocket.send(gson, "/{userName}/postCategory", categoryDto, userValue.getUserName());
+    }
+
+    public void websocketDeleteCategory(CategoryDto categoryDto, User userValue) {
+        webSocket.send(gson, "/{userName}/deleteCategory", categoryDto, userValue.getUserName());
+    }
+
+    public void websocketPutShoppingItem(ShoppingItemDto shoppingItemDto, User user) {
+        webSocket.send(gson, "/{userName}/putShoppingItem", shoppingItemDto, user.getUserName());
+    }
+
+    public void websocketPostShoppingItem(ShoppingItemDto shoppingItemDto, User userValue) {
+        webSocket.send(gson, "/{userName}/postShoppingItem", shoppingItemDto, userValue.getUserName());
+    }
+
+    public void websocketDeleteShoppingItem(ShoppingItemDto shoppingItemDto, User userValue) {
+        webSocket.send(gson, "/{userName}/deleteShoppingItem", shoppingItemDto, userValue.getUserName());
+    }
 
     private OkHttpClient createClientWithOutUser(Context context) {
         OkHttpClient.Builder okHttpClientBuilder = SSLUtil.getSSLContext(context);
@@ -217,6 +283,8 @@ public class ShoppingServiceRepository {
         Call<Boolean> call = userService.logUser(ServiceUtil.userToUserDto(user));
         call.enqueue(callback);
     }
+
+
 }
 
 

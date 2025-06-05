@@ -9,11 +9,12 @@ import java.util.List;
 
 import pl.kamjer.shoppinglist.model.AmountType;
 import pl.kamjer.shoppinglist.model.Category;
+import pl.kamjer.shoppinglist.model.ModifyState;
 import pl.kamjer.shoppinglist.model.ShoppingItem;
 import pl.kamjer.shoppinglist.repository.SharedRepository;
 import pl.kamjer.shoppinglist.repository.ShoppingRepository;
 import pl.kamjer.shoppinglist.repository.ShoppingServiceRepository;
-import pl.kamjer.shoppinglist.util.funcinterface.OnFailureAction;
+import pl.kamjer.shoppinglist.util.ServiceUtil;
 
 public class NewShoppingItemDialogViewModel extends CustomViewModel{
 
@@ -46,11 +47,19 @@ public class NewShoppingItemDialogViewModel extends CustomViewModel{
         categoryListLiveData.observe(owner, observer);
     }
 
-    public void insertShoppingItem(ShoppingItem shoppingItem, OnFailureAction action) {
-        shoppingRepository.insertShoppingItem(getUserValue(), shoppingItem, this::synchronizeData);
+    public void insertShoppingItem(ShoppingItem shoppingItem) {
+        shoppingRepository.insertShoppingItem(getUserValue(), shoppingItem, () -> insertShoppingItemServer(shoppingItem));
     }
 
-    public void updateShoppingItem(ShoppingItem shoppingItem, OnFailureAction action) {
-        shoppingRepository.updateShoppingItemFlag(shoppingItem, this::synchronizeData);
+    public void insertShoppingItemServer(ShoppingItem shoppingItem) {
+        shoppingServiceRepository.websocketPutShoppingItem(ServiceUtil.shoppingItemToShoppingItemDto(shoppingItem, ModifyState.INSERT), getUserValue());
+    }
+
+    public void updateShoppingItem(ShoppingItem shoppingItem) {
+        shoppingRepository.updateShoppingItemFlag(shoppingItem, () -> updateShoppingItemServer(shoppingItem));
+    }
+
+    public void updateShoppingItemServer(ShoppingItem shoppingItem) {
+        shoppingServiceRepository.websocketPostShoppingItem(ServiceUtil.shoppingItemToShoppingItemDto(shoppingItem, ModifyState.UPDATE), getUserValue());
     }
 }

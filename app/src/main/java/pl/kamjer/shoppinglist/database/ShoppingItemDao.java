@@ -2,11 +2,13 @@ package pl.kamjer.shoppinglist.database;
 
 import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
+import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.Query;
 import androidx.room.Transaction;
 import androidx.room.Update;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import pl.kamjer.shoppinglist.model.AmountType;
@@ -25,8 +27,23 @@ public interface ShoppingItemDao {
     @Update
     void updateShoppingItem(ShoppingItem item);
 
+    @Transaction
+    default void updateShoppingItemAndSavedTime(ShoppingItem shoppingItem, LocalDateTime savedTime) {
+        updateShoppingItem(shoppingItem);
+        updateUsersSavedTime(savedTime, shoppingItem.getUserName());
+    }
+
     @Update
     void updateShoppingItems(List<ShoppingItem> shoppingItems);
+
+    @Delete
+    void deleteShoppingItem(ShoppingItem shoppingItem);
+
+    @Transaction
+    default void deleteShoppingItemAndSavedTime(ShoppingItem shoppingItem, LocalDateTime savedTime) {
+        deleteShoppingItem(shoppingItem);
+        updateUsersSavedTime(savedTime, shoppingItem.getUserName());
+    }
 
     @Transaction
     default void deleteShoppingItemSoft(ShoppingItem shoppingItem) {
@@ -50,6 +67,7 @@ public interface ShoppingItemDao {
         updateShoppingItem(shoppingItem);
     }
 
+    @Transaction
     default void updateShoppingItemsAmountTypeAndDeleteAmountType(AmountType amountTypeToDelete, AmountType amountTypeToChange) {
         findAllShoppingItemsForUser(amountTypeToDelete.getLocalAmountTypeId()).forEach(shoppingItem -> {
             shoppingItem.setLocalItemAmountTypeId(amountTypeToChange.getLocalAmountTypeId());
@@ -74,4 +92,6 @@ public interface ShoppingItemDao {
     @Query("SELECT * FROM SHOPPING_ITEM WHERE local_item_amount_type_id=:localAmountTypeId")
     List<ShoppingItem> findAllShoppingItemsForUser(Long localAmountTypeId);
 
+    @Query("Update USER SET saved_time = :savedTime WHERE user_name=:userName")
+    void updateUsersSavedTime(LocalDateTime savedTime, String userName);
 }

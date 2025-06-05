@@ -42,6 +42,8 @@ public class InitializerActivity extends GenericActivity {
         initializertextView = findViewById(R.id.initializerLabel);
 //        set observer for a logged user
         initializerViewModel.setUserLiveDataObserver(user -> {
+//            if connection already exist disconnect it
+            initializerViewModel.websocketDisconnect();
             initializerViewModel.setInitializerLabelLiveDataValue(getString(R.string.initializing_connection_to_server_label));
 //            if user is null this means no user data was saved, so it needs to be created and inserted,
             if (user != null) {

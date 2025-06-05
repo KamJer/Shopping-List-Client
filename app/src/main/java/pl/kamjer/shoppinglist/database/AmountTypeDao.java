@@ -8,6 +8,7 @@ import androidx.room.Query;
 import androidx.room.Transaction;
 import androidx.room.Update;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import pl.kamjer.shoppinglist.model.AmountType;
@@ -25,8 +26,19 @@ public interface AmountTypeDao {
     @Update
     void updateAmountType(AmountType amountType);
 
+    @Transaction
+    default void updateAmountTypeAndSavedTime(AmountType amountType, LocalDateTime savedTime) {
+        updateAmountType(amountType);
+        updateUsersSavedTime(savedTime, amountType.getUserName());
+    }
+
     @Delete
     void deleteAmountType(AmountType amountType);
+
+    default void deleteAmountTypeAndSavedTime(AmountType amountType, LocalDateTime savedTime) {
+        deleteAmountType(amountType);
+        updateUsersSavedTime(savedTime, amountType.getUserName());
+    }
 
     @Query("SELECT * FROM SHOPPING_ITEM WHERE local_item_amount_type_id=:localAmountTypeId")
     List<ShoppingItem> findAllShoppingItemsForAmountType(Long localAmountTypeId);
@@ -62,5 +74,6 @@ public interface AmountTypeDao {
     @Query("SELECT * FROM AMOUNT_TYPE WHERE user_name=:userName")
     List<AmountType> findAllAmountTypeForUserToBeUpdated(String userName);
 
-
+    @Query("Update USER SET saved_time = :savedTime WHERE user_name=:userName")
+    void updateUsersSavedTime(LocalDateTime savedTime, String userName);
 }

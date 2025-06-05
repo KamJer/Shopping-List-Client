@@ -6,6 +6,7 @@ import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.Query;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import pl.kamjer.shoppinglist.model.User;
@@ -26,4 +27,7 @@ public interface UserDao {
 
     @Delete
     void deleteUser(User user);
+
+    @Query("Update USER SET saved_time = :savedTime WHERE user_name=:userName")
+    void updateUsersSavedTime(LocalDateTime savedTime, String userName);
 }

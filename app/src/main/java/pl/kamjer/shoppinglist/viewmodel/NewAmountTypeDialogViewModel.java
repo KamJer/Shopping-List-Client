@@ -3,10 +3,11 @@ package pl.kamjer.shoppinglist.viewmodel;
 import androidx.lifecycle.viewmodel.ViewModelInitializer;
 
 import pl.kamjer.shoppinglist.model.AmountType;
+import pl.kamjer.shoppinglist.model.ModifyState;
 import pl.kamjer.shoppinglist.repository.SharedRepository;
 import pl.kamjer.shoppinglist.repository.ShoppingRepository;
 import pl.kamjer.shoppinglist.repository.ShoppingServiceRepository;
-import pl.kamjer.shoppinglist.util.funcinterface.OnFailureAction;
+import pl.kamjer.shoppinglist.util.ServiceUtil;
 
 public class NewAmountTypeDialogViewModel extends CustomViewModel{
 
@@ -23,11 +24,19 @@ public class NewAmountTypeDialogViewModel extends CustomViewModel{
         loadUser();
     }
 
-    public void insertAmountType(AmountType amountType, OnFailureAction action) {
-        shoppingRepository.insertAmountType(getUserValue(), amountType, () -> putAmountType(amountType));
+    public void insertAmountType(AmountType amountType) {
+        shoppingRepository.insertAmountType(getUserValue(), amountType, () -> putAmountTypeServer(amountType));
     }
 
-    public void updateAmountType(AmountType amountType, OnFailureAction action) {
-        shoppingRepository.updateAmountType(amountType, this::synchronizeData);
+    public void updateAmountType(AmountType amountType) {
+        shoppingRepository.updateAmountTypeSoft(amountType, () -> postAmountTypeServer(amountType));
+    }
+
+    private void putAmountTypeServer(AmountType amountType) {
+        shoppingServiceRepository.websocketPutAmountType(ServiceUtil.amountTypeToAmountTypeDto(amountType, ModifyState.INSERT), getUserValue());
+    }
+
+    private void postAmountTypeServer(AmountType amountType) {
+        shoppingServiceRepository.websocketPostAmountType(ServiceUtil.amountTypeToAmountTypeDto(amountType, ModifyState.UPDATE), getUserValue());
     }
 }
