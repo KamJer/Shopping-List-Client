@@ -54,5 +54,4 @@
 ## 9. Kontakt
    W sprawach związanych z prywatnością i bezpieczeństwem danych prosimy o kontakt:
 
-   Kamil Jerzyński
    Email: kamjersoft@gmail.com
