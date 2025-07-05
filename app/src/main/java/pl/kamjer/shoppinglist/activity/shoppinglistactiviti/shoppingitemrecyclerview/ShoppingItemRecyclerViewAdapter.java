@@ -12,6 +12,7 @@ import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 import pl.kamjer.shoppinglist.R;
 import pl.kamjer.shoppinglist.model.ShoppingItemWithAmountTypeAndCategory;
 import pl.kamjer.shoppinglist.util.funcinterface.ModifyShoppingItemAction;
@@ -19,13 +20,15 @@ import pl.kamjer.shoppinglist.util.funcinterface.UpdateShoppingItemActonCheckBox
 
 @AllArgsConstructor
 @Getter
+@Setter
 @Builder
 public class ShoppingItemRecyclerViewAdapter extends RecyclerView.Adapter<ShoppingItemViewHolder>{
 
-    private List<ShoppingItemWithAmountTypeAndCategory> shoppingItemWithAmountTypeAndCategories;
-    private UpdateShoppingItemActonCheckBox checkBoxListener;
-    private ModifyShoppingItemAction deleteShoppingItemAction;
-    private ModifyShoppingItemAction modifyShoppingItemAction;
+    private boolean expended;
+    private final List<ShoppingItemWithAmountTypeAndCategory> shoppingItemWithAmountTypeAndCategories;
+    private final UpdateShoppingItemActonCheckBox checkBoxListener;
+    private final ModifyShoppingItemAction deleteShoppingItemAction;
+    private final ModifyShoppingItemAction modifyShoppingItemAction;
 
     @NonNull
     @Override
@@ -42,6 +45,6 @@ public class ShoppingItemRecyclerViewAdapter extends RecyclerView.Adapter<Shoppi
 
     @Override
     public int getItemCount() {
-        return shoppingItemWithAmountTypeAndCategories.size();
+        return expended ? shoppingItemWithAmountTypeAndCategories.size(): 0;
     }
 }

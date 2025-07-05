@@ -5,7 +5,7 @@ import androidx.annotation.Nullable;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
-import androidx.room.Index;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 import java.io.Serializable;
@@ -28,6 +28,9 @@ import lombok.Setter;
         }
 )
 public class Category implements Serializable {
+
+    public Category() {
+    }
 
     @ColumnInfo(name = "local_category_id")
     @PrimaryKey(autoGenerate = true)
@@ -58,4 +61,7 @@ public class Category implements Serializable {
     public String toString() {
         return categoryName;
     }
+
+    @Ignore
+    private boolean collapsed;
 }

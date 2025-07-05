@@ -5,10 +5,10 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
+import java.util.Optional;
 
 import pl.kamjer.shoppinglist.R;
 import pl.kamjer.shoppinglist.activity.shoppinglistactiviti.shoppingitemrecyclerview.ShoppingItemLinearLayoutMenager;
@@ -27,6 +27,29 @@ public class CategoryViewHolder extends RecyclerView.ViewHolder {
     private final ImageButton deleteCategoryImageButton;
     private final ImageButton updateCategoryImageButton;
     private final ImageButton addShoppinItemImageButton;
+//    has to initialized this way
+    private ImageButton collapseRecyclerViewButton;
+    private ShoppingItemRecyclerViewAdapter shoppingItemRecyclerViewAdapter;
+
+    private Category category;
+
+    private final View.OnClickListener collapseRecyclerViewButtonListener = v ->
+            Optional.ofNullable(shoppingItemRecyclerViewAdapter).ifPresent(shoppingItemRecyclerViewAdapter1 -> {
+                if (shoppingItemRecyclerViewAdapter1.getShoppingItemWithAmountTypeAndCategories().isEmpty()) {
+                    return;
+                }
+                shoppingItemRecyclerViewAdapter1.setExpended(!shoppingItemRecyclerViewAdapter1.isExpended());
+                category.setCollapsed(!category.isCollapsed());
+                Optional.ofNullable(collapseRecyclerViewButton).ifPresent(imageButton -> {
+                    collapseRecyclerViewButton = itemView.findViewById(R.id.collapseRecyclerViewButton);
+                    if (shoppingItemRecyclerViewAdapter1.isExpended()) {
+                        collapseRecyclerViewButton.setBackgroundResource(R.drawable.baseline_keyboard_arrow_up_24);
+                    } else {
+                        collapseRecyclerViewButton.setBackgroundResource(R.drawable.baseline_keyboard_arrow_down_24);
+                    }
+                });
+                shoppingItemRecyclerViewAdapter1.notifyDataSetChanged();
+            });
 
     public CategoryViewHolder(@NonNull View itemView) {
         super(itemView);
@@ -35,6 +58,7 @@ public class CategoryViewHolder extends RecyclerView.ViewHolder {
         deleteCategoryImageButton = itemView.findViewById(R.id.deleteCategoryImageButton);
         addShoppinItemImageButton = itemView.findViewById(R.id.addShoppingItemImageButton);
         updateCategoryImageButton = itemView.findViewById(R.id.updateCategoryImageButton);
+        collapseRecyclerViewButton = itemView.findViewById(R.id.collapseRecyclerViewButton);
     }
 
     public void bind(Category category,
@@ -45,15 +69,24 @@ public class CategoryViewHolder extends RecyclerView.ViewHolder {
                      RemoveCategoryAction updateCategory,
                      ModifyShoppingItemAction deleteShoppingItemAction,
                      ModifyShoppingItemAction modifyShoppingItemAction) {
+        this.category = category;
         categoryNameTextView.setText(category.getCategoryName());
         shoppingItemsRecyclerView.setLayoutManager(new ShoppingItemLinearLayoutMenager(itemView.getContext()));
-        ShoppingItemRecyclerViewAdapter shoppingItemRecyclerViewAdapter = new ShoppingItemRecyclerViewAdapter(shoppingItemWithAmountTypeAndCategories,
+        shoppingItemRecyclerViewAdapter = new ShoppingItemRecyclerViewAdapter(
+                !category.isCollapsed(),
+                shoppingItemWithAmountTypeAndCategories,
                 checkBoxListener,
                 deleteShoppingItemAction,
                 modifyShoppingItemAction);
+        if (!shoppingItemWithAmountTypeAndCategories.isEmpty()) {
+            collapseRecyclerViewButton.setBackgroundResource(R.drawable.baseline_keyboard_arrow_up_24);
+        } else {
+            collapseRecyclerViewButton.setBackgroundResource(R.drawable.baseline_drag_handle_24);
+        }
         shoppingItemsRecyclerView.setAdapter(shoppingItemRecyclerViewAdapter);
         deleteCategoryImageButton.setOnClickListener(v -> removeCategoryAction.action(category));
         updateCategoryImageButton.setOnClickListener(v -> updateCategory.action(category));
         addShoppinItemImageButton.setOnClickListener(v -> addShoppingItemAction.action(category));
+        collapseRecyclerViewButton.setOnClickListener(collapseRecyclerViewButtonListener);
     }
 }
