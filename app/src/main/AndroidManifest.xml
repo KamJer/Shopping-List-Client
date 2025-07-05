@@ -14,7 +14,7 @@
         android:roundIcon="@drawable/baseline_shopping_cart_24_logo"
         android:supportsRtl="true"
         android:theme="@style/Theme.ShoppingList"
-        tools:targetApi="31">
+        tools:targetApi="35">
         <activity
             android:name=".activity.InitializerActivity"
             android:exported="true">
