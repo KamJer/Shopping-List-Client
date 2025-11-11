@@ -34,22 +34,23 @@ public class ShoppingListActionBar extends AppBarLayout {
 
     private ShoppingListActionBarViewModel shoppingListActionBarViewModel;
 
-    private OnClickListener amountTypeListButtonAction = v -> {
+    private final OnClickListener amountTypeListButtonAction = v -> {
         Intent amountTypeListActivityIntent = new Intent(this.getContext(), AmountTypeListActivity.class);
         this.getContext().startActivity(amountTypeListActivityIntent);
     };
 
-    private OnClickListener boughtListButtonAction = v -> {
+    private final OnClickListener boughtListButtonAction = v -> {
         Intent boughtShoppingItemListActivityIntent = new Intent(this.getContext(), BoughtShoppingItemListActivity.class);
         this.getContext().startActivity(boughtShoppingItemListActivityIntent);
     };
 
-    private OnClickListener loginDialogButtonAction = v -> {
+    private final OnClickListener loginDialogButtonAction = v -> {
         Intent loginDialogIntent = new Intent(this.getContext(), LoginDialogOptionalLogin.class);
         this.getContext().startActivity(loginDialogIntent);
     };
 
-    private OnClickListener connectionButtonIndicatorAction = v -> shoppingListActionBarViewModel.reconnectWebsocket();
+    private final OnClickListener connectionButtonIndicatorAction =
+            v -> shoppingListActionBarViewModel.reconnectWebsocket();
 
     public ShoppingListActionBar(@NonNull Context context) {
         super(context);
@@ -98,11 +99,11 @@ public class ShoppingListActionBar extends AppBarLayout {
         }
 
         shoppingListActionBarViewModel.setOnOpenConnectionAction((connected) -> {
-            Drawable drawable1 = connectionButtonIndicator.getBackground().mutate();
+            Drawable buttonIcon = connectionButtonIndicator.getBackground().mutate();
             if (connected) {
-                drawable1.setTint(Color.GREEN);
+                buttonIcon.setTint(Color.GREEN);
             } else {
-                drawable1.setTint(Color.RED);
+                buttonIcon.setTint(Color.RED);
             }
         });
     }

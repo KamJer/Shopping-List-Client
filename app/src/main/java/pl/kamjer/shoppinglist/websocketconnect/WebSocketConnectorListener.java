@@ -2,7 +2,6 @@ package pl.kamjer.shoppinglist.websocketconnect;
 
 import android.os.Handler;
 import android.os.Looper;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
@@ -55,19 +54,23 @@ public class WebSocketConnectorListener extends WebSocketListener {
 
     @Override
     public void onClosing(@NonNull WebSocket webSocket, int code, @NonNull String reason) {
-        Optional.ofNullable(onClosingAction).ifPresent(onClosedAction1 -> onClosedAction1.action(webSocket, code, reason));
+        Optional.ofNullable(onClosingAction).ifPresent(onClosingAction1 -> onClosingAction1.action(webSocket, code, reason));
     }
 
     @Override
     public void onClosed(@NonNull WebSocket webSocket, int code, @NonNull String reason) {
         messageBroker.handleClosing(webSocket, code, reason);
-        new Handler(Looper.getMainLooper()).post(() -> Optional.ofNullable(onClosedAction).ifPresent(onFailureAction1 -> onFailureAction1.action(webSocket, code, reason)));
+        new Handler(Looper.getMainLooper()).post(() ->
+                Optional.ofNullable(onClosedAction)
+                        .ifPresent(onFailureAction1 -> onFailureAction1.action(webSocket, code, reason)));
     }
 
     @Override
     public void onFailure(@NonNull WebSocket webSocket, @NonNull Throwable t, Response response) {
         getMessageBroker().handleFailure(webSocket, t, response);
-        new Handler(Looper.getMainLooper()).post(() -> Optional.ofNullable(onFailureAction).ifPresent(onFailureAction1 -> onFailureAction1.action(webSocket, t, response)));
+        new Handler(Looper.getMainLooper()).post(() ->
+                Optional.ofNullable(onFailureAction)
+                        .ifPresent(onFailureAction1 -> onFailureAction1.action(webSocket, t, response)));
 
     }
 }

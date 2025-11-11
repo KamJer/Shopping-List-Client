@@ -15,6 +15,7 @@ import pl.kamjer.shoppinglist.repository.ShoppingRepository;
 import pl.kamjer.shoppinglist.repository.ShoppingServiceRepository;
 import pl.kamjer.shoppinglist.util.exception.handler.ShoppingListExceptionHandler;
 import pl.kamjer.shoppinglist.util.loadManager.ServerMessageCoordinator;
+import pl.kamjer.shoppinglist.websocketconnect.funcIntarface.OnFailureAction;
 import pl.kamjer.shoppinglist.websocketconnect.funcIntarface.OnMessageAction;
 
 @Log
@@ -70,7 +71,9 @@ public class InitializerViewModel extends CustomViewModel {
         shoppingRepository.deleteUser(user);
     }
 
-    public void initializeOnMessageAction(User user, OnMessageAction<String> onErrorAction, pl.kamjer.shoppinglist.websocketconnect.funcIntarface.OnFailureAction failure) {
+    public void initializeOnMessageAction(User user,
+                                          OnMessageAction<String> onErrorAction,
+                                          OnFailureAction failure) {
         ServerMessageCoordinator serverMessageCoordinator = new ServerMessageCoordinator(shoppingRepository, shoppingServiceRepository);
         serverMessageCoordinator.register(user, onErrorAction, failure);
     }

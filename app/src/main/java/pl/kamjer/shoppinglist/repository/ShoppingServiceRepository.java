@@ -31,7 +31,6 @@ import pl.kamjer.shoppinglist.service.service.UtilService;
 import pl.kamjer.shoppinglist.util.NetworkReceiver;
 import pl.kamjer.shoppinglist.util.ServiceUtil;
 import pl.kamjer.shoppinglist.util.funcinterface.OnConnectAction;
-import pl.kamjer.shoppinglist.util.loadManager.ServerMessageCoordinator;
 import pl.kamjer.shoppinglist.websocketconnect.WebSocket;
 import pl.kamjer.shoppinglist.websocketconnect.funcIntarface.OnConnectChangeAction;
 import pl.kamjer.shoppinglist.websocketconnect.funcIntarface.OnFailureAction;
@@ -48,8 +47,8 @@ public class ShoppingServiceRepository {
     public static final String CONNECTION_FAILED_MESSAGE = "Connection failed: Http code:";
 
     private String ip;
-    private String baseUrl = "https://";
-    private String websocketBaseUrl = "wss://";
+    private final static String BASE_URL = "https://";
+    private final static String WEBSOCKET_BASE_URL = "wss://";
 
     private static ShoppingServiceRepository shoppingServiceRepository;
 
@@ -92,8 +91,6 @@ public class ShoppingServiceRepository {
     @Setter
     private boolean initializedWithUser;
 
-    private ServerMessageCoordinator loadManager;
-
     private OkHttpClient okHttpClient;
 
     private Gson gson;
@@ -119,7 +116,7 @@ public class ShoppingServiceRepository {
                 .create();
         OkHttpClient okHttpClient = createClientWithOutUser(appContext);
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(baseUrl + ip)
+                .baseUrl(BASE_URL + ip)
                 .client(okHttpClient)
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .build();
@@ -134,7 +131,7 @@ public class ShoppingServiceRepository {
                 .create();
         okHttpClient = createClient(appContext, user);
 
-        webSocket = new WebSocket(websocketBaseUrl + ip + "/ws")
+        webSocket = new WebSocket(WEBSOCKET_BASE_URL + ip + "/ws")
                 .basicWebsocketHeader()
                 .onConnectAction((connected) -> onConnectChangeAction.forEach(onConnectChangeAction1 -> onConnectChangeAction1.action(connected)))
                 .onFailure((webSocket1, t, response) -> onFailureAction.action(webSocket1, t, response))
@@ -156,7 +153,7 @@ public class ShoppingServiceRepository {
                 .subscribe(gson, "/{userName}/deleteShoppingItem", ShoppingItemDto.class, onMessageActionDeleteShoppingItem, user.getUserName())
                 ;
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(baseUrl + ip)
+                .baseUrl(BASE_URL + ip)
                 .client(okHttpClient)
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .build();
@@ -273,10 +270,6 @@ public class ShoppingServiceRepository {
 
     public void addOnConnectionChangedAction(OnConnectChangeAction action) {
         onConnectChangeAction.add(action);
-    }
-
-    public void removeOnConnectionChangedAction(OnConnectChangeAction action) {
-        onConnectChangeAction.remove(action);
     }
 
     public void isUserCorrect(User user, Callback<Boolean> callback) {

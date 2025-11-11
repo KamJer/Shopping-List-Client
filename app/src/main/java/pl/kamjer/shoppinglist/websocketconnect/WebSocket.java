@@ -157,7 +157,8 @@ public class WebSocket {
     }
 
     public WebSocket disconnect() {
-        okHttpWebSocket.close(1000, "finished");
+        Optional.ofNullable(okHttpWebSocket).ifPresent(webSocket ->
+                webSocket.close(1000, "finished"));
         connectedLiveData.postValue(null);
         return this;
     }
