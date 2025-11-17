@@ -48,9 +48,8 @@ public class InitializerActivity extends GenericActivity {
 //            if user is null this means no user data was saved, so it needs to be created and inserted,
             if (user != null) {
                 initializerViewModel.initializeOnMessageAction(user,
-                        (webSocket, object) -> {
-                            createToast(object);
-                        },
+                        (webSocket, object) ->
+                                createToast(object),
                         (webSocket, t, response) -> {
                             if (response != null) {
                                 if (response.code() == 401) {

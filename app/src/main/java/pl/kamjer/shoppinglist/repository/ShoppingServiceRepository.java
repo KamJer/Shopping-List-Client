@@ -47,6 +47,9 @@ public class ShoppingServiceRepository {
     public static final String CONNECTION_FAILED_MESSAGE = "Connection failed: Http code:";
 
     private String ip;
+    private String shopping_List_port;
+    private String user_port;
+
     private final static String BASE_URL = "https://";
     private final static String WEBSOCKET_BASE_URL = "wss://";
 
@@ -91,7 +94,8 @@ public class ShoppingServiceRepository {
     @Setter
     private boolean initializedWithUser;
 
-    private OkHttpClient okHttpClient;
+    private OkHttpClient okHttpClientShopping;
+    private OkHttpClient okHttpClientUser;
 
     private Gson gson;
 
@@ -110,14 +114,16 @@ public class ShoppingServiceRepository {
 
     public void initialize(Context appContext) {
         ip = appContext.getResources().getString(R.string.ip);
+        shopping_List_port = appContext.getResources().getString(R.string.shopping_port);
+        user_port = appContext.getResources().getString(R.string.user_port);
         Gson gson = new GsonBuilder()
                 .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeSerializer())
                 .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeDeserializer())
                 .create();
-        OkHttpClient okHttpClient = createClientWithOutUser(appContext);
+        OkHttpClient okHttpClientUser = createClientWithOutUser();
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(BASE_URL + ip)
-                .client(okHttpClient)
+                .baseUrl(BASE_URL + ip + ":" + user_port)
+                .client(okHttpClientUser)
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .build();
         userService = retrofit.create(UserService.class);
@@ -129,7 +135,8 @@ public class ShoppingServiceRepository {
                 .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeSerializer())
                 .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeDeserializer())
                 .create();
-        okHttpClient = createClient(appContext, user);
+        okHttpClientShopping = createClient(user);
+        okHttpClientUser = createClient(user);
 
         webSocket = new WebSocket(WEBSOCKET_BASE_URL + ip + "/ws")
                 .basicWebsocketHeader()
@@ -152,19 +159,24 @@ public class ShoppingServiceRepository {
                 .subscribe(gson, "/{userName}/postShoppingItem", ShoppingItemDto.class, onMessageActionUpdateShoppingItem, user.getUserName())
                 .subscribe(gson, "/{userName}/deleteShoppingItem", ShoppingItemDto.class, onMessageActionDeleteShoppingItem, user.getUserName())
                 ;
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(BASE_URL + ip)
-                .client(okHttpClient)
+        Retrofit retrofitUser = new Retrofit.Builder()
+                .baseUrl(BASE_URL + ip + ":" + user_port)
+                .client(okHttpClientUser)
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .build();
-        userService = retrofit.create(UserService.class);
-        utilService = retrofit.create(UtilService.class);
+        Retrofit retrofitShoppingList = new Retrofit.Builder()
+                .baseUrl(BASE_URL + ip + ":" + shopping_List_port)
+                .client(okHttpClientShopping)
+                .addConverterFactory(GsonConverterFactory.create(gson))
+                .build();
+        userService = retrofitUser.create(UserService.class);
+        utilService = retrofitShoppingList.create(UtilService.class);
         initializedWithUser = true;
 
         NetworkReceiver.register(appContext,
                 network -> {
                     log.info("connected");
-                    webSocket.connect(okHttpClient);
+                    webSocket.connect(okHttpClientShopping);
                 },
                 network -> {
                     log.info("lost");
@@ -188,7 +200,7 @@ public class ShoppingServiceRepository {
     }
 
     public void reconnectWebsocket() {
-        webSocket.connect(okHttpClient);
+        webSocket.connect(okHttpClientShopping);
     }
 
     public void websocketSynchronize(AllDto allDto, User user) {
@@ -231,14 +243,14 @@ public class ShoppingServiceRepository {
         webSocket.send(gson, "/{userName}/deleteShoppingItem", shoppingItemDto, userValue.getUserName());
     }
 
-    private OkHttpClient createClientWithOutUser(Context context) {
-        OkHttpClient.Builder okHttpClientBuilder = SSLUtil.getSSLContext(context);
+    private OkHttpClient createClientWithOutUser() {
+        OkHttpClient.Builder okHttpClientBuilder = SSLUtil.getSSLContext();
         return okHttpClientBuilder.build();
 
     }
 
-    private OkHttpClient createClient(Context appContext, User user) {
-        OkHttpClient.Builder okHttpClientBuilder = SSLUtil.getSSLContext(appContext);
+    private OkHttpClient createClient(User user) {
+        OkHttpClient.Builder okHttpClientBuilder = SSLUtil.getSSLContext();
         okHttpClientBuilder.addInterceptor(new BasicAuthInterceptor(user));
         return okHttpClientBuilder.build();
     }
