@@ -7,6 +7,10 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.viewmodel.ViewModelInitializer;
 
+import java.security.InvalidAlgorithmParameterException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+
 import lombok.extern.java.Log;
 import pl.kamjer.shoppinglist.R;
 import pl.kamjer.shoppinglist.model.User;
@@ -38,7 +42,7 @@ public class InitializerViewModel extends CustomViewModel {
                             SharedRepository.getSharedRepository(),
                             new MutableLiveData<>()));
 
-    public void initialize(Context appContext) {
+    public void initialize(Context appContext) throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException {
         Thread.setDefaultUncaughtExceptionHandler(new ShoppingListExceptionHandler(
                 appContext,
                 ShoppingServiceRepository.getShoppingServiceRepository(),

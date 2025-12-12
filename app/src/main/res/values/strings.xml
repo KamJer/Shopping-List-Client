@@ -46,4 +46,5 @@
     <string name="bought_activity_tutorial_exp">Przenosi do listy zakupionych przedmiotów</string>
     <string name="connector_indicator_tutorial_exp">Indykator połączenia z internetem, kolor czerwony oznacza brak połaczenia, kliknji by spróbować nawiązać połączenie</string>
     <string name="indicator_green_tutorial_exp">Kolor zielony oznacza że wszystko w porzadku z połączeniem</string>
+    <string name="password_encryption_error_info">Nie udało się załadowac bazy danych, skontaktuj się z administratorem aplikacji </string>
 </resources>

@@ -8,6 +8,10 @@ import androidx.annotation.Nullable;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
+import java.security.InvalidAlgorithmParameterException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+
 import lombok.extern.java.Log;
 import pl.kamjer.shoppinglist.R;
 import pl.kamjer.shoppinglist.activity.logindialog.LoginDialogForcedLogin;
@@ -36,7 +40,12 @@ public class InitializerActivity extends GenericActivity {
         ).get(InitializerViewModel.class);
 
 //        initialize all of a necessary components of an app
-        initializerViewModel.initialize(getApplicationContext());
+        try {
+            initializerViewModel.initialize(getApplicationContext());
+        } catch (InvalidAlgorithmParameterException | NoSuchAlgorithmException |
+                 NoSuchProviderException e) {
+            throw new RuntimeException(e);
+        }
         initializerViewModel.loadUser();
 
         initializertextView = findViewById(R.id.initializerLabel);

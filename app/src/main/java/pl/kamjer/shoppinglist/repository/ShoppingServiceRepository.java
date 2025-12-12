@@ -46,9 +46,8 @@ public class ShoppingServiceRepository {
 
     public static final String CONNECTION_FAILED_MESSAGE = "Connection failed: Http code:";
 
-    private String ip;
-    private String shopping_List_port;
-    private String user_port;
+    private String shoppingListDomain;
+    private String userDomain;
 
     private final static String BASE_URL = "https://";
     private final static String WEBSOCKET_BASE_URL = "wss://";
@@ -113,16 +112,15 @@ public class ShoppingServiceRepository {
     }
 
     public void initialize(Context appContext) {
-        ip = appContext.getResources().getString(R.string.ip);
-        shopping_List_port = appContext.getResources().getString(R.string.shopping_port);
-        user_port = appContext.getResources().getString(R.string.user_port);
+        shoppingListDomain = appContext.getResources().getString(R.string.shopping_list_address);
+        userDomain = appContext.getResources().getString(R.string.user_address);
         Gson gson = new GsonBuilder()
                 .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeSerializer())
                 .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeDeserializer())
                 .create();
         OkHttpClient okHttpClientUser = createClientWithOutUser();
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(BASE_URL + ip + ":" + user_port)
+                .baseUrl(BASE_URL + userDomain)
                 .client(okHttpClientUser)
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .build();
@@ -138,7 +136,7 @@ public class ShoppingServiceRepository {
         okHttpClientShopping = createClient(user);
         okHttpClientUser = createClient(user);
 
-        webSocket = new WebSocket(WEBSOCKET_BASE_URL + ip + "/ws")
+        webSocket = new WebSocket(WEBSOCKET_BASE_URL + shoppingListDomain + "/ws")
                 .basicWebsocketHeader()
                 .onConnectAction((connected) -> onConnectChangeAction.forEach(onConnectChangeAction1 -> onConnectChangeAction1.action(connected)))
                 .onFailure((webSocket1, t, response) -> onFailureAction.action(webSocket1, t, response))
@@ -160,12 +158,12 @@ public class ShoppingServiceRepository {
                 .subscribe(gson, "/{userName}/deleteShoppingItem", ShoppingItemDto.class, onMessageActionDeleteShoppingItem, user.getUserName())
                 ;
         Retrofit retrofitUser = new Retrofit.Builder()
-                .baseUrl(BASE_URL + ip + ":" + user_port)
+                .baseUrl(BASE_URL + userDomain)
                 .client(okHttpClientUser)
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .build();
         Retrofit retrofitShoppingList = new Retrofit.Builder()
-                .baseUrl(BASE_URL + ip + ":" + shopping_List_port)
+                .baseUrl(BASE_URL + shoppingListDomain)
                 .client(okHttpClientShopping)
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .build();
