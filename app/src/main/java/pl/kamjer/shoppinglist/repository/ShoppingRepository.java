@@ -254,8 +254,12 @@ public class ShoppingRepository {
         });
     }
 
+    public void updateCategoryLocal(Category category) {
+        executorService.execute(() -> categoryDao.updateCategory(category));
+    }
+
     /**
-     * Updates category in database with out setting up a flag
+     * Updates category in database with out setting up a flag but update savedTime
      *
      * @param categoryDto dto of a amount type to updates
      * @param user          - user logged in

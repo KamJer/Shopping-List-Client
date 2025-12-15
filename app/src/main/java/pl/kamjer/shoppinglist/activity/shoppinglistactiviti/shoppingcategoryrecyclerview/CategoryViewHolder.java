@@ -7,6 +7,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,6 +18,7 @@ import pl.kamjer.shoppinglist.model.Category;
 import pl.kamjer.shoppinglist.model.ShoppingItemWithAmountTypeAndCategory;
 import pl.kamjer.shoppinglist.util.funcinterface.AddShoppingItemAction;
 import pl.kamjer.shoppinglist.util.funcinterface.ModifyShoppingItemAction;
+import pl.kamjer.shoppinglist.util.funcinterface.OnOrderChangedListener;
 import pl.kamjer.shoppinglist.util.funcinterface.RemoveCategoryAction;
 import pl.kamjer.shoppinglist.util.funcinterface.UpdateShoppingItemActonCheckBox;
 
@@ -27,7 +29,9 @@ public class CategoryViewHolder extends RecyclerView.ViewHolder {
     private final ImageButton deleteCategoryImageButton;
     private final ImageButton updateCategoryImageButton;
     private final ImageButton addShoppinItemImageButton;
-//    has to initialized this way
+    private final ImageButton moveUpButton;
+    private final ImageButton moveDownButton;
+    //    has to initialized this way
     private ImageButton collapseRecyclerViewButton;
     private ShoppingItemRecyclerViewAdapter shoppingItemRecyclerViewAdapter;
 
@@ -59,6 +63,8 @@ public class CategoryViewHolder extends RecyclerView.ViewHolder {
         addShoppinItemImageButton = itemView.findViewById(R.id.addShoppingItemImageButton);
         updateCategoryImageButton = itemView.findViewById(R.id.updateCategoryImageButton);
         collapseRecyclerViewButton = itemView.findViewById(R.id.collapseRecyclerViewButton);
+        this.moveUpButton = itemView.findViewById(R.id.moveUpButton);
+        this.moveDownButton = itemView.findViewById(R.id.moveDownButton);
     }
 
     public void bind(Category category,
@@ -68,7 +74,9 @@ public class CategoryViewHolder extends RecyclerView.ViewHolder {
                      UpdateShoppingItemActonCheckBox checkBoxListener,
                      RemoveCategoryAction updateCategory,
                      ModifyShoppingItemAction deleteShoppingItemAction,
-                     ModifyShoppingItemAction modifyShoppingItemAction) {
+                     ModifyShoppingItemAction modifyShoppingItemAction,
+                     OnOrderChangedListener onOrderChangedListener,
+                     ShoppingCategoryRecyclerViewAdapter adapter) {
         this.category = category;
         categoryNameTextView.setText(category.getCategoryName());
         shoppingItemsRecyclerView.setLayoutManager(new ShoppingItemLinearLayoutMenager(itemView.getContext()));
@@ -88,5 +96,29 @@ public class CategoryViewHolder extends RecyclerView.ViewHolder {
         updateCategoryImageButton.setOnClickListener(v -> updateCategory.action(category));
         addShoppinItemImageButton.setOnClickListener(v -> addShoppingItemAction.action(category));
         collapseRecyclerViewButton.setOnClickListener(collapseRecyclerViewButtonListener);
+        moveUpButton.setOnClickListener(v -> {
+            int currentIndex = adapter.getCategoryList().indexOf(category);
+            if (currentIndex > 0) {
+                int newIndex = currentIndex - 1;
+                Collections.swap(adapter.getCategoryList(), currentIndex, newIndex);
+                adapter.notifyDataSetChanged();
+                category.setIndex(newIndex);
+                Category oldCategory = adapter.getCategoryList().get(currentIndex);
+                oldCategory.setIndex(currentIndex);
+                onOrderChangedListener.onOrderChanged(category, oldCategory);
+            }
+        });
+        moveDownButton.setOnClickListener(v -> {
+            int currentIndex = adapter.getCategoryList().indexOf(category);
+            if (currentIndex != adapter.getCategoryList().size() - 1) {
+                int newIndex = currentIndex + 1;
+                Collections.swap(adapter.getCategoryList(), currentIndex, newIndex);
+                adapter.notifyDataSetChanged();
+                category.setIndex(newIndex);
+                Category oldCategory = adapter.getCategoryList().get(currentIndex);
+                oldCategory.setIndex(currentIndex);
+                onOrderChangedListener.onOrderChanged(category, oldCategory);
+            }
+        });
     }
 }

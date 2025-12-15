@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -39,6 +40,7 @@ import pl.kamjer.shoppinglist.util.TutorialManager;
 import pl.kamjer.shoppinglist.util.exception.NoResourceFoundException;
 import pl.kamjer.shoppinglist.util.funcinterface.AddShoppingItemAction;
 import pl.kamjer.shoppinglist.util.funcinterface.ModifyShoppingItemAction;
+import pl.kamjer.shoppinglist.util.funcinterface.OnOrderChangedListener;
 import pl.kamjer.shoppinglist.util.funcinterface.RemoveCategoryAction;
 import pl.kamjer.shoppinglist.util.funcinterface.UpdateShoppingItemActonCheckBox;
 import pl.kamjer.shoppinglist.viewmodel.ShoppingListViewModel;
@@ -101,6 +103,11 @@ public class ShoppingListActivity extends GenericActivity {
         startActivity(updateShoppingItemIntent);
     };
 
+    private final OnOrderChangedListener onOrderChangedListener = (category, oldCategory) -> {
+        shoppingListViewModel.updateLocalCategory(category);
+        shoppingListViewModel.updateLocalCategory(oldCategory);
+    };
+
     protected OnBackPressedCallback onBack = new OnBackPressedCallback(true) {
         @Override
         public void handleOnBackPressed() {
@@ -154,12 +161,15 @@ public class ShoppingListActivity extends GenericActivity {
                 addShoppingItemAction,
                 checkBoxListener,
                 deleteShoppingItemAction,
-                modifyShoppingItemAction);
+                modifyShoppingItemAction,
+                onOrderChangedListener);
         shoppingCategoryRecyclerViewAdapter.setStateRestorationPolicy(RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY);
         categoryRecyclerView.setAdapter(shoppingCategoryRecyclerViewAdapter);
 
         shoppingListViewModel.setAllCategoryObserver(this, categories -> {
             categoryList = categories;
+//            sorting elements in a elis with index for showing order
+            categoryList.sort(Comparator.comparingInt(Category::getIndex));
             shoppingCategoryRecyclerViewAdapter.setCategoryList(categoryList);
             shoppingCategoryRecyclerViewAdapter.setShoppingItemWithAmountTypeAndCategories(shoppingItemWithAmountTypeAndCategoriesList);
             shoppingCategoryRecyclerViewAdapter.notifyDataSetChanged();
@@ -167,6 +177,7 @@ public class ShoppingListActivity extends GenericActivity {
 
         shoppingListViewModel.setShoppingItemWithAmountTypeAndCategoryLiveDataObserver(this, shoppingItemWithAmountTypeAndCategories -> {
             shoppingItemWithAmountTypeAndCategoriesList = shoppingItemWithAmountTypeAndCategories;
+            categoryList.sort(Comparator.comparingInt(Category::getIndex));
             shoppingCategoryRecyclerViewAdapter.setCategoryList(categoryList);
             shoppingCategoryRecyclerViewAdapter.setShoppingItemWithAmountTypeAndCategories(shoppingItemWithAmountTypeAndCategoriesList);
             shoppingCategoryRecyclerViewAdapter.notifyDataSetChanged();
@@ -179,6 +190,8 @@ public class ShoppingListActivity extends GenericActivity {
                 if (data != null) {
                     shoppingListViewModel.insertCategory(Category.builder()
                                     .categoryName(data.getStringExtra(NewCategoryDialog.NEW_CATEGORY_NAME))
+//                                      sets index for the last element in the list
+                                    .index(shoppingListViewModel.getSizeCategory() + 1)
                                     .build());
                 }
             }
@@ -190,8 +203,7 @@ public class ShoppingListActivity extends GenericActivity {
                 if (data != null) {
                     try {
                         Category category = Optional.ofNullable((Category) data.getSerializableExtra(UpdateCategoryDialog.CATEGORY_FIELD_NAME)).orElseThrow(() -> new NoResourceFoundException(getString(R.string.no_category_found_massage)));
-                        shoppingListViewModel.updateCategory(category,
-                                connectionFailedAction);
+                        shoppingListViewModel.updateCategory(category);
                     } catch (NoResourceFoundException e) {
                         createToast(e.getMessage());
                     }

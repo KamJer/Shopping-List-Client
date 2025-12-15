@@ -21,6 +21,7 @@ import pl.kamjer.shoppinglist.model.Category;
 import pl.kamjer.shoppinglist.model.ShoppingItemWithAmountTypeAndCategory;
 import pl.kamjer.shoppinglist.util.funcinterface.AddShoppingItemAction;
 import pl.kamjer.shoppinglist.util.funcinterface.ModifyShoppingItemAction;
+import pl.kamjer.shoppinglist.util.funcinterface.OnOrderChangedListener;
 import pl.kamjer.shoppinglist.util.funcinterface.RemoveCategoryAction;
 import pl.kamjer.shoppinglist.util.funcinterface.UpdateShoppingItemActonCheckBox;
 
@@ -38,6 +39,7 @@ public class ShoppingCategoryRecyclerViewAdapter extends RecyclerView.Adapter<Ca
     private UpdateShoppingItemActonCheckBox checkBoxListener;
     private ModifyShoppingItemAction deleteShoppingItemAction;
     private ModifyShoppingItemAction modifyShoppingItemAction;
+    private OnOrderChangedListener onOrderChangedListener;
 
     @NonNull
     @Override
@@ -60,7 +62,9 @@ public class ShoppingCategoryRecyclerViewAdapter extends RecyclerView.Adapter<Ca
                 checkBoxListener,
                 updateCategoryAction,
                 deleteShoppingItemAction,
-                modifyShoppingItemAction);
+                modifyShoppingItemAction,
+                onOrderChangedListener,
+                this);
     }
 
     @Override

@@ -19,7 +19,6 @@ import pl.kamjer.shoppinglist.repository.SharedRepository;
 import pl.kamjer.shoppinglist.repository.ShoppingRepository;
 import pl.kamjer.shoppinglist.repository.ShoppingServiceRepository;
 import pl.kamjer.shoppinglist.util.ServiceUtil;
-import pl.kamjer.shoppinglist.util.funcinterface.OnFailureAction;
 
 @Getter
 @Log
@@ -94,8 +93,16 @@ public class ShoppingListViewModel extends CustomViewModel {
         shoppingRepository.insertCategory(getUserValue(), category, () -> insertCategoryServer(category));
     }
 
-    public void updateCategory(Category category, OnFailureAction action) {
+    public void updateCategory(Category category) {
         shoppingRepository.updateCategoryFlag(category, () -> updateCategoryServer(category));
+    }
+
+    /**
+     * Updates category in database with out setting up a flag for it to be updated on a server
+     * @param category - to update
+     */
+    public void updateLocalCategory(Category category) {
+        shoppingRepository.updateCategoryLocal(category);
     }
 
     private void insertCategoryServer(Category category) {
@@ -108,6 +115,13 @@ public class ShoppingListViewModel extends CustomViewModel {
 
     private void deleteCategoryServer(Category category) {
         shoppingServiceRepository.websocketDeleteCategory(ServiceUtil.categoryToCategoryDto(category, ModifyState.DELETE), getUserValue());
+    }
+
+    /**
+     * @return size of category list
+     */
+    public int getSizeCategory() {
+        return Optional.ofNullable(getAllCategoryLiveData().getValue()).orElse(new ArrayList<>()).size();
     }
 
     public boolean isTutorialSeen() {

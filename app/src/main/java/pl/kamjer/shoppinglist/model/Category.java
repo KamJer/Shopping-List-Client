@@ -45,6 +45,9 @@ public class Category implements Serializable {
     private boolean updated;
     @ColumnInfo(name = "deleted")
     private boolean deleted;
+//   how sorted category should be displayed
+    @ColumnInfo(name="index")
+    private int index;
 
     @Override
     public int hashCode() {
@@ -64,4 +67,5 @@ public class Category implements Serializable {
 
     @Ignore
     private boolean collapsed;
+
 }
