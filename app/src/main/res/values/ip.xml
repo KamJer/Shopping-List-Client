@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="shopping_list_address">shoppinglist.kamjer.online</string>
-    <string name="user_address">user.kamjer.online</string>
+<!--    <string name="shopping_list_address">shoppinglist.kamjer.online</string>-->
+<!--    <string name="user_address">user.kamjer.online</string>-->
+    <string name="shopping_list_address">192.168.0.13:5443</string>
+    <string name="user_address">192.168.0.13:4443</string>
 </resources>

@@ -49,8 +49,8 @@ public class ShoppingServiceRepository {
     private String shoppingListDomain;
     private String userDomain;
 
-    private final static String BASE_URL = "https://";
-    private final static String WEBSOCKET_BASE_URL = "wss://";
+    private final static String BASE_URL = "http://";
+    private final static String WEBSOCKET_BASE_URL = "ws://";
 
     private static ShoppingServiceRepository shoppingServiceRepository;
 

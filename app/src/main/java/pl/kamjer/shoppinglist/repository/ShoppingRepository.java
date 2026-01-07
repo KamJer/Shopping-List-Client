@@ -101,6 +101,7 @@ public class ShoppingRepository {
 
         ShoppingDatabase shoppingDatabase = Room.databaseBuilder(appContext,
                         ShoppingDatabase.class, ShoppingDatabase.DATABASE_NAME)
+                .addMigrations(ShoppingDatabase.MIGRATION_1_2)
                 .openHelperFactory(supportFactoryPass)
                 .build();
         shoppingItemDao = shoppingDatabase.getShoppingItemDao();

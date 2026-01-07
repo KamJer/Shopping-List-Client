@@ -10,16 +10,14 @@ android {
         applicationId = "pl.kamjer.shoppinglist"
         minSdk = 26
         targetSdk = 35
-        versionCode = 21
-        versionName = "2.0"
+        versionCode = 23
+        versionName = "2.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
         release {
-//            isMinifyEnabled  = true
-//            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
