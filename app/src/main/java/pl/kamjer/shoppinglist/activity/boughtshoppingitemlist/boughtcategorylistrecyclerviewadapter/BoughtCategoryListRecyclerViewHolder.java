@@ -11,8 +11,8 @@ import java.util.List;
 
 import pl.kamjer.shoppinglist.R;
 import pl.kamjer.shoppinglist.activity.boughtshoppingitemlist.boughtshoppingitemlistadapter.BoughtShoppintItemListRecyclerViewAdapter;
-import pl.kamjer.shoppinglist.model.Category;
-import pl.kamjer.shoppinglist.model.ShoppingItemWithAmountTypeAndCategory;
+import pl.kamjer.shoppinglist.model.shopping_list.Category;
+import pl.kamjer.shoppinglist.model.shopping_list.ShoppingItemWithAmountTypeAndCategory;
 import pl.kamjer.shoppinglist.util.funcinterface.ModifyShoppingItemAction;
 import pl.kamjer.shoppinglist.util.funcinterface.UpdateShoppingItemActonCheckBox;
 

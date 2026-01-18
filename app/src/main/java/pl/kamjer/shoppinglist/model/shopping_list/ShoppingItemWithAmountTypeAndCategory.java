@@ -1,4 +1,4 @@
-package pl.kamjer.shoppinglist.model;
+package pl.kamjer.shoppinglist.model.shopping_list;
 
 import androidx.room.Embedded;
 import androidx.room.Relation;
@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import pl.kamjer.shoppinglist.model.user.User;
 
 @Getter
 @Setter

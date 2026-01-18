@@ -4,22 +4,20 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModel;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
-import pl.kamjer.shoppinglist.model.AmountType;
-import pl.kamjer.shoppinglist.model.Category;
-import pl.kamjer.shoppinglist.model.ModifyState;
-import pl.kamjer.shoppinglist.model.ShoppingItem;
-import pl.kamjer.shoppinglist.model.User;
 import pl.kamjer.shoppinglist.model.dto.AllDto;
 import pl.kamjer.shoppinglist.model.dto.AmountTypeDto;
 import pl.kamjer.shoppinglist.model.dto.CategoryDto;
 import pl.kamjer.shoppinglist.model.dto.ShoppingItemDto;
+import pl.kamjer.shoppinglist.model.shopping_list.AmountType;
+import pl.kamjer.shoppinglist.model.shopping_list.Category;
+import pl.kamjer.shoppinglist.model.shopping_list.ModifyState;
+import pl.kamjer.shoppinglist.model.shopping_list.ShoppingItem;
+import pl.kamjer.shoppinglist.model.user.User;
 import pl.kamjer.shoppinglist.repository.SharedRepository;
 import pl.kamjer.shoppinglist.repository.ShoppingRepository;
 import pl.kamjer.shoppinglist.repository.ShoppingServiceRepository;
@@ -54,6 +52,7 @@ public class CustomViewModel extends ViewModel {
 
     /**
      * Method for synchronization for passed user
+     *
      * @param user - to synchronize for
      */
     public void synchronizeData(User user) {
@@ -118,30 +117,32 @@ public class CustomViewModel extends ViewModel {
     }
 
     protected void synchronizeData(User user, AllDto responseAllDto) {
-        Map<ModifyState, List<AmountType>> amountTypeListFiltered = Optional.ofNullable(responseAllDto.getAmountTypeDtoList()).orElse(new ArrayList<>())
-                .stream()
-                .collect(Collectors.groupingBy(
-                        AmountTypeDto::getModifyState,
-                        Collectors.mapping(dto -> ServiceUtil.amountTypeDtoToAmountType(user, dto), Collectors.toList())));
-
-        Map<ModifyState, List<Category>> categoryListFiltered = Optional.ofNullable(responseAllDto.getCategoryDtoList()).orElse(new ArrayList<>())
-                .stream()
-                .collect(Collectors.groupingBy(
-                        CategoryDto::getModifyState,
-                        Collectors.mapping(dto -> ServiceUtil.categoryDtoToCategory(user, dto), Collectors.toList())));
-
-        Map<ModifyState, List<ShoppingItem>> shoppingItemListFiltered = Optional.ofNullable(responseAllDto.getShoppingItemDtoList()).orElse(new ArrayList<>())
-                .stream()
-                .collect(Collectors.groupingBy(
-                        ShoppingItemDto::getModifyState,
-                        Collectors.mapping(dto -> ServiceUtil.shoppingItemDtoToShoppingItem(user, dto), Collectors.toList())));
+//        Map<ModifyState, List<AmountType>> amountTypeListFiltered = Optional.ofNullable(responseAllDto.getAmountTypeDtoList()).orElse(new ArrayList<>())
+//                .stream()
+//                .collect(Collectors.groupingBy(
+//                        AmountTypeDto::getModifyState,
+//                        Collectors.mapping(dto -> ServiceUtil.amountTypeDtoToAmountType(user, dto), Collectors.toList())));
+//
+//        Map<ModifyState, List<Category>> categoryListFiltered = Optional.ofNullable(responseAllDto.getCategoryDtoList()).orElse(new ArrayList<>())
+//                .stream()
+//                .collect(Collectors.groupingBy(
+//                        CategoryDto::getModifyState,
+//                        Collectors.mapping(dto -> ServiceUtil.categoryDtoToCategory(user, dto), Collectors.toList())));
+//
+//        Map<ModifyState, List<ShoppingItem>> shoppingItemListFiltered = Optional.ofNullable(responseAllDto.getShoppingItemDtoList()).orElse(new ArrayList<>())
+//                .stream()
+//                .collect(Collectors.groupingBy(
+//                        ShoppingItemDto::getModifyState,
+//                        Collectors.mapping(dto -> ServiceUtil.shoppingItemDtoToShoppingItem(user, dto), Collectors.toList())));
 
         shoppingRepository.synchronizeData(
-                amountTypeListFiltered,
-                categoryListFiltered,
-                shoppingItemListFiltered,
+//                amountTypeListFiltered,
+//                categoryListFiltered,
+//                shoppingItemListFiltered,
                 user,
-                responseAllDto.getSavedTime());
+                responseAllDto);
+//                responseAllDto.getSavedTime(),
+//                responseAllDto.getDirty());
     }
 
     protected String decodeErrorMassage(Response<?> response) {

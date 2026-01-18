@@ -1,4 +1,4 @@
-package pl.kamjer.shoppinglist.model;
+package pl.kamjer.shoppinglist.model.user;
 
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;

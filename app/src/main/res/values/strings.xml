@@ -51,4 +51,15 @@
     <string name="edit_category">Edytuj kategorię</string>
     <string name="collapse_category">Zwiń kategorię</string>
     <string name="uncollapse_category">Rozwiń kategorię</string>
+    <string name="search_hint">Wpisz szukaną frazę…</string>
+    <string name="search_button_desc">Wyszukaj</string>
+    <string name="with_name_search_menu_txt">Po nazwie</string>
+    <string name="with_ingredients_search_menu_txt">Po składnikach</string>
+    <string name="with_tags_search_menu_txt">Po tagach</string>
+    <string name="with_tags_required_search_menu_txt">Po tagach (wymagane)</string>
+    <string name="amount_type_text">Jednostki</string>
+    <string name="bought_menu_txt">Zakupione</string>
+    <string name="login_menu_txt">Logowanie</string>
+    <string name="recipes_menu_txt">Przepisy</string>
+    <string name="image_for_recipe_desc">Zdjęcie do przepisu</string>
 </resources>

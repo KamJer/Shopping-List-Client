@@ -1,7 +1,7 @@
 package pl.kamjer.shoppinglist.util.validation;
 
-import pl.kamjer.shoppinglist.model.AmountType;
-import pl.kamjer.shoppinglist.model.Category;
+import pl.kamjer.shoppinglist.model.shopping_list.AmountType;
+import pl.kamjer.shoppinglist.model.shopping_list.Category;
 
 public class NewItemDialogDataValidator {
 

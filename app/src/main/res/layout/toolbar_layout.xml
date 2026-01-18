@@ -35,40 +35,50 @@
             android:scaleY="0.25" />
 
         <ImageButton
-            android:id="@+id/boughtListButton"
+            android:id="@+id/main_tools_menu"
             android:layout_width="?attr/actionBarSize"
             android:layout_height="?attr/actionBarSize"
             android:layout_alignParentTop="true"
             android:layout_alignParentBottom="true"
             android:layout_toStartOf="@+id/connectionIndicationImageButton"
-            android:background="@drawable/baseline_shopping_cart_checkout_24"
-            android:contentDescription="@string/todo"
-            android:scaleX="0.75"
-            android:scaleY="0.75" />
+            android:background="@drawable/baseline_more_vert_24"
+            android:contentDescription="@string/todo" />
 
-        <ImageButton
-            android:id="@+id/amountTypeListButton"
-            android:layout_width="?attr/actionBarSize"
-            android:layout_height="?attr/actionBarSize"
-            android:contentDescription="@string/todo"
-            android:scaleX="0.75"
-            android:scaleY="0.75"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentBottom="true"
-            android:layout_toStartOf="@+id/boughtListButton"
-            android:background="@drawable/baseline_ballot_24" />
+<!--        <ImageButton-->
+<!--            android:id="@+id/boughtListButton"-->
+<!--            android:layout_width="?attr/actionBarSize"-->
+<!--            android:layout_height="?attr/actionBarSize"-->
+<!--            android:layout_alignParentTop="true"-->
+<!--            android:layout_alignParentBottom="true"-->
+<!--            android:layout_toStartOf="@+id/connectionIndicationImageButton"-->
+<!--            android:background="@drawable/baseline_shopping_cart_checkout_24"-->
+<!--            android:contentDescription="@string/todo"-->
+<!--            android:scaleX="0.75"-->
+<!--            android:scaleY="0.75" />-->
 
-        <ImageButton
-            android:id="@+id/loginDialogButton"
-            android:layout_width="?attr/actionBarSize"
-            android:layout_height="?attr/actionBarSize"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentBottom="true"
-            android:layout_toStartOf="@+id/amountTypeListButton"
-            android:contentDescription="@string/todo"
-            android:scaleX="0.75"
-            android:scaleY="0.75"
-            android:background="@drawable/baseline_person_24" />
+<!--        <ImageButton-->
+<!--            android:id="@+id/amountTypeListButton"-->
+<!--            android:layout_width="?attr/actionBarSize"-->
+<!--            android:layout_height="?attr/actionBarSize"-->
+<!--            android:contentDescription="@string/todo"-->
+<!--            android:scaleX="0.75"-->
+<!--            android:scaleY="0.75"-->
+<!--            android:layout_alignParentTop="true"-->
+<!--            android:layout_alignParentBottom="true"-->
+<!--            android:layout_toStartOf="@+id/boughtListButton"-->
+<!--            android:background="@drawable/baseline_ballot_24" />-->
+
+<!--        <ImageButton-->
+<!--            android:id="@+id/loginDialogButton"-->
+<!--            android:layout_width="?attr/actionBarSize"-->
+<!--            android:layout_height="?attr/actionBarSize"-->
+<!--            android:layout_alignParentTop="true"-->
+<!--            android:layout_alignParentBottom="true"-->
+<!--            android:layout_toStartOf="@+id/amountTypeListButton"-->
+<!--            android:contentDescription="@string/todo"-->
+<!--            android:scaleX="0.75"-->
+<!--            android:scaleY="0.75"-->
+<!--            android:background="@drawable/baseline_person_24" />-->
     </RelativeLayout>
 
 </com.google.android.material.appbar.AppBarLayout>

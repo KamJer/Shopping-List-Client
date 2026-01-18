@@ -10,6 +10,7 @@ import com.google.gson.GsonBuilder;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -18,14 +19,18 @@ import okhttp3.OkHttpClient;
 import pl.kamjer.shoppinglist.R;
 import pl.kamjer.shoppinglist.gsonconverter.LocalDateTimeDeserializer;
 import pl.kamjer.shoppinglist.gsonconverter.LocalDateTimeSerializer;
-import pl.kamjer.shoppinglist.model.User;
+import pl.kamjer.shoppinglist.model.user.User;
 import pl.kamjer.shoppinglist.model.dto.AllDto;
 import pl.kamjer.shoppinglist.model.dto.AmountTypeDto;
 import pl.kamjer.shoppinglist.model.dto.CategoryDto;
 import pl.kamjer.shoppinglist.model.dto.ExceptionDto;
+import pl.kamjer.shoppinglist.model.dto.RecipeDto;
+import pl.kamjer.shoppinglist.model.dto.RecipeRequestDto;
 import pl.kamjer.shoppinglist.model.dto.ShoppingItemDto;
+import pl.kamjer.shoppinglist.model.dto.TagDto;
 import pl.kamjer.shoppinglist.service.BasicAuthInterceptor;
 import pl.kamjer.shoppinglist.service.SSLUtil;
+import pl.kamjer.shoppinglist.service.service.RecipeService;
 import pl.kamjer.shoppinglist.service.service.UserService;
 import pl.kamjer.shoppinglist.service.service.UtilService;
 import pl.kamjer.shoppinglist.util.NetworkReceiver;
@@ -48,6 +53,7 @@ public class ShoppingServiceRepository {
 
     private String shoppingListDomain;
     private String userDomain;
+    private String recipeDomain;
 
     private final static String BASE_URL = "http://";
     private final static String WEBSOCKET_BASE_URL = "ws://";
@@ -56,6 +62,7 @@ public class ShoppingServiceRepository {
 
     private UserService userService;
     private UtilService utilService;
+    private RecipeService recipeService;
 
     @Getter
     private WebSocket webSocket;
@@ -94,7 +101,7 @@ public class ShoppingServiceRepository {
     private boolean initializedWithUser;
 
     private OkHttpClient okHttpClientShopping;
-    private OkHttpClient okHttpClientUser;
+    private OkHttpClient okHttpClientRecipe;
 
     private Gson gson;
 
@@ -114,6 +121,8 @@ public class ShoppingServiceRepository {
     public void initialize(Context appContext) {
         shoppingListDomain = appContext.getResources().getString(R.string.shopping_list_address);
         userDomain = appContext.getResources().getString(R.string.user_address);
+        recipeDomain = appContext.getResources().getString(R.string.recipe_address);
+
         Gson gson = new GsonBuilder()
                 .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeSerializer())
                 .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeDeserializer())
@@ -129,12 +138,14 @@ public class ShoppingServiceRepository {
     }
 
     public void reInitializeWithUser(Context appContext, User user) {
+
         gson = new GsonBuilder()
                 .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeSerializer())
                 .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeDeserializer())
                 .create();
         okHttpClientShopping = createClient(user);
-        okHttpClientUser = createClient(user);
+        OkHttpClient okHttpClientUser = createClient(user);
+        okHttpClientRecipe = createClient(user);
 
         webSocket = new WebSocket(WEBSOCKET_BASE_URL + shoppingListDomain + "/ws")
                 .basicWebsocketHeader()
@@ -155,8 +166,7 @@ public class ShoppingServiceRepository {
 //                registering shopping item endpoints
                 .subscribe(gson, "/{userName}/putShoppingItem", ShoppingItemDto.class, onMessageActionAddShoppingItem, user.getUserName())
                 .subscribe(gson, "/{userName}/postShoppingItem", ShoppingItemDto.class, onMessageActionUpdateShoppingItem, user.getUserName())
-                .subscribe(gson, "/{userName}/deleteShoppingItem", ShoppingItemDto.class, onMessageActionDeleteShoppingItem, user.getUserName())
-                ;
+                .subscribe(gson, "/{userName}/deleteShoppingItem", ShoppingItemDto.class, onMessageActionDeleteShoppingItem, user.getUserName());
         Retrofit retrofitUser = new Retrofit.Builder()
                 .baseUrl(BASE_URL + userDomain)
                 .client(okHttpClientUser)
@@ -167,8 +177,14 @@ public class ShoppingServiceRepository {
                 .client(okHttpClientShopping)
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .build();
+        Retrofit retrofitRecipe = new Retrofit.Builder()
+                .baseUrl(BASE_URL + recipeDomain)
+                .client(okHttpClientShopping)
+                .addConverterFactory(GsonConverterFactory.create(gson))
+                .build();
         userService = retrofitUser.create(UserService.class);
         utilService = retrofitShoppingList.create(UtilService.class);
+        recipeService = retrofitRecipe.create(RecipeService.class);
         initializedWithUser = true;
 
         NetworkReceiver.register(appContext,
@@ -201,43 +217,59 @@ public class ShoppingServiceRepository {
         webSocket.connect(okHttpClientShopping);
     }
 
+    private void ifDisconnectedConnect() {
+        if (!isConnected()) {
+            reconnectWebsocket();
+        }
+    }
+
     public void websocketSynchronize(AllDto allDto, User user) {
+        ifDisconnectedConnect();
         webSocket.send(gson, "/synchronizeData", allDto, user.getUserName());
     }
 
     public void websocketPutAmountType(AmountTypeDto amountTypeDto, User user) {
+        ifDisconnectedConnect();
         webSocket.send(gson, "/{userName}/putAmountType", amountTypeDto, user.getUserName());
     }
 
     public void websocketPostAmountType(AmountTypeDto amountTypeDto, User user) {
+        ifDisconnectedConnect();
         webSocket.send(gson, "/{userName}/postAmountType", amountTypeDto, user.getUserName());
     }
 
     public void websocketDeleteAmountType(AmountTypeDto amountTypeDto, User user) {
+        ifDisconnectedConnect();
         webSocket.send(gson, "/{userName}/deleteAmountType", amountTypeDto, user.getUserName());
     }
 
     public void websocketPutCategory(CategoryDto categoryDto, User user) {
+        ifDisconnectedConnect();
         webSocket.send(gson, "/{userName}/putCategory", categoryDto, user.getUserName());
     }
 
     public void websocketPostCategory(CategoryDto categoryDto, User userValue) {
+        ifDisconnectedConnect();
         webSocket.send(gson, "/{userName}/postCategory", categoryDto, userValue.getUserName());
     }
 
     public void websocketDeleteCategory(CategoryDto categoryDto, User userValue) {
+        ifDisconnectedConnect();
         webSocket.send(gson, "/{userName}/deleteCategory", categoryDto, userValue.getUserName());
     }
 
     public void websocketPutShoppingItem(ShoppingItemDto shoppingItemDto, User user) {
+        ifDisconnectedConnect();
         webSocket.send(gson, "/{userName}/putShoppingItem", shoppingItemDto, user.getUserName());
     }
 
     public void websocketPostShoppingItem(ShoppingItemDto shoppingItemDto, User userValue) {
+        ifDisconnectedConnect();
         webSocket.send(gson, "/{userName}/postShoppingItem", shoppingItemDto, userValue.getUserName());
     }
 
     public void websocketDeleteShoppingItem(ShoppingItemDto shoppingItemDto, User userValue) {
+        ifDisconnectedConnect();
         webSocket.send(gson, "/{userName}/deleteShoppingItem", shoppingItemDto, userValue.getUserName());
     }
 
@@ -287,7 +319,56 @@ public class ShoppingServiceRepository {
         call.enqueue(callback);
     }
 
+    public void insertRecipe(RecipeDto recipeDto, Callback<RecipeDto> callback) {
+        Call<RecipeDto> call = recipeService.putRecipe(recipeDto);
+        call.enqueue(callback);
 
+    }
+
+    public void updateRecipe(RecipeDto recipeDto, Callback<Boolean> callback) {
+        Call<Boolean> call = recipeService.postRecipe(recipeDto);
+        call.enqueue(callback);
+    }
+
+    public void deleteRecipe(Long id, Callback<Boolean> callback) {
+        Call<Boolean> call = recipeService.deleteRecipe(id);
+        call.enqueue(callback);
+    }
+
+    public void getRecipesByProducts(RecipeRequestDto requestDto, Callback<List<RecipeDto>> callback) {
+        Call<List<RecipeDto>> call = recipeService.getRecipeByProducts(requestDto);
+        call.enqueue(callback);
+    }
+
+    public void getRecipesByQuery(String query, Callback<List<RecipeDto>> callback) {
+        Call<List<RecipeDto>> call = recipeService.getRecipeByQuery(query);
+        call.enqueue(callback);
+    }
+
+    public void getRecipesByTags(Set<TagDto> tags, Callback<List<RecipeDto>> callback) {
+        Call<List<RecipeDto>> call = recipeService.getRecipeByTags(tags);
+        call.enqueue(callback);
+    }
+
+    public void getRecipesByTagsRequired(Set<TagDto> tags, Callback<List<RecipeDto>> callback) {
+        Call<List<RecipeDto>> call = recipeService.getRecipeByTagsRequired(tags);
+        call.enqueue(callback);
+    }
+
+    public void getRecipesForUser(String userName, Callback<List<RecipeDto>> callback) {
+        Call<List<RecipeDto>> call = recipeService.getRecipeForUser(userName);
+        call.enqueue(callback);
+    }
+
+    public void insertRecipeForUser(Long recipeId, Callback<Boolean> callback) {
+        Call<Boolean> call = recipeService.putRecipeForUser(recipeId);
+        call.enqueue(callback);
+    }
+
+    public void deleteRecipeForUser(Long recipeId, Callback<Boolean> callback) {
+        Call<Boolean> call = recipeService.deleteRecipeForUser(recipeId);
+        call.enqueue(callback);
+    }
 }
 
 

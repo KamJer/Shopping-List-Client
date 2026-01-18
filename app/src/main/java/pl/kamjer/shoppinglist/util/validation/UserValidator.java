@@ -1,6 +1,6 @@
 package pl.kamjer.shoppinglist.util.validation;
 
-import pl.kamjer.shoppinglist.model.User;
+import pl.kamjer.shoppinglist.model.user.User;
 
 public class UserValidator {
 

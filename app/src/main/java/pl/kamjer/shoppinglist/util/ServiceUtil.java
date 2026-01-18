@@ -3,11 +3,11 @@ package pl.kamjer.shoppinglist.util;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import pl.kamjer.shoppinglist.model.AmountType;
-import pl.kamjer.shoppinglist.model.Category;
-import pl.kamjer.shoppinglist.model.ModifyState;
-import pl.kamjer.shoppinglist.model.ShoppingItem;
-import pl.kamjer.shoppinglist.model.User;
+import pl.kamjer.shoppinglist.model.shopping_list.AmountType;
+import pl.kamjer.shoppinglist.model.shopping_list.Category;
+import pl.kamjer.shoppinglist.model.shopping_list.ModifyState;
+import pl.kamjer.shoppinglist.model.shopping_list.ShoppingItem;
+import pl.kamjer.shoppinglist.model.user.User;
 import pl.kamjer.shoppinglist.model.dto.AllDto;
 import pl.kamjer.shoppinglist.model.dto.AmountTypeDto;
 import pl.kamjer.shoppinglist.model.dto.CategoryDto;

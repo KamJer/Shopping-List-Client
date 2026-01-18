@@ -9,7 +9,7 @@ import androidx.annotation.Nullable;
 import java.util.Optional;
 
 import pl.kamjer.shoppinglist.R;
-import pl.kamjer.shoppinglist.model.Category;
+import pl.kamjer.shoppinglist.model.shopping_list.Category;
 import pl.kamjer.shoppinglist.util.exception.NoResourceFoundException;
 
 public class UpdateCategoryDialog extends NewCategoryDialog {

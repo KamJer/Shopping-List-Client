@@ -16,7 +16,7 @@ import lombok.extern.java.Log;
 import pl.kamjer.shoppinglist.R;
 import pl.kamjer.shoppinglist.activity.logindialog.LoginDialogForcedLogin;
 import pl.kamjer.shoppinglist.activity.shoppinglistactiviti.ShoppingListActivity;
-import pl.kamjer.shoppinglist.model.User;
+import pl.kamjer.shoppinglist.model.user.User;
 import pl.kamjer.shoppinglist.repository.ShoppingServiceRepository;
 import pl.kamjer.shoppinglist.viewmodel.InitializerViewModel;
 

@@ -15,9 +15,9 @@ import java.util.Optional;
 
 import pl.kamjer.shoppinglist.R;
 import pl.kamjer.shoppinglist.activity.GenericActivity;
-import pl.kamjer.shoppinglist.model.AmountType;
-import pl.kamjer.shoppinglist.model.Category;
-import pl.kamjer.shoppinglist.model.ShoppingItem;
+import pl.kamjer.shoppinglist.model.shopping_list.AmountType;
+import pl.kamjer.shoppinglist.model.shopping_list.Category;
+import pl.kamjer.shoppinglist.model.shopping_list.ShoppingItem;
 import pl.kamjer.shoppinglist.util.validation.NewItemDialogDataValidator;
 import pl.kamjer.shoppinglist.viewmodel.NewShoppingItemDialogViewModel;
 

@@ -1,7 +1,7 @@
 package pl.kamjer.shoppinglist.util.loadManager;
 
 import lombok.AllArgsConstructor;
-import pl.kamjer.shoppinglist.model.User;
+import pl.kamjer.shoppinglist.model.user.User;
 import pl.kamjer.shoppinglist.repository.ShoppingRepository;
 import pl.kamjer.shoppinglist.repository.ShoppingServiceRepository;
 import pl.kamjer.shoppinglist.util.ServiceUtil;

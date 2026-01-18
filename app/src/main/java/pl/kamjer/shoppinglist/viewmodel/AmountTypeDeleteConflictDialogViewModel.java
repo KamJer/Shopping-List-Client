@@ -7,11 +7,10 @@ import androidx.lifecycle.viewmodel.ViewModelInitializer;
 
 import java.util.List;
 
-import pl.kamjer.shoppinglist.model.AmountType;
+import pl.kamjer.shoppinglist.model.shopping_list.AmountType;
 import pl.kamjer.shoppinglist.repository.SharedRepository;
 import pl.kamjer.shoppinglist.repository.ShoppingRepository;
 import pl.kamjer.shoppinglist.repository.ShoppingServiceRepository;
-import pl.kamjer.shoppinglist.util.funcinterface.OnFailureAction;
 
 public class AmountTypeDeleteConflictDialogViewModel extends CustomViewModel{
 

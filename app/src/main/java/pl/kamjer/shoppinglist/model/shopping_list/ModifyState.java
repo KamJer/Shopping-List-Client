@@ -1,4 +1,4 @@
-package pl.kamjer.shoppinglist.model;
+package pl.kamjer.shoppinglist.model.shopping_list;
 
 public enum ModifyState {
     INSERT,

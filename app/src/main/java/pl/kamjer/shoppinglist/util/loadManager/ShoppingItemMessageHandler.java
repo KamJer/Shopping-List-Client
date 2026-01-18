@@ -1,6 +1,6 @@
 package pl.kamjer.shoppinglist.util.loadManager;
 
-import pl.kamjer.shoppinglist.model.User;
+import pl.kamjer.shoppinglist.model.user.User;
 import pl.kamjer.shoppinglist.repository.ShoppingRepository;
 import pl.kamjer.shoppinglist.repository.ShoppingServiceRepository;
 

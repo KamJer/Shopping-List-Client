@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources> <string-array name="search_modes">
+
+
+    <item>@string/with_name_search_menu_txt</item>
+    <item>@string/with_ingredients_search_menu_txt</item>
+    <item>@string/with_tags_search_menu_txt</item>
+    <item>@string/with_tags_required_search_menu_txt</item>
+</string-array></resources>

@@ -11,7 +11,7 @@ import androidx.lifecycle.viewmodel.ViewModelInitializer;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import pl.kamjer.shoppinglist.model.User;
+import pl.kamjer.shoppinglist.model.user.User;
 import pl.kamjer.shoppinglist.repository.SharedRepository;
 import pl.kamjer.shoppinglist.repository.ShoppingRepository;
 import pl.kamjer.shoppinglist.repository.ShoppingServiceRepository;

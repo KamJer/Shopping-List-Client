@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import pl.kamjer.shoppinglist.R;
 import pl.kamjer.shoppinglist.activity.amounttypelist.functionalinterface.ModifyAmountTypeAction;
-import pl.kamjer.shoppinglist.model.AmountType;
+import pl.kamjer.shoppinglist.model.shopping_list.AmountType;
 
 public class AmountTypeRecyclerViewHolder extends RecyclerView.ViewHolder {
 

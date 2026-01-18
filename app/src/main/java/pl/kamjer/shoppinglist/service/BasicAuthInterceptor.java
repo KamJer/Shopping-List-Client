@@ -9,7 +9,7 @@ import lombok.AllArgsConstructor;
 import okhttp3.Interceptor;
 import okhttp3.Request;
 import okhttp3.Response;
-import pl.kamjer.shoppinglist.model.User;
+import pl.kamjer.shoppinglist.model.user.User;
 
 @AllArgsConstructor
 public class BasicAuthInterceptor implements Interceptor {

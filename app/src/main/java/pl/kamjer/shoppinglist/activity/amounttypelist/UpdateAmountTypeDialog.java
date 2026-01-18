@@ -8,7 +8,7 @@ import java.util.Optional;
 
 import pl.kamjer.shoppinglist.R;
 import pl.kamjer.shoppinglist.activity.amounttypelist.addnewamounttypedialog.AddNewAmountTypeDialog;
-import pl.kamjer.shoppinglist.model.AmountType;
+import pl.kamjer.shoppinglist.model.shopping_list.AmountType;
 import pl.kamjer.shoppinglist.util.exception.NoUserFoundException;
 
 public class UpdateAmountTypeDialog extends AddNewAmountTypeDialog {

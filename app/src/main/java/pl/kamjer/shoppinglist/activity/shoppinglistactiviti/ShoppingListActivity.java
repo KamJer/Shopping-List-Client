@@ -33,9 +33,9 @@ import pl.kamjer.shoppinglist.activity.shoppinglistactiviti.newcategorydialog.Up
 import pl.kamjer.shoppinglist.activity.shoppinglistactiviti.newshoppingitemdialog.NewShoppingItemDialog;
 import pl.kamjer.shoppinglist.activity.shoppinglistactiviti.newshoppingitemdialog.UpdateShoppingItemDialog;
 import pl.kamjer.shoppinglist.activity.shoppinglistactiviti.shoppingcategoryrecyclerview.ShoppingCategoryRecyclerViewAdapter;
-import pl.kamjer.shoppinglist.model.Category;
-import pl.kamjer.shoppinglist.model.ShoppingItem;
-import pl.kamjer.shoppinglist.model.ShoppingItemWithAmountTypeAndCategory;
+import pl.kamjer.shoppinglist.model.shopping_list.Category;
+import pl.kamjer.shoppinglist.model.shopping_list.ShoppingItem;
+import pl.kamjer.shoppinglist.model.shopping_list.ShoppingItemWithAmountTypeAndCategory;
 import pl.kamjer.shoppinglist.util.TutorialManager;
 import pl.kamjer.shoppinglist.util.exception.NoResourceFoundException;
 import pl.kamjer.shoppinglist.util.funcinterface.AddShoppingItemAction;

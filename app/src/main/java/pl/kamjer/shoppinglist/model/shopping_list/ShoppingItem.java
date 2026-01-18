@@ -1,9 +1,8 @@
-package pl.kamjer.shoppinglist.model;
+package pl.kamjer.shoppinglist.model.shopping_list;
 
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
-import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
 import java.io.Serializable;
@@ -12,6 +11,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import pl.kamjer.shoppinglist.model.user.User;
 
 @AllArgsConstructor
 @Builder

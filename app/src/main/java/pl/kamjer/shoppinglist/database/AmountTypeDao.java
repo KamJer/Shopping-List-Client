@@ -11,8 +11,8 @@ import androidx.room.Update;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import pl.kamjer.shoppinglist.model.AmountType;
-import pl.kamjer.shoppinglist.model.ShoppingItem;
+import pl.kamjer.shoppinglist.model.shopping_list.AmountType;
+import pl.kamjer.shoppinglist.model.shopping_list.ShoppingItem;
 
 @Dao
 public interface AmountTypeDao {

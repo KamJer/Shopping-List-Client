@@ -12,7 +12,7 @@ import java.util.List;
 import lombok.AllArgsConstructor;
 import pl.kamjer.shoppinglist.R;
 import pl.kamjer.shoppinglist.activity.shoppinglistactiviti.shoppingitemrecyclerview.ShoppingItemViewHolder;
-import pl.kamjer.shoppinglist.model.ShoppingItemWithAmountTypeAndCategory;
+import pl.kamjer.shoppinglist.model.shopping_list.ShoppingItemWithAmountTypeAndCategory;
 import pl.kamjer.shoppinglist.util.funcinterface.ModifyShoppingItemAction;
 import pl.kamjer.shoppinglist.util.funcinterface.UpdateShoppingItemActonCheckBox;
 

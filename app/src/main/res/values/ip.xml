@@ -2,6 +2,8 @@
 <resources>
 <!--    <string name="shopping_list_address">shoppinglist.kamjer.online</string>-->
 <!--    <string name="user_address">user.kamjer.online</string>-->
+<!--    <string name="recipe_address">recipe.kamjer.online</string>-->
     <string name="shopping_list_address">192.168.0.13:5443</string>
     <string name="user_address">192.168.0.13:4443</string>
+    <string name="recipe_address">192.168.0.13:6443</string>
 </resources>

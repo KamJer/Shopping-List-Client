@@ -9,7 +9,7 @@ import androidx.room.Query;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import pl.kamjer.shoppinglist.model.User;
+import pl.kamjer.shoppinglist.model.user.User;
 
 @Dao
 public interface UserDao {

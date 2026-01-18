@@ -10,8 +10,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import pl.kamjer.shoppinglist.R;
-import pl.kamjer.shoppinglist.model.AmountType;
-import pl.kamjer.shoppinglist.model.ShoppingItem;
+import pl.kamjer.shoppinglist.model.shopping_list.AmountType;
+import pl.kamjer.shoppinglist.model.shopping_list.ShoppingItem;
 
 public class UpdateShoppingItemDialog extends NewShoppingItemDialog{
 

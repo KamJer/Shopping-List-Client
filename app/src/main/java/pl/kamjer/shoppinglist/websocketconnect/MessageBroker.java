@@ -53,10 +53,18 @@ public class MessageBroker {
 
     private void handleError(okhttp3.WebSocket webSocket, Message message) {
         log.warning(message.jsonyfy());
+        subscribeMessages.forEach((s, subscribeMessage) -> {
+            subscribeMessage.setSend(false);
+            subscribeMessage.setUnsubscribed(true);
+        });
         Optional.ofNullable(onMessageHolder.getOnErrorAction()).ifPresent(stringOnMessageAction -> stringOnMessageAction.action(webSocket, message.getHeaders().get(Header.BODY)));
     }
 
     public void handleFailure(okhttp3.WebSocket webSocket, Throwable t, Response response) {
+        subscribeMessages.forEach((s, subscribeMessage) -> {
+            subscribeMessage.setSend(false);
+            subscribeMessage.setUnsubscribed(true);
+        });
         connectedLiveData.postValue(null);
     }
 

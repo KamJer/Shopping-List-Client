@@ -8,7 +8,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import pl.kamjer.shoppinglist.R;
-import pl.kamjer.shoppinglist.model.User;
+import pl.kamjer.shoppinglist.model.user.User;
 import pl.kamjer.shoppinglist.util.funcinterface.DeleteUserAction;
 
 public class UserViewHolder extends RecyclerView.ViewHolder {

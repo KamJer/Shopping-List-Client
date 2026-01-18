@@ -6,7 +6,9 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.widget.ImageButton;
+import android.widget.PopupMenu;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -26,10 +28,8 @@ import pl.kamjer.shoppinglist.viewmodel.ShoppingListActionBarViewModel;
 @Getter
 public class ShoppingListActionBar extends AppBarLayout {
 
-    private ImageButton amountTypeListButton;
-    private ImageButton boughtListButton;
-    private ImageButton loginDialogButton;
     private ImageButton connectionButtonIndicator;
+    private ImageButton menuButton;
     private Toolbar toolbar;
 
     private ShoppingListActionBarViewModel shoppingListActionBarViewModel;
@@ -47,6 +47,30 @@ public class ShoppingListActionBar extends AppBarLayout {
     private final OnClickListener loginDialogButtonAction = v -> {
         Intent loginDialogIntent = new Intent(this.getContext(), LoginDialogOptionalLogin.class);
         this.getContext().startActivity(loginDialogIntent);
+    };
+
+    private final OnClickListener menuPopUpAction = v -> {
+        PopupMenu menu = new PopupMenu(this.getContext(), v);
+        menu.getMenuInflater().inflate(R.menu.main_toolbar_menu, menu.getMenu());
+        MenuItem collapseItem = menu.getMenu().findItem(R.id.collapse_category);
+        menu.setOnMenuItemClickListener(item -> {
+            int id = item.getItemId();
+            if (id == R.id.amount_type_list) {
+                amountTypeListAction();
+                return true;
+            } else if (id ==R.id.bought_list) {
+                boughtListAction();
+                return true;
+            } else if (id == R.id.login_dialog) {
+                loginDialogAction();
+                return true;
+            }else if (id == R.id.recipe_activity) {
+                recipeAction();
+                return true;
+            }
+            return false;
+        });
+        menu.show();
     };
 
     private final OnClickListener connectionButtonIndicatorAction =
@@ -72,12 +96,8 @@ public class ShoppingListActionBar extends AppBarLayout {
         inflater.inflate(R.layout.toolbar_layout, this, true);
 
         toolbar = findViewById(R.id.toolbar);
-        amountTypeListButton = findViewById(R.id.amountTypeListButton);
-        amountTypeListButton.setOnClickListener(amountTypeListButtonAction);
-        boughtListButton = findViewById(R.id.boughtListButton);
-        boughtListButton.setOnClickListener(boughtListButtonAction);
-        loginDialogButton = findViewById(R.id.loginDialogButton);
-        loginDialogButton.setOnClickListener(loginDialogButtonAction);
+        menuButton = findViewById(R.id.main_tools_menu);
+        menuButton.setOnClickListener(menuPopUpAction);
         connectionButtonIndicator = findViewById(R.id.connectionIndicationImageButton);
 
         connectionButtonIndicator.setOnClickListener(connectionButtonIndicatorAction);
@@ -91,20 +111,37 @@ public class ShoppingListActionBar extends AppBarLayout {
 
         shoppingListActionBarViewModel.loadUser();
 
+        changeColorIndicator(shoppingListActionBarViewModel.isConnected());
+
+        shoppingListActionBarViewModel.setOnOpenConnectionAction(this::changeColorIndicator);
+    }
+
+    private void changeColorIndicator(boolean connected) {
         Drawable drawable = connectionButtonIndicator.getBackground().mutate();
-        if (shoppingListActionBarViewModel.isConnected()) {
+        if (connected) {
             drawable.setTint(Color.GREEN);
         } else {
             drawable.setTint(Color.RED);
         }
+    }
 
-        shoppingListActionBarViewModel.setOnOpenConnectionAction((connected) -> {
-            Drawable buttonIcon = connectionButtonIndicator.getBackground().mutate();
-            if (connected) {
-                buttonIcon.setTint(Color.GREEN);
-            } else {
-                buttonIcon.setTint(Color.RED);
-            }
-        });
+    private void amountTypeListAction() {
+        Intent amountTypeListActivityIntent = new Intent(this.getContext(), AmountTypeListActivity.class);
+        this.getContext().startActivity(amountTypeListActivityIntent);
+    }
+
+    private void boughtListAction() {
+        Intent boughtShoppingItemListActivityIntent = new Intent(this.getContext(), BoughtShoppingItemListActivity.class);
+        this.getContext().startActivity(boughtShoppingItemListActivityIntent);
+    }
+
+    private void loginDialogAction() {
+        Intent loginDialogIntent = new Intent(this.getContext(), LoginDialogOptionalLogin.class);
+        this.getContext().startActivity(loginDialogIntent);
+    }
+
+    private void recipeAction() {
+        Intent recipeSearchActivityIntent = new Intent(this.getContext(), RecipeSearchActivity.class);
+        this.getContext().startActivity(recipeSearchActivityIntent);
     }
 }

@@ -10,7 +10,7 @@ import java.util.Optional;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import pl.kamjer.shoppinglist.R;
-import pl.kamjer.shoppinglist.model.User;
+import pl.kamjer.shoppinglist.model.user.User;
 
 @RequiredArgsConstructor
 public class SharedRepository {

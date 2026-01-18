@@ -12,7 +12,7 @@ import java.util.List;
 import lombok.AllArgsConstructor;
 import pl.kamjer.shoppinglist.R;
 import pl.kamjer.shoppinglist.activity.amounttypelist.functionalinterface.ModifyAmountTypeAction;
-import pl.kamjer.shoppinglist.model.AmountType;
+import pl.kamjer.shoppinglist.model.shopping_list.AmountType;
 
 @AllArgsConstructor
 public class AmountTypeRecyclerViewAdapter extends RecyclerView.Adapter<AmountTypeRecyclerViewHolder>{

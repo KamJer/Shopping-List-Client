@@ -16,9 +16,9 @@ import java.util.Optional;
 import pl.kamjer.shoppinglist.R;
 import pl.kamjer.shoppinglist.activity.ShoppingListActionBar;
 import pl.kamjer.shoppinglist.activity.boughtshoppingitemlist.boughtcategorylistrecyclerviewadapter.BoughtCategoryListRecyclerViewAdapter;
-import pl.kamjer.shoppinglist.model.Category;
-import pl.kamjer.shoppinglist.model.ShoppingItem;
-import pl.kamjer.shoppinglist.model.ShoppingItemWithAmountTypeAndCategory;
+import pl.kamjer.shoppinglist.model.shopping_list.Category;
+import pl.kamjer.shoppinglist.model.shopping_list.ShoppingItem;
+import pl.kamjer.shoppinglist.model.shopping_list.ShoppingItemWithAmountTypeAndCategory;
 import pl.kamjer.shoppinglist.util.funcinterface.ModifyShoppingItemAction;
 import pl.kamjer.shoppinglist.util.funcinterface.OnFailureAction;
 import pl.kamjer.shoppinglist.util.funcinterface.UpdateShoppingItemActonCheckBox;
@@ -40,7 +40,6 @@ public class BoughtShoppingItemListActivity extends AppCompatActivity {
     private final ModifyShoppingItemAction deleteShoppingItemAction = shoppingItemWithAmountTypeAndCategory -> {
         boughtShoppingItemsListViewModel.deleteShoppingItem(shoppingItemWithAmountTypeAndCategory.getShoppingItem());
     };
-
     private final ModifyShoppingItemAction modifyShoppingItemAction = shoppingItemWithAmountTypeAndCategory -> {
         boughtShoppingItemsListViewModel.deleteShoppingItem(shoppingItemWithAmountTypeAndCategory.getShoppingItem());
     };
@@ -60,7 +59,6 @@ public class BoughtShoppingItemListActivity extends AppCompatActivity {
         ShoppingListActionBar shoppingListActionBar = findViewById(R.id.appBar);
         setSupportActionBar(shoppingListActionBar.getToolbar());
         Optional.ofNullable(getSupportActionBar()).ifPresent(actionBar -> actionBar.setDisplayShowTitleEnabled(false));
-
         Optional.ofNullable(getSupportActionBar()).ifPresent(actionBar -> actionBar.setDisplayHomeAsUpEnabled(true));
 
         boughtShoppingItemsListViewModel = new ViewModelProvider(
@@ -68,7 +66,6 @@ public class BoughtShoppingItemListActivity extends AppCompatActivity {
                 ViewModelProvider.Factory.from(BoughtShoppingItemsListViewModel.initializer)
         ).get(BoughtShoppingItemsListViewModel.class);
 
-//        loading data
         boughtShoppingItemsListViewModel.loadUser();
         boughtShoppingItemsListViewModel.loadAllShoppingItemWithAmountTypeAndCategoryLiveData();
         boughtShoppingItemsListViewModel.loadAllCategory();

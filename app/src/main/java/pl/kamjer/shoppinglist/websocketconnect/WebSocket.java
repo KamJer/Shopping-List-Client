@@ -62,12 +62,11 @@ public class WebSocket {
             LinkedList<Message> sendMessages = getStompMessagesValue();
             while (!sendMessages.isEmpty()) {
                 Message message = sendMessages.poll();
-                message.getHeaders().put(Header.ID, getOpenValue().orElseThrow(() -> new NoSuchElementException(NOT_OPEN_EXCEPTION_MESSAGE)).getHeaders().get(Header.ID));
+                message.getHeaders().put(Header.ID, getOpenValue()
+                        .orElseThrow(() -> new NoSuchElementException(NOT_OPEN_EXCEPTION_MESSAGE))
+                        .getHeaders().get(Header.ID));
                 sendMessage(message);
             }
-        } else {
-//            if received connect message is null unregister all observers
-            unregisterObservers();
         }
         onConnectAction.action(openMessage != null);
     };
@@ -137,16 +136,18 @@ public class WebSocket {
     }
 
     public WebSocket connect(OkHttpClient okHttpClient) {
-//        makes sure that observers are set on main thread
-        new Handler(Looper.getMainLooper()).post(() -> {
-            subscribeMessagesLiveData.observeForever(subscribeMessagesLiveDataObserver);
-            connectedLiveData.observeForever(connectedLiveDataObserver);
-            messageQueueLiveData.observeForever(messageQueueLiveDataObserver);
+        if (!isConnected()) {
+            //        makes sure that observers are set on main thread
+            new Handler(Looper.getMainLooper()).post(() -> {
+                subscribeMessagesLiveData.observeForever(subscribeMessagesLiveDataObserver);
+                connectedLiveData.observeForever(connectedLiveDataObserver);
+                messageQueueLiveData.observeForever(messageQueueLiveDataObserver);
 
-            webSocketListener.setMessageBroker(new MessageBroker(getSubscribeMessageValue(), connectedLiveData, onMessageHolder));
-            webSocketListener.setGson(new Gson());
-            okHttpWebSocket = okHttpClient.newWebSocket(request.build(), webSocketListener);
-        });
+                webSocketListener.setMessageBroker(new MessageBroker(getSubscribeMessageValue(), connectedLiveData, onMessageHolder));
+                webSocketListener.setGson(new Gson());
+                okHttpWebSocket = okHttpClient.newWebSocket(request.build(), webSocketListener);
+            });
+        }
         return this;
     }
 
@@ -159,14 +160,25 @@ public class WebSocket {
     public WebSocket disconnect() {
         Optional.ofNullable(okHttpWebSocket).ifPresent(webSocket ->
                 webSocket.close(1000, "finished"));
+
+        resetSubscriptions();
         connectedLiveData.postValue(null);
         return this;
     }
 
     public WebSocket disconnect(int code, String reason) {
+        resetSubscriptions();
         okHttpWebSocket.close(code, reason);
         connectedLiveData.postValue(null);
         return this;
+    }
+
+    private void resetSubscriptions() {
+        HashMap<String, SubscribeMessage> subs = getSubscribeMessageValue();
+        subs.values().forEach(sub -> {
+            sub.setSend(false);
+            sub.setUnsubscribed(true);
+        });
     }
 
     public WebSocket onOpen(OnOpenAction action) {

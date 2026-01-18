@@ -38,16 +38,16 @@ import pl.kamjer.shoppinglist.database.ShoppingItemDao;
 import pl.kamjer.shoppinglist.database.UserDao;
 import pl.kamjer.shoppinglist.database.UtilDao;
 import pl.kamjer.shoppinglist.database.threadfactory.ShoppingListDataBaseThreadFactory;
-import pl.kamjer.shoppinglist.model.AmountType;
-import pl.kamjer.shoppinglist.model.Category;
-import pl.kamjer.shoppinglist.model.ModifyState;
-import pl.kamjer.shoppinglist.model.ShoppingItem;
-import pl.kamjer.shoppinglist.model.ShoppingItemWithAmountTypeAndCategory;
-import pl.kamjer.shoppinglist.model.User;
 import pl.kamjer.shoppinglist.model.dto.AllDto;
 import pl.kamjer.shoppinglist.model.dto.AmountTypeDto;
 import pl.kamjer.shoppinglist.model.dto.CategoryDto;
 import pl.kamjer.shoppinglist.model.dto.ShoppingItemDto;
+import pl.kamjer.shoppinglist.model.shopping_list.AmountType;
+import pl.kamjer.shoppinglist.model.shopping_list.Category;
+import pl.kamjer.shoppinglist.model.shopping_list.ModifyState;
+import pl.kamjer.shoppinglist.model.shopping_list.ShoppingItem;
+import pl.kamjer.shoppinglist.model.shopping_list.ShoppingItemWithAmountTypeAndCategory;
+import pl.kamjer.shoppinglist.model.user.User;
 import pl.kamjer.shoppinglist.util.ServiceUtil;
 import pl.kamjer.shoppinglist.util.exception.handler.DatabaseAndServiceOperationExceptionHandler;
 import pl.kamjer.shoppinglist.util.funcinterface.LoadToServerAction;
@@ -263,7 +263,7 @@ public class ShoppingRepository {
      * Updates category in database with out setting up a flag but update savedTime
      *
      * @param categoryDto dto of a amount type to updates
-     * @param user          - user logged in
+     * @param user        - user logged in
      */
     public void updateCategoryFinal(CategoryDto categoryDto, User user) {
         executorService.execute(() ->
@@ -338,8 +338,9 @@ public class ShoppingRepository {
                                 Map<ModifyState, List<Category>> categories,
                                 Map<ModifyState, List<ShoppingItem>> shoppingItems,
                                 User user,
-                                LocalDateTime savedTime) {
-        executorService.execute(() -> utilDao.synchronizeData(amountTypes, categories, shoppingItems, user, savedTime));
+                                LocalDateTime savedTime,
+                                boolean dirty) {
+        executorService.execute(() -> utilDao.synchronizeData(amountTypes, categories, shoppingItems, user, savedTime, dirty));
     }
 
     public void synchronizeData(User user, AllDto responseAllDto) {
@@ -366,7 +367,8 @@ public class ShoppingRepository {
                 categoryListFiltered,
                 shoppingItemListFiltered,
                 user,
-                responseAllDto.getSavedTime());
+                responseAllDto.getSavedTime(),
+                responseAllDto.getDirty());
     }
 
     public LiveData<List<User>> loadAllUsers() {

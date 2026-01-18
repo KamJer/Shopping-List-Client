@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import pl.kamjer.shoppinglist.model.ModifyState;
+import pl.kamjer.shoppinglist.model.shopping_list.ModifyState;
 
 @AllArgsConstructor
 @Builder

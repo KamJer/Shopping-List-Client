@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/amount_type_list"
+        android:title="@string/amount_type_text" />
+    <item
+        android:id="@+id/bought_list"
+        android:title="@string/bought_menu_txt" />
+    <item
+        android:id="@+id/login_dialog"
+        android:title="@string/login_menu_txt" />
+    <item
+        android:id="@+id/recipe_activity"
+        android:title="@string/recipes_menu_txt" />
+</menu>

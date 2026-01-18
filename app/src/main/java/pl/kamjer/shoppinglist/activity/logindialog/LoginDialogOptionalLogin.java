@@ -19,7 +19,7 @@ import pl.kamjer.shoppinglist.R;
 import pl.kamjer.shoppinglist.activity.GenericActivity;
 import pl.kamjer.shoppinglist.activity.ShoppingListActionBar;
 import pl.kamjer.shoppinglist.activity.logindialog.usersrecyclerview.UsersRecyclerViewAdapter;
-import pl.kamjer.shoppinglist.model.User;
+import pl.kamjer.shoppinglist.model.user.User;
 import pl.kamjer.shoppinglist.util.funcinterface.DeleteUserAction;
 import pl.kamjer.shoppinglist.util.validation.UserValidator;
 import pl.kamjer.shoppinglist.viewmodel.LoginDialogViewModel;

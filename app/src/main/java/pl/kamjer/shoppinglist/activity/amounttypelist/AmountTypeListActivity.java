@@ -21,7 +21,7 @@ import pl.kamjer.shoppinglist.activity.ShoppingListActionBar;
 import pl.kamjer.shoppinglist.activity.amounttypelist.addnewamounttypedialog.AddNewAmountTypeDialog;
 import pl.kamjer.shoppinglist.activity.amounttypelist.amounttyperecyclerview.AmountTypeRecyclerViewAdapter;
 import pl.kamjer.shoppinglist.activity.amounttypelist.functionalinterface.ModifyAmountTypeAction;
-import pl.kamjer.shoppinglist.model.ShoppingItem;
+import pl.kamjer.shoppinglist.model.shopping_list.ShoppingItem;
 import pl.kamjer.shoppinglist.viewmodel.AmountTypeViewModel;
 
 public class AmountTypeListActivity extends GenericActivity {

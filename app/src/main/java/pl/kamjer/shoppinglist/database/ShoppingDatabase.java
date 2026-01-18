@@ -8,10 +8,10 @@ import androidx.room.migration.Migration;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
 import pl.kamjer.shoppinglist.database.converter.LocalDateTimeStringConverter;
-import pl.kamjer.shoppinglist.model.AmountType;
-import pl.kamjer.shoppinglist.model.Category;
-import pl.kamjer.shoppinglist.model.ShoppingItem;
-import pl.kamjer.shoppinglist.model.User;
+import pl.kamjer.shoppinglist.model.shopping_list.AmountType;
+import pl.kamjer.shoppinglist.model.shopping_list.Category;
+import pl.kamjer.shoppinglist.model.shopping_list.ShoppingItem;
+import pl.kamjer.shoppinglist.model.user.User;
 
 @Database(entities = {ShoppingItem.class, AmountType.class, Category.class, User.class}, version = 2)
 @TypeConverters({LocalDateTimeStringConverter.class})
