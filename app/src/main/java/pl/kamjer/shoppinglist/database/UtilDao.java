@@ -195,26 +195,21 @@ public interface UtilDao {
                                  boolean dirty) {
         if (dirty) {
             deleteAll(user);
-            insertAllElements(
-                    amountTypes.values().stream().flatMap(List::stream).collect(Collectors.toList()),
-                    categories.values().stream().flatMap(List::stream).collect(Collectors.toList()),
-                    shoppingItems.values().stream().flatMap(List::stream).collect(Collectors.toList()));
-        } else {
-            insertAllElements(
-                    Optional.ofNullable(amountTypes.get(ModifyState.INSERT)).orElseGet(ArrayList::new),
-                    Optional.ofNullable(categories.get(ModifyState.INSERT)).orElseGet(ArrayList::new),
-                    Optional.ofNullable(shoppingItems.get(ModifyState.INSERT)).orElseGet(ArrayList::new));
-            updateAllElements(
-                    Optional.ofNullable(amountTypes.get(ModifyState.UPDATE)).orElseGet(ArrayList::new),
-                    Optional.ofNullable(categories.get(ModifyState.UPDATE)).orElseGet(ArrayList::new),
-                    Optional.ofNullable(shoppingItems.get(ModifyState.UPDATE)).orElseGet(ArrayList::new));
-            deleteAllElements(
-                    Optional.ofNullable(amountTypes.get(ModifyState.DELETE)).orElseGet(ArrayList::new),
-                    Optional.ofNullable(categories.get(ModifyState.DELETE)).orElseGet(ArrayList::new),
-                    Optional.ofNullable(shoppingItems.get(ModifyState.DELETE)).orElseGet(ArrayList::new));
-            user.setSavedTime(savedTime);
-            updateUser(user);
         }
+        insertAllElements(
+                Optional.ofNullable(amountTypes.get(ModifyState.INSERT)).orElseGet(ArrayList::new),
+                Optional.ofNullable(categories.get(ModifyState.INSERT)).orElseGet(ArrayList::new),
+                Optional.ofNullable(shoppingItems.get(ModifyState.INSERT)).orElseGet(ArrayList::new));
+        updateAllElements(
+                Optional.ofNullable(amountTypes.get(ModifyState.UPDATE)).orElseGet(ArrayList::new),
+                Optional.ofNullable(categories.get(ModifyState.UPDATE)).orElseGet(ArrayList::new),
+                Optional.ofNullable(shoppingItems.get(ModifyState.UPDATE)).orElseGet(ArrayList::new));
+        deleteAllElements(
+                Optional.ofNullable(amountTypes.get(ModifyState.DELETE)).orElseGet(ArrayList::new),
+                Optional.ofNullable(categories.get(ModifyState.DELETE)).orElseGet(ArrayList::new),
+                Optional.ofNullable(shoppingItems.get(ModifyState.DELETE)).orElseGet(ArrayList::new));
+        user.setSavedTime(savedTime);
+        updateUser(user);
     }
 
     default Long getLocalAmountTypeIdForShoppingItem(List<AmountType> amountTypes, ShoppingItem shoppingItem) {
