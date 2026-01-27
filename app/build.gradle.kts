@@ -10,7 +10,7 @@ android {
         applicationId = "pl.kamjer.shoppinglist"
         minSdk = 26
         targetSdk = 35
-        versionCode = 24
+        versionCode = 25
         versionName = "2.2"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"

@@ -9,7 +9,7 @@ lombok = "1.18.32"
 room = "2.8.4"
 retrofit = "2.9.0"
 androidx-recyclerView = "1.4.0"
-zetetic = "4.5.3"
+zetetic = "4.13.0"
 jackson = "2.17.2"
 
 [libraries]
@@ -25,7 +25,7 @@ room-compiler = { group = "androidx.room", name = "room-compiler", version.ref =
 retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
 retrofit-converter = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "retrofit" }
 androidx-recyclerView = {group ="androidx.recyclerview", name = "recyclerview", version.ref = "androidx-recyclerView"}
-zetetic-security = {group="net.zetetic", name="android-database-sqlcipher", version.ref="zetetic"}
+zetetic-security = {group="net.zetetic", name="sqlcipher-android", version.ref="zetetic"}
 jackson = {group="com.fasterxml.jackson.core", name = "jackson-databind", version.ref="jackson"}
 
 [plugins]

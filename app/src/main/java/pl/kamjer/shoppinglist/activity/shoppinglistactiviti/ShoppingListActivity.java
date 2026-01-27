@@ -12,6 +12,8 @@ import androidx.activity.OnBackPressedCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -140,6 +142,18 @@ public class ShoppingListActivity extends GenericActivity {
 
         categoryList = new ArrayList<>();
         shoppingItemWithAmountTypeAndCategoriesList = new ArrayList<>();
+
+        final View rootView = findViewById(R.id.shopping_list_activity_id);
+
+        ViewCompat.setOnApplyWindowInsetsListener(rootView, (view, insets) -> {
+            int statusBarHeight = insets.getInsets(WindowInsetsCompat.Type.statusBars()).top;
+            view.setPadding(view.getPaddingLeft(),
+                    statusBarHeight,
+                    view.getPaddingRight(),
+                    view.getPaddingBottom());
+            return insets;
+        });
+
 //        finding view elements
         ShoppingListActionBar shoppingListActionBar = findViewById(R.id.appBar);
         shoppingListActionBar.create(this);

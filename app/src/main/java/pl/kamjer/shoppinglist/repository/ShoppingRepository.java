@@ -1,15 +1,11 @@
 package pl.kamjer.shoppinglist.repository;
 
 import android.content.Context;
-import android.security.keystore.KeyGenParameterSpec;
-import android.security.keystore.KeyProperties;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 import androidx.room.Room;
-
-import net.sqlcipher.database.SupportFactory;
 
 import java.security.InvalidAlgorithmParameterException;
 import java.security.NoSuchAlgorithmException;
@@ -22,9 +18,6 @@ import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
-
-import javax.crypto.KeyGenerator;
-import javax.crypto.SecretKey;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -52,6 +45,7 @@ import pl.kamjer.shoppinglist.util.ServiceUtil;
 import pl.kamjer.shoppinglist.util.exception.handler.DatabaseAndServiceOperationExceptionHandler;
 import pl.kamjer.shoppinglist.util.funcinterface.LoadToServerAction;
 import pl.kamjer.shoppinglist.util.funcinterface.PostNewElements;
+import pl.kamjer.shoppinglist.util.sqlCipher.SqlCipherKeyManager;
 
 @RequiredArgsConstructor
 @Log
@@ -95,14 +89,15 @@ public class ShoppingRepository {
      * @param shoppingServiceRepository - initialized repository for a server, necessary for sending exceptions to the server
      */
     public void initialize(Context appContext, ShoppingServiceRepository shoppingServiceRepository) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException {
-        SecretKey secretKey = getOrCreateKey();
-        byte[] pass = secretKey.getEncoded();
-        SupportFactory supportFactoryPass = new SupportFactory(pass);
+        System.loadLibrary("sqlcipher");
+
+        SqlCipherKeyManager sqlCipherKeyManager = new SqlCipherKeyManager(SharedRepository.getSharedRepository().getSharedPref());
 
         ShoppingDatabase shoppingDatabase = Room.databaseBuilder(appContext,
-                        ShoppingDatabase.class, ShoppingDatabase.DATABASE_NAME)
+                        ShoppingDatabase.class,
+                        ShoppingDatabase.DATABASE_NAME)
                 .addMigrations(ShoppingDatabase.MIGRATION_1_2)
-                .openHelperFactory(supportFactoryPass)
+                .openHelperFactory(sqlCipherKeyManager.getSupportFactory())
                 .build();
         shoppingItemDao = shoppingDatabase.getShoppingItemDao();
         categoryDao = shoppingDatabase.getCategoryDao();
@@ -139,24 +134,24 @@ public class ShoppingRepository {
         return userLiveData;
     }
 
-    private SecretKey getOrCreateKey() throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException {
-        KeyGenerator keyGenerator = KeyGenerator.getInstance(
-                "AES",
-                "AndroidKeyStore"
-        );
-
-        KeyGenParameterSpec spec = new KeyGenParameterSpec.Builder(
-                "room_key",
-                KeyProperties.PURPOSE_ENCRYPT | KeyProperties.PURPOSE_DECRYPT
-        )
-                .setBlockModes(KeyProperties.BLOCK_MODE_GCM)
-                .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
-                .setRandomizedEncryptionRequired(true)
-                .build();
-
-        keyGenerator.init(spec);
-        return keyGenerator.generateKey();
-    }
+//    private SecretKey getOrCreateKey() throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException {
+//        KeyGenerator keyGenerator = KeyGenerator.getInstance(
+//                "AES",
+//                "AndroidKeyStore"
+//        );
+//
+//        KeyGenParameterSpec spec = new KeyGenParameterSpec.Builder(
+//                "room_key",
+//                KeyProperties.PURPOSE_ENCRYPT | KeyProperties.PURPOSE_DECRYPT
+//        )
+//                .setBlockModes(KeyProperties.BLOCK_MODE_GCM)
+//                .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
+//                .setRandomizedEncryptionRequired(true)
+//                .build();
+//
+//        keyGenerator.init(spec);
+//        return keyGenerator.generateKey();
+//    }
 
     //
     public void insertUser(User user) {

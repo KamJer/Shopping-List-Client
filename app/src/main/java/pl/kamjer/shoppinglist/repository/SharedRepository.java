@@ -20,6 +20,7 @@ public class SharedRepository {
 
     private static SharedRepository sharedRepository;
 
+    @Getter
     private SharedPreferences sharedPref;
 
     @Getter
