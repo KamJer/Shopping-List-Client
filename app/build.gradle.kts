@@ -35,10 +35,8 @@ android {
 
 dependencies {
     implementation(libs.appcompat)
-    implementation(libs.jackson)
     implementation(libs.material)
     implementation(libs.room.runtime)
-    implementation(libs.room.rxjava3)
     implementation(libs.retrofit)
     implementation(libs.retrofit.converter)
     implementation(libs.androidx.recyclerView)

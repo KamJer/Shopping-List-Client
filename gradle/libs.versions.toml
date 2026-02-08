@@ -20,13 +20,11 @@ appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "a
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 lombok = { group = "org.projectlombok", name = "lombok", version.ref = "lombok" }
 room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
-room-rxjava3 = { group = "androidx.room", name = "room-rxjava3", version.ref = "room" }
 room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
 retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
 retrofit-converter = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "retrofit" }
 androidx-recyclerView = {group ="androidx.recyclerview", name = "recyclerview", version.ref = "androidx-recyclerView"}
 zetetic-security = {group="net.zetetic", name="sqlcipher-android", version.ref="zetetic"}
-jackson = {group="com.fasterxml.jackson.core", name = "jackson-databind", version.ref="jackson"}
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

@@ -23,6 +23,7 @@ import pl.kamjer.shoppinglist.R;
 import pl.kamjer.shoppinglist.activity.amounttypelist.AmountTypeListActivity;
 import pl.kamjer.shoppinglist.activity.boughtshoppingitemlist.BoughtShoppingItemListActivity;
 import pl.kamjer.shoppinglist.activity.logindialog.LoginDialogOptionalLogin;
+import pl.kamjer.shoppinglist.activity.recipeactivity.RecipeSearchActivity;
 import pl.kamjer.shoppinglist.viewmodel.ShoppingListActionBarViewModel;
 
 @Getter

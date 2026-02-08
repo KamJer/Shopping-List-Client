@@ -1,30 +1,26 @@
 package pl.kamjer.shoppinglist.activity.boughtshoppingitemlist;
 
 import android.os.Bundle;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import pl.kamjer.shoppinglist.R;
-import pl.kamjer.shoppinglist.activity.ShoppingListActionBar;
+import pl.kamjer.shoppinglist.activity.GenericActivity;
 import pl.kamjer.shoppinglist.activity.boughtshoppingitemlist.boughtcategorylistrecyclerviewadapter.BoughtCategoryListRecyclerViewAdapter;
 import pl.kamjer.shoppinglist.model.shopping_list.Category;
 import pl.kamjer.shoppinglist.model.shopping_list.ShoppingItem;
 import pl.kamjer.shoppinglist.model.shopping_list.ShoppingItemWithAmountTypeAndCategory;
 import pl.kamjer.shoppinglist.util.funcinterface.ModifyShoppingItemAction;
-import pl.kamjer.shoppinglist.util.funcinterface.OnFailureAction;
 import pl.kamjer.shoppinglist.util.funcinterface.UpdateShoppingItemActonCheckBox;
 import pl.kamjer.shoppinglist.viewmodel.BoughtShoppingItemsListViewModel;
 
-public class BoughtShoppingItemListActivity extends AppCompatActivity {
+public class BoughtShoppingItemListActivity extends GenericActivity {
 
     private BoughtShoppingItemsListViewModel boughtShoppingItemsListViewModel;
 
@@ -32,10 +28,6 @@ public class BoughtShoppingItemListActivity extends AppCompatActivity {
 
     private List<Category> allCategories = new ArrayList<>();
     private List<ShoppingItemWithAmountTypeAndCategory> allShoppingWithAmountTypeAndCategories = new ArrayList<>();
-
-    private final OnFailureAction connectionFailedAction =
-            (t) -> createToast(Optional.ofNullable(t).map(Throwable::getMessage).orElse("could not found reason for error"));
-
 
     private final ModifyShoppingItemAction deleteShoppingItemAction = shoppingItemWithAmountTypeAndCategory -> {
         boughtShoppingItemsListViewModel.deleteShoppingItem(shoppingItemWithAmountTypeAndCategory.getShoppingItem());
@@ -54,12 +46,9 @@ public class BoughtShoppingItemListActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.bought_shopping_item_list_activity_layout);
+        inflate(R.layout.bought_shopping_item_list_activity_layout, R.id.bought_list_activity_id);
 
-        ShoppingListActionBar shoppingListActionBar = findViewById(R.id.appBar);
-        setSupportActionBar(shoppingListActionBar.getToolbar());
-        Optional.ofNullable(getSupportActionBar()).ifPresent(actionBar -> actionBar.setDisplayShowTitleEnabled(false));
-        Optional.ofNullable(getSupportActionBar()).ifPresent(actionBar -> actionBar.setDisplayHomeAsUpEnabled(true));
+        createMenuBar(true);
 
         boughtShoppingItemsListViewModel = new ViewModelProvider(
                 this,
@@ -69,8 +58,6 @@ public class BoughtShoppingItemListActivity extends AppCompatActivity {
         boughtShoppingItemsListViewModel.loadUser();
         boughtShoppingItemsListViewModel.loadAllShoppingItemWithAmountTypeAndCategoryLiveData();
         boughtShoppingItemsListViewModel.loadAllCategory();
-
-        shoppingListActionBar.create(this);
 
         boughtShoppingItemsListRecyclerView = findViewById(R.id.boughtShoppingItemsListRecyclerView);
         boughtShoppingItemsListRecyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -93,9 +80,4 @@ public class BoughtShoppingItemListActivity extends AppCompatActivity {
                     modifyShoppingItemAction));
         });
     }
-
-    private void createToast(String s) {
-        Toast.makeText(this, s, Toast.LENGTH_LONG).show();
-    }
-
 }

@@ -62,4 +62,14 @@
     <string name="login_menu_txt">Logowanie</string>
     <string name="recipes_menu_txt">Przepisy</string>
     <string name="image_for_recipe_desc">Zdjęcie do przepisu</string>
+    <string name="about_app">O aplikacji</string>
+    <string name="recipe_picture">Zdjęcie przepisu</string>
+    <string name="recipe_name">Tytuł przepisu</string>
+    <string name="recipe_desc">Dłuższy opis przepisu, który może zajmować więcej miejsca...</string>
+    <string name="step_number_hint">nr. kroku</string>
+    <string name="step_desc_hint">Opis kroku</string>
+    <string name="steps_recipe_layout_text">Kroki</string>
+    <string name="ingredients_recipe_layout_text">Składniki</string>
+    <string name="tags_recipe_layout_text">Tagi</string>
+    <string name="tag_hint_layout">tag</string>
 </resources>

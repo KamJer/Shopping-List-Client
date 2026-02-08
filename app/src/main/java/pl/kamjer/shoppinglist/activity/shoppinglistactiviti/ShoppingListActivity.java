@@ -12,8 +12,6 @@ import androidx.activity.OnBackPressedCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -29,7 +27,6 @@ import java.util.stream.Collectors;
 import lombok.extern.java.Log;
 import pl.kamjer.shoppinglist.R;
 import pl.kamjer.shoppinglist.activity.GenericActivity;
-import pl.kamjer.shoppinglist.activity.ShoppingListActionBar;
 import pl.kamjer.shoppinglist.activity.shoppinglistactiviti.newcategorydialog.NewCategoryDialog;
 import pl.kamjer.shoppinglist.activity.shoppinglistactiviti.newcategorydialog.UpdateCategoryDialog;
 import pl.kamjer.shoppinglist.activity.shoppinglistactiviti.newshoppingitemdialog.NewShoppingItemDialog;
@@ -98,6 +95,7 @@ public class ShoppingListActivity extends GenericActivity {
 
     private final ModifyShoppingItemAction deleteShoppingItemAction = shoppingItemWithAmountTypeAndCategory ->
             shoppingListViewModel.deleteShoppingItem(shoppingItemWithAmountTypeAndCategory.getShoppingItem());
+
     private final ModifyShoppingItemAction modifyShoppingItemAction = shoppingItemWithAmountTypeAndCategory -> {
         Intent updateShoppingItemIntent = new Intent(this, UpdateShoppingItemDialog.class);
         updateShoppingItemIntent.putExtra(NewShoppingItemDialog.CATEGORY_FIELD_NAME, shoppingItemWithAmountTypeAndCategory.getCategory());
@@ -120,8 +118,7 @@ public class ShoppingListActivity extends GenericActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        setContentView(R.layout.shopping_list_activity_layout);
+        inflate(R.layout.shopping_list_activity_layout, R.id.shopping_list_activity_id);
 
         getOnBackPressedDispatcher().addCallback(this, onBack);
 
@@ -134,30 +131,12 @@ public class ShoppingListActivity extends GenericActivity {
         shoppingListViewModel.initialize();
 
 //        initializing tutorial
-        TutorialManager tutorialManager = new TutorialManager(
-                shoppingListViewModel,
-                new FrameLayout[]{findViewById(R.id.first_tutorial_overlay), findViewById(R.id.second_tutorial_overlay)},
-                new FloatingActionButton[]{findViewById(R.id.nextOverlayButton), findViewById(R.id.okButton)});
-        tutorialManager.runOverlayTutorial();
+        createTutorialManager();
 
         categoryList = new ArrayList<>();
         shoppingItemWithAmountTypeAndCategoriesList = new ArrayList<>();
 
-        final View rootView = findViewById(R.id.shopping_list_activity_id);
-
-        ViewCompat.setOnApplyWindowInsetsListener(rootView, (view, insets) -> {
-            int statusBarHeight = insets.getInsets(WindowInsetsCompat.Type.statusBars()).top;
-            view.setPadding(view.getPaddingLeft(),
-                    statusBarHeight,
-                    view.getPaddingRight(),
-                    view.getPaddingBottom());
-            return insets;
-        });
-
-//        finding view elements
-        ShoppingListActionBar shoppingListActionBar = findViewById(R.id.appBar);
-        shoppingListActionBar.create(this);
-        setSupportActionBar(shoppingListActionBar.getToolbar());
+        createMenuBar(false);
 
         RecyclerView categoryRecyclerView = findViewById(R.id.categoryListRecyclerView);
         categoryRecyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -224,6 +203,13 @@ public class ShoppingListActivity extends GenericActivity {
                 }
             }
         });
+    }
 
+    private void createTutorialManager() {
+        TutorialManager tutorialManager = new TutorialManager(
+                shoppingListViewModel,
+                new FrameLayout[]{findViewById(R.id.first_tutorial_overlay), findViewById(R.id.second_tutorial_overlay)},
+                new FloatingActionButton[]{findViewById(R.id.nextOverlayButton), findViewById(R.id.okButton)});
+        tutorialManager.runOverlayTutorial();
     }
 }

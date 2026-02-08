@@ -98,7 +98,8 @@ public class LoginDialogOptionalLogin extends GenericActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.login_dialog_layout);
+        inflate(R.layout.login_dialog_layout, R.id.login_dialog_id);
+//        setContentView(R.layout.login_dialog_layout);
 
         loginDialogViewModel = new ViewModelProvider(
                 this,

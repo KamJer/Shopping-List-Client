@@ -1,8 +1,11 @@
 package pl.kamjer.shoppinglist.activity;
 
+import android.view.View;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 import java.util.Optional;
 import java.util.logging.Level;
@@ -23,5 +26,27 @@ public class GenericActivity extends AppCompatActivity {
 
     protected void createToast(String s) {
         Toast.makeText(getApplicationContext(), s, Toast.LENGTH_LONG).show();
+    }
+
+    protected void inflate(int layout, int layoutId) {
+        setContentView(layout);
+        final View rootView = findViewById(layoutId);
+        ViewCompat.setOnApplyWindowInsetsListener(rootView, (view, insets) -> {
+            int statusBarHeight = insets.getInsets(WindowInsetsCompat.Type.statusBars()).top;
+            view.setPadding(view.getPaddingLeft(),
+                    statusBarHeight,
+                    view.getPaddingRight(),
+                    view.getPaddingBottom());
+            return insets;
+        });
+    }
+
+    protected void createMenuBar(boolean displayHomeButton) {
+        ShoppingListActionBar shoppingListActionBar = findViewById(R.id.appBar);
+        setSupportActionBar(shoppingListActionBar.getToolbar());
+        Optional.ofNullable(getSupportActionBar()).ifPresent(actionBar -> actionBar.setDisplayShowTitleEnabled(!displayHomeButton));
+        Optional.ofNullable(getSupportActionBar()).ifPresent(actionBar -> actionBar.setDisplayHomeAsUpEnabled(displayHomeButton));
+
+        shoppingListActionBar.create(this);
     }
 }

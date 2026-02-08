@@ -13,11 +13,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
-import java.util.Optional;
 
 import pl.kamjer.shoppinglist.R;
 import pl.kamjer.shoppinglist.activity.GenericActivity;
-import pl.kamjer.shoppinglist.activity.ShoppingListActionBar;
 import pl.kamjer.shoppinglist.activity.amounttypelist.addnewamounttypedialog.AddNewAmountTypeDialog;
 import pl.kamjer.shoppinglist.activity.amounttypelist.amounttyperecyclerview.AmountTypeRecyclerViewAdapter;
 import pl.kamjer.shoppinglist.activity.amounttypelist.functionalinterface.ModifyAmountTypeAction;
@@ -69,13 +67,9 @@ public class AmountTypeListActivity extends GenericActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.amount_type_activity_layout);
+        inflate(R.layout.amount_type_activity_layout, R.id.amount_type_activity_id);
 
-        ShoppingListActionBar shoppingListActionBar = findViewById(R.id.appBar);
-        setSupportActionBar(shoppingListActionBar.getToolbar());
-        Optional.ofNullable(getSupportActionBar()).ifPresent(actionBar -> actionBar.setDisplayShowTitleEnabled(false));
-
-        Optional.ofNullable(getSupportActionBar()).ifPresent(actionBar -> actionBar.setDisplayHomeAsUpEnabled(true));
+        createMenuBar(true);
 
         amountTypeViewModel = new ViewModelProvider(
                 this,
@@ -85,8 +79,6 @@ public class AmountTypeListActivity extends GenericActivity {
 //        loading data
         amountTypeViewModel.loadUser();
         amountTypeViewModel.loadAllAmountType();
-
-        shoppingListActionBar.create(this);
 
 //        finding views
         amountTypeRecyclerView = findViewById(R.id.amountTypeRecyclerView);
