@@ -1,6 +1,5 @@
 package pl.kamjer.shoppinglist.activity.recipeactivity.recyclerview;
 
-import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,12 +12,13 @@ import java.util.List;
 import lombok.AllArgsConstructor;
 import pl.kamjer.shoppinglist.R;
 import pl.kamjer.shoppinglist.model.recipe.Recipe;
+import pl.kamjer.shoppinglist.util.funcinterface.PassActiveRecipe;
 
 @AllArgsConstructor
 public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeViewHolder> {
 
-    private Context context;
     private List<Recipe> recipes;
+    private PassActiveRecipe passActiveRecipe;
 
     @NonNull
     @Override
@@ -30,7 +30,7 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeViewHo
 
     @Override
     public void onBindViewHolder(@NonNull RecipeViewHolder holder, int position) {
-        holder.bind(context, recipes.get(position));
+        holder.bind(recipes.get(position), passActiveRecipe);
     }
 
     @Override

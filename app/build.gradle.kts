@@ -6,6 +6,10 @@ android {
     namespace = "pl.kamjer.shoppinglist"
     compileSdk = 35
 
+    buildFeatures {
+        buildConfig = true
+    }
+
     defaultConfig {
         applicationId = "pl.kamjer.shoppinglist"
         minSdk = 26
@@ -20,8 +24,20 @@ android {
         release {
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                "proguard-rules.pro",
             )
+            buildConfigField("String", "RECIPE_URL", "\"recipe.kamjer.online\"")
+            buildConfigField("String", "SHOPPING_URL", "\"shoppinglist.kamjer.online\"")
+            buildConfigField("String", "USER_URL", "\"user.kamjer.online\"")
+            buildConfigField("String", "WEBSOCKET_BASE_URL", "\"wss://\"")
+            buildConfigField("String", "HTTP_BASE_URL", "\"https://\"")
+        }
+        debug {
+            buildConfigField("String", "SHOPPING_URL", "\"192.168.0.13:5443\"")
+            buildConfigField("String", "RECIPE_URL", "\"192.168.0.13:6443\"")
+            buildConfigField("String", "USER_URL", "\"192.168.0.13:4443\"")
+            buildConfigField("String", "WEBSOCKET_BASE_URL", "\"ws://\"")
+            buildConfigField("String", "HTTP_BASE_URL", "\"http://\"")
         }
     }
     compileOptions {
@@ -41,6 +57,8 @@ dependencies {
     implementation(libs.retrofit.converter)
     implementation(libs.androidx.recyclerView)
     implementation(libs.zetetic.security)
+    implementation(libs.androidx.navigation.fragment)
+    implementation(libs.androidx.navigation.ui)
     compileOnly(libs.lombok)
     annotationProcessor(libs.lombok)
     annotationProcessor(libs.room.compiler)

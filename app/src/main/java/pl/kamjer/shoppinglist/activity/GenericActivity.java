@@ -25,7 +25,7 @@ public class GenericActivity extends AppCompatActivity {
             };
 
     protected void createToast(String s) {
-        Toast.makeText(getApplicationContext(), s, Toast.LENGTH_LONG).show();
+        Toast.makeText(getApplicationContext(), Optional.ofNullable(s).orElse(""), Toast.LENGTH_LONG).show();
     }
 
     protected void inflate(int layout, int layoutId) {

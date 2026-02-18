@@ -1,4 +1,4 @@
-package pl.kamjer.shoppinglist.activity.recipeactivity;
+package pl.kamjer.shoppinglist.activity.recipeactivity.recipe_view;
 
 import android.view.LayoutInflater;
 import android.view.View;

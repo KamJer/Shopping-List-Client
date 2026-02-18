@@ -72,4 +72,8 @@
     <string name="ingredients_recipe_layout_text">Składniki</string>
     <string name="tags_recipe_layout_text">Tagi</string>
     <string name="tag_hint_layout">tag</string>
+    <string name="my_recipes_menu_item_txt">Pokaż mi moje przepisy</string>
+    <string name="author_recipe_label_text">Autor:</string>
+    <string name="recipe_source_label_text_view">Źródło:</string>
+    <string name="recipe_published_text_label">Opublikowane</string>
 </resources>

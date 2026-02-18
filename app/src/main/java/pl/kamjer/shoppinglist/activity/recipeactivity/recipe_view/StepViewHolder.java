@@ -1,4 +1,4 @@
-package pl.kamjer.shoppinglist.activity.recipeactivity;
+package pl.kamjer.shoppinglist.activity.recipeactivity.recipe_view;
 
 import android.view.View;
 import android.widget.TextView;
@@ -13,8 +13,8 @@ import pl.kamjer.shoppinglist.model.recipe.Step;
 
 public class StepViewHolder extends RecyclerView.ViewHolder {
 
-    private TextView stepNumberTextView;
-    private TextView stepDescTextView;
+    private final TextView stepNumberTextView;
+    private final TextView stepDescTextView;
 
     public StepViewHolder(@NonNull View itemView) {
         super(itemView);

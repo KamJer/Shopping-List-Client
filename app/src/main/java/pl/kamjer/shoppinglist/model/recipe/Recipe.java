@@ -1,6 +1,9 @@
 package pl.kamjer.shoppinglist.model.recipe;
 
+import android.os.Parcelable;
+
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -34,7 +37,7 @@ public class Recipe {
                 .steps(recipeDto.getSteps().stream().map(Step::map).collect(Collectors.toList()))
                 .tags(recipeDto.getTags().stream().map(Tag::map).collect(Collectors.toSet()))
                 .recipeId(recipeDto.getRecipeId())
-                .source(recipeDto.getSource())
+                .source(Optional.ofNullable(recipeDto.getSource()).orElse(""))
                 .published(recipeDto.getPublished())
                 .build();
     }

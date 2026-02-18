@@ -6,7 +6,6 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.widget.ImageButton;
 import android.widget.PopupMenu;
 
@@ -23,7 +22,7 @@ import pl.kamjer.shoppinglist.R;
 import pl.kamjer.shoppinglist.activity.amounttypelist.AmountTypeListActivity;
 import pl.kamjer.shoppinglist.activity.boughtshoppingitemlist.BoughtShoppingItemListActivity;
 import pl.kamjer.shoppinglist.activity.logindialog.LoginDialogOptionalLogin;
-import pl.kamjer.shoppinglist.activity.recipeactivity.RecipeSearchActivity;
+import pl.kamjer.shoppinglist.activity.recipeactivity.RecipeActivity;
 import pl.kamjer.shoppinglist.viewmodel.ShoppingListActionBarViewModel;
 
 @Getter
@@ -53,7 +52,6 @@ public class ShoppingListActionBar extends AppBarLayout {
     private final OnClickListener menuPopUpAction = v -> {
         PopupMenu menu = new PopupMenu(this.getContext(), v);
         menu.getMenuInflater().inflate(R.menu.main_toolbar_menu, menu.getMenu());
-        MenuItem collapseItem = menu.getMenu().findItem(R.id.collapse_category);
         menu.setOnMenuItemClickListener(item -> {
             int id = item.getItemId();
             if (id == R.id.amount_type_list) {
@@ -142,7 +140,7 @@ public class ShoppingListActionBar extends AppBarLayout {
     }
 
     private void recipeAction() {
-        Intent recipeSearchActivityIntent = new Intent(this.getContext(), RecipeSearchActivity.class);
+        Intent recipeSearchActivityIntent = new Intent(this.getContext(), RecipeActivity.class);
         this.getContext().startActivity(recipeSearchActivityIntent);
     }
 }

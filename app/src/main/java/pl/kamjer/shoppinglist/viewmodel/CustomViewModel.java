@@ -42,6 +42,10 @@ public class CustomViewModel extends ViewModel {
         return Optional.ofNullable(userLiveData.getValue()).orElseThrow(() -> new NoUserFoundException("No user is logged"));
     }
 
+    public void initialize() {
+        loadUser();
+    }
+
     /**
      * Synchronizes data for currently logged user, if user is not logged will throw NoUserFoundException,
      * to avoid this, in a situation call synchronizeData(User user)

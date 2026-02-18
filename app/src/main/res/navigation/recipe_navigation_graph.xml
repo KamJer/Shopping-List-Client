@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/recipe_navigation_graph"
+    app:startDestination="@id/recipe_search_fragment_id_dest">
+
+    <fragment
+        android:id="@+id/recipe_search_fragment_id_dest"
+        android:name="pl.kamjer.shoppinglist.activity.recipeactivity.recipe_search.RecipeSearchFragment"
+        android:label="Search">
+        <action
+            android:id="@+id/action_search_to_recipe"
+            app:destination="@id/recipe_fragment_id_dest" />
+        <action
+            android:id="@+id/action_search_to_user_recipes"
+            app:destination="@id/user_recipes_id_dest" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/recipe_fragment_id_dest"
+        android:name="pl.kamjer.shoppinglist.activity.recipeactivity.recipe_view.RecipeFragment"
+        android:label="Recipe">
+    </fragment>
+
+    <fragment
+        android:id="@+id/create_recipe_fragment_id_dest"
+        android:name="pl.kamjer.shoppinglist.activity.recipeactivity.recipe_create.CreateRecipeFragment"
+        android:label="Recipe">
+        <action
+            android:id="@+id/action_create_user_recipe_to_recipe"
+            app:destination="@id/recipe_fragment_id_dest"
+            app:popUpTo="@id/user_recipes_id_dest"
+            app:popUpToInclusive="false"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/user_recipes_id_dest"
+        android:name="pl.kamjer.shoppinglist.activity.recipeactivity.user_recipe.UserRecipeFragment"
+        android:label="user_recipes">
+        <action
+            android:id="@+id/action_user_recipes_to_recipe"
+            app:destination="@id/recipe_fragment_id_dest" />
+        <action
+            android:id="@+id/action_user_recipe_to_create_user_recipe"
+            app:destination="@id/create_recipe_fragment_id_dest" />
+    </fragment>
+
+</navigation>

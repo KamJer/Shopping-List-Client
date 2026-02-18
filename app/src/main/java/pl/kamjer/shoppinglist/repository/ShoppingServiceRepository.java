@@ -16,18 +16,19 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.java.Log;
 import okhttp3.OkHttpClient;
-import pl.kamjer.shoppinglist.R;
+import pl.kamjer.shoppinglist.BuildConfig;
 import pl.kamjer.shoppinglist.gsonconverter.LocalDateTimeDeserializer;
 import pl.kamjer.shoppinglist.gsonconverter.LocalDateTimeSerializer;
-import pl.kamjer.shoppinglist.model.user.User;
 import pl.kamjer.shoppinglist.model.dto.AllDto;
 import pl.kamjer.shoppinglist.model.dto.AmountTypeDto;
 import pl.kamjer.shoppinglist.model.dto.CategoryDto;
 import pl.kamjer.shoppinglist.model.dto.ExceptionDto;
+import pl.kamjer.shoppinglist.model.dto.Page;
 import pl.kamjer.shoppinglist.model.dto.RecipeDto;
 import pl.kamjer.shoppinglist.model.dto.RecipeRequestDto;
 import pl.kamjer.shoppinglist.model.dto.ShoppingItemDto;
 import pl.kamjer.shoppinglist.model.dto.TagDto;
+import pl.kamjer.shoppinglist.model.user.User;
 import pl.kamjer.shoppinglist.service.BasicAuthInterceptor;
 import pl.kamjer.shoppinglist.service.SSLUtil;
 import pl.kamjer.shoppinglist.service.service.RecipeService;
@@ -49,14 +50,15 @@ import retrofit2.converter.gson.GsonConverterFactory;
 @Log
 public class ShoppingServiceRepository {
 
+    public static final int PAGE_SIZE = 10;
     public static final String CONNECTION_FAILED_MESSAGE = "Connection failed: Http code:";
 
     private String shoppingListDomain;
     private String userDomain;
     private String recipeDomain;
 
-    private final static String BASE_URL = "https://";
-    private final static String WEBSOCKET_BASE_URL = "wss://";
+    private final static String BASE_URL = BuildConfig.HTTP_BASE_URL;
+    private final static String WEBSOCKET_BASE_URL = BuildConfig.WEBSOCKET_BASE_URL;
 
     private static ShoppingServiceRepository shoppingServiceRepository;
 
@@ -119,9 +121,12 @@ public class ShoppingServiceRepository {
     }
 
     public void initialize(Context appContext) {
-        shoppingListDomain = appContext.getResources().getString(R.string.shopping_list_address);
-        userDomain = appContext.getResources().getString(R.string.user_address);
-        recipeDomain = appContext.getResources().getString(R.string.recipe_address);
+        shoppingListDomain = BuildConfig.SHOPPING_URL;
+//    appContext.getResources().getString(R.string.shopping_list_address);
+        userDomain = BuildConfig.USER_URL;
+//                appContext.getResources().getString(R.string.user_address);
+        recipeDomain = BuildConfig.RECIPE_URL;
+//                appContext.getResources().getString(R.string.recipe_address);
 
         Gson gson = new GsonBuilder()
                 .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeSerializer())
@@ -179,7 +184,7 @@ public class ShoppingServiceRepository {
                 .build();
         Retrofit retrofitRecipe = new Retrofit.Builder()
                 .baseUrl(BASE_URL + recipeDomain)
-                .client(okHttpClientShopping)
+                .client(okHttpClientRecipe)
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .build();
         userService = retrofitUser.create(UserService.class);
@@ -322,7 +327,6 @@ public class ShoppingServiceRepository {
     public void insertRecipe(RecipeDto recipeDto, Callback<RecipeDto> callback) {
         Call<RecipeDto> call = recipeService.putRecipe(recipeDto);
         call.enqueue(callback);
-
     }
 
     public void updateRecipe(RecipeDto recipeDto, Callback<Boolean> callback) {
@@ -335,28 +339,28 @@ public class ShoppingServiceRepository {
         call.enqueue(callback);
     }
 
-    public void getRecipesByProducts(RecipeRequestDto requestDto, Callback<List<RecipeDto>> callback) {
-        Call<List<RecipeDto>> call = recipeService.getRecipeByProducts(requestDto);
+    public void getRecipesByProducts(RecipeRequestDto requestDto, Callback<Page<RecipeDto>> callback) {
+        Call<Page<RecipeDto>> call = recipeService.getRecipeByProducts(requestDto);
         call.enqueue(callback);
     }
 
-    public void getRecipesByQuery(String query, Callback<List<RecipeDto>> callback) {
-        Call<List<RecipeDto>> call = recipeService.getRecipeByQuery(query);
+    public void getRecipesByQuery(String query, int page, Callback<Page<RecipeDto>> callback) {
+        Call<Page<RecipeDto>> call = recipeService.getRecipeByQuery(query, page, PAGE_SIZE);
         call.enqueue(callback);
     }
 
-    public void getRecipesByTags(Set<TagDto> tags, Callback<List<RecipeDto>> callback) {
-        Call<List<RecipeDto>> call = recipeService.getRecipeByTags(tags);
+    public void getRecipesByTags(Set<TagDto> tags, int page, Callback<Page<RecipeDto>> callback) {
+        Call<Page<RecipeDto>> call = recipeService.getRecipeByTags(tags, page, PAGE_SIZE);
         call.enqueue(callback);
     }
 
-    public void getRecipesByTagsRequired(Set<TagDto> tags, Callback<List<RecipeDto>> callback) {
-        Call<List<RecipeDto>> call = recipeService.getRecipeByTagsRequired(tags);
+    public void getRecipesByTagsRequired(Set<TagDto> tags, int page, Callback<Page<RecipeDto>> callback) {
+        Call<Page<RecipeDto>> call = recipeService.getRecipeByTagsRequired(tags, page, PAGE_SIZE);
         call.enqueue(callback);
     }
 
-    public void getRecipesForUser(String userName, Callback<List<RecipeDto>> callback) {
-        Call<List<RecipeDto>> call = recipeService.getRecipeForUser(userName);
+    public void getRecipesForUser(String userName, int page, Callback<Page<RecipeDto>> callback) {
+        Call<Page<RecipeDto>> call = recipeService.getRecipeForUser(userName, page, PAGE_SIZE);
         call.enqueue(callback);
     }
 
@@ -367,6 +371,11 @@ public class ShoppingServiceRepository {
 
     public void deleteRecipeForUser(Long recipeId, Callback<Boolean> callback) {
         Call<Boolean> call = recipeService.deleteRecipeForUser(recipeId);
+        call.enqueue(callback);
+    }
+
+    public void getAllRecipes(int page, Callback<Page<RecipeDto>> callback) {
+        Call<Page<RecipeDto>> call = recipeService.getAllRecipes(page, PAGE_SIZE);
         call.enqueue(callback);
     }
 }

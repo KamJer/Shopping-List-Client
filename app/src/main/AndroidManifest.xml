@@ -72,13 +72,9 @@
             android:exported="false"
             android:parentActivityName=".activity.shoppinglistactiviti.ShoppingListActivity" />
         <activity
-            android:name=".activity.recipeactivity.RecipeSearchActivity"
-            android:exported="false"
-            android:parentActivityName=".activity.shoppinglistactiviti.ShoppingListActivity" />
-        <activity
             android:name=".activity.recipeactivity.RecipeActivity"
             android:exported="false"
-            android:parentActivityName=".activity.recipeactivity.RecipeSearchActivity"
+            android:parentActivityName=".activity.shoppinglistactiviti.ShoppingListActivity"
             />
     </application>
 
