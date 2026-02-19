@@ -59,6 +59,8 @@ dependencies {
     implementation(libs.zetetic.security)
     implementation(libs.androidx.navigation.fragment)
     implementation(libs.androidx.navigation.ui)
+    implementation(libs.androidx.paging.runtime)
+    implementation(libs.androidx.paging.guava)
     compileOnly(libs.lombok)
     annotationProcessor(libs.lombok)
     annotationProcessor(libs.room.compiler)

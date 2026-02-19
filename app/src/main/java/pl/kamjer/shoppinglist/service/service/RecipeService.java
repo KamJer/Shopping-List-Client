@@ -33,7 +33,7 @@ public interface RecipeService {
     Call<Boolean> deleteRecipeForUser(@Path("recipeId") Long recipeId);
 
     @POST("/recipe/products")
-    Call<Page<RecipeDto>> getRecipeByProducts(@Body RecipeRequestDto recipeRequestDto);
+    Call<Page<RecipeDto>> getRecipeByProducts(@Body RecipeRequestDto recipeRequestDto, @Query("page") int page, @Query("size") int size);
 
     @GET("/recipe/name/{query}")
     Call<Page<RecipeDto>> getRecipeByQuery(
@@ -44,8 +44,8 @@ public interface RecipeService {
     @POST("/recipe/tag")
     Call<Page<RecipeDto>> getRecipeByTags(@Body Set<TagDto> tags, @Query("page") int page, @Query("size") int size);
 
-    @GET("/recipe/user/{userName}")
-    Call<Page<RecipeDto>> getRecipeForUser(@Path("userName") String userName, @Query("page") int page, @Query("size") int size);
+    @GET("/recipe/user")
+    Call<Page<RecipeDto>> getRecipeForUser(@Query("page") int page, @Query("size") int size);
 
     @POST("/recipe/tag/required")
     Call<Page<RecipeDto>> getRecipeByTagsRequired(@Body Set<TagDto> tags, @Query("page") int page, @Query("size") int size);

@@ -10,7 +10,6 @@ import com.google.gson.GsonBuilder;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -23,11 +22,8 @@ import pl.kamjer.shoppinglist.model.dto.AllDto;
 import pl.kamjer.shoppinglist.model.dto.AmountTypeDto;
 import pl.kamjer.shoppinglist.model.dto.CategoryDto;
 import pl.kamjer.shoppinglist.model.dto.ExceptionDto;
-import pl.kamjer.shoppinglist.model.dto.Page;
 import pl.kamjer.shoppinglist.model.dto.RecipeDto;
-import pl.kamjer.shoppinglist.model.dto.RecipeRequestDto;
 import pl.kamjer.shoppinglist.model.dto.ShoppingItemDto;
-import pl.kamjer.shoppinglist.model.dto.TagDto;
 import pl.kamjer.shoppinglist.model.user.User;
 import pl.kamjer.shoppinglist.service.BasicAuthInterceptor;
 import pl.kamjer.shoppinglist.service.SSLUtil;
@@ -64,6 +60,7 @@ public class ShoppingServiceRepository {
 
     private UserService userService;
     private UtilService utilService;
+    @Getter
     private RecipeService recipeService;
 
     @Getter
@@ -336,46 +333,6 @@ public class ShoppingServiceRepository {
 
     public void deleteRecipe(Long id, Callback<Boolean> callback) {
         Call<Boolean> call = recipeService.deleteRecipe(id);
-        call.enqueue(callback);
-    }
-
-    public void getRecipesByProducts(RecipeRequestDto requestDto, Callback<Page<RecipeDto>> callback) {
-        Call<Page<RecipeDto>> call = recipeService.getRecipeByProducts(requestDto);
-        call.enqueue(callback);
-    }
-
-    public void getRecipesByQuery(String query, int page, Callback<Page<RecipeDto>> callback) {
-        Call<Page<RecipeDto>> call = recipeService.getRecipeByQuery(query, page, PAGE_SIZE);
-        call.enqueue(callback);
-    }
-
-    public void getRecipesByTags(Set<TagDto> tags, int page, Callback<Page<RecipeDto>> callback) {
-        Call<Page<RecipeDto>> call = recipeService.getRecipeByTags(tags, page, PAGE_SIZE);
-        call.enqueue(callback);
-    }
-
-    public void getRecipesByTagsRequired(Set<TagDto> tags, int page, Callback<Page<RecipeDto>> callback) {
-        Call<Page<RecipeDto>> call = recipeService.getRecipeByTagsRequired(tags, page, PAGE_SIZE);
-        call.enqueue(callback);
-    }
-
-    public void getRecipesForUser(String userName, int page, Callback<Page<RecipeDto>> callback) {
-        Call<Page<RecipeDto>> call = recipeService.getRecipeForUser(userName, page, PAGE_SIZE);
-        call.enqueue(callback);
-    }
-
-    public void insertRecipeForUser(Long recipeId, Callback<Boolean> callback) {
-        Call<Boolean> call = recipeService.putRecipeForUser(recipeId);
-        call.enqueue(callback);
-    }
-
-    public void deleteRecipeForUser(Long recipeId, Callback<Boolean> callback) {
-        Call<Boolean> call = recipeService.deleteRecipeForUser(recipeId);
-        call.enqueue(callback);
-    }
-
-    public void getAllRecipes(int page, Callback<Page<RecipeDto>> callback) {
-        Call<Page<RecipeDto>> call = recipeService.getAllRecipes(page, PAGE_SIZE);
         call.enqueue(callback);
     }
 }

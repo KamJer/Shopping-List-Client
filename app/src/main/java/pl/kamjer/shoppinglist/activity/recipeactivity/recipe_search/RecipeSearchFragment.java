@@ -65,6 +65,8 @@ public class RecipeSearchFragment extends Fragment {
      */
     private RecyclerView recyclerViewRecipes;
 
+    private RecipeRecyclerViewAdapter recipeRecyclerViewAdapter;
+
     /**
      * Initializes the activity and sets up all UI components and functionality.
      * This method is called during the activity creation lifecycle.
@@ -91,7 +93,7 @@ public class RecipeSearchFragment extends Fragment {
         // Setup click listeners for UI elements
         setupClickListeners();
 
-        loadInitialData();
+//        loadInitialData();
 
         return view;
     }
@@ -105,9 +107,9 @@ public class RecipeSearchFragment extends Fragment {
         recipeSearchViewModel.initialize();
     }
 
-    private void loadInitialData() {
-        recipeSearchViewModel.getAllRecipes(0);
-    }
+//    private void loadInitialData() {
+//        recipeSearchViewModel.getAllRecipes(0);
+//    }
 
     /**
      * Initializes all UI view references by finding them in the layout.
@@ -122,13 +124,21 @@ public class RecipeSearchFragment extends Fragment {
     }
 
     private void setupRecyclerView() {
-        // Setup observer for recipe data updates
+        recipeRecyclerViewAdapter = new RecipeRecyclerViewAdapter(new RecipeRecyclerViewAdapter.RecipeComparator(),
+                recipe -> {
+                    recipeSearchViewModel.setActiveRecipe(recipe);
+                    findNavController(this).navigate(R.id.action_search_to_recipe);
+                }
+        );
+        recyclerViewRecipes.setAdapter(recipeRecyclerViewAdapter);
+        recyclerViewRecipes.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        setUpObservers();
+    }
+
+    private void setUpObservers() {
         recipeSearchViewModel.setRecipesLiveDataObserver(this, recipes -> {
-            recyclerViewRecipes.setAdapter(new RecipeRecyclerViewAdapter(recipes.getContent(), recipe -> {
-                recipeSearchViewModel.setActiveRecipe(recipe);
-                findNavController(RecipeSearchFragment.this).navigate(R.id.action_search_to_recipe);
-            }));
-            recyclerViewRecipes.setLayoutManager(new LinearLayoutManager(getContext()));
+            recipeRecyclerViewAdapter.submitData(getViewLifecycleOwner().getLifecycle(), recipes);
         });
     }
 
@@ -161,10 +171,13 @@ public class RecipeSearchFragment extends Fragment {
         String searchText = editTextSearch.getText().toString().trim();
 
         // Get selected search mode from spinner
-        String searchMode = spinnerSearchMode.getSelectedItem().toString();
+        RecipeViewModel.SearchMode searchMode = RecipeViewModel.SearchMode.getModeBySelection(getContext(), spinnerSearchMode.getSelectedItem().toString());
 
+        if (searchText.isEmpty()) searchMode = RecipeViewModel.SearchMode.NONE;
         // Execute the search operation through the ViewModel
-        recipeSearchViewModel.performSearch(RecipeViewModel.SearchMode.getModeBySelection(getContext(), searchMode), searchText);
+        recipeSearchViewModel.recipesLiveData.removeObservers(getViewLifecycleOwner());
+        recipeSearchViewModel.performSearch(searchMode, searchText);
+        setUpObservers();
     }
 
     /**

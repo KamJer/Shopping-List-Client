@@ -66,6 +66,9 @@ public class ShoppingListActionBar extends AppBarLayout {
             }else if (id == R.id.recipe_activity) {
                 recipeAction();
                 return true;
+            } else if (id == R.id.about_app) {
+                aboutAppAction();
+                return true;
             }
             return false;
         });
@@ -142,5 +145,10 @@ public class ShoppingListActionBar extends AppBarLayout {
     private void recipeAction() {
         Intent recipeSearchActivityIntent = new Intent(this.getContext(), RecipeActivity.class);
         this.getContext().startActivity(recipeSearchActivityIntent);
+    }
+
+    private void aboutAppAction() {
+        Intent aboutAppIntent = new Intent(this.getContext(), AboutActivity.class);
+        this.getContext().startActivity(aboutAppIntent);
     }
 }

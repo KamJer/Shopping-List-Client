@@ -1,7 +1,5 @@
 package pl.kamjer.shoppinglist.model.recipe;
 
-import android.os.Parcelable;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -9,6 +7,7 @@ import java.util.stream.Collectors;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -19,13 +18,14 @@ import pl.kamjer.shoppinglist.model.dto.RecipeDto;
 @Builder
 @Getter
 @Setter
+@EqualsAndHashCode
 public class Recipe {
+    private Long recipeId;
     private String name;
     private String description;
     private List<Ingredient> ingredients;
     private List<Step> steps;
     private Set<Tag> tags;
-    private Long recipeId;
     private String source;
     private Boolean published;
 

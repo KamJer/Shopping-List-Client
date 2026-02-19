@@ -5,24 +5,30 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
+import androidx.paging.PagingDataAdapter;
+import androidx.recyclerview.widget.DiffUtil;
 
-import java.util.List;
-
-import lombok.AllArgsConstructor;
 import pl.kamjer.shoppinglist.R;
 import pl.kamjer.shoppinglist.model.recipe.Recipe;
 import pl.kamjer.shoppinglist.util.funcinterface.DeleteRecipeAction;
 import pl.kamjer.shoppinglist.util.funcinterface.EditRecipeAction;
 import pl.kamjer.shoppinglist.util.funcinterface.PassActiveRecipe;
 
-@AllArgsConstructor
-public class UserRecipeAdapter extends RecyclerView.Adapter<UserRecipeCardViewHolder>{
+public class UserRecipeAdapter extends PagingDataAdapter<Recipe, UserRecipeCardViewHolder> {
 
-    private List<Recipe> recipes;
     private PassActiveRecipe passActiveRecipe;
     private EditRecipeAction editRecipeAction;
     private DeleteRecipeAction deleteRecipeAction;
+
+    public UserRecipeAdapter(@NonNull DiffUtil.ItemCallback<Recipe> diffCallback,
+                             PassActiveRecipe passActiveRecipe,
+                             EditRecipeAction editRecipeAction,
+                             DeleteRecipeAction deleteRecipeAction) {
+        super(diffCallback);
+        this.passActiveRecipe = passActiveRecipe;
+        this.editRecipeAction = editRecipeAction;
+        this.deleteRecipeAction = deleteRecipeAction;
+    }
 
     @NonNull
     @Override
@@ -34,11 +40,7 @@ public class UserRecipeAdapter extends RecyclerView.Adapter<UserRecipeCardViewHo
 
     @Override
     public void onBindViewHolder(@NonNull UserRecipeCardViewHolder holder, int position) {
-        holder.bind(recipes.get(position), passActiveRecipe, editRecipeAction, deleteRecipeAction);
+        holder.bind(getItem(position), passActiveRecipe, editRecipeAction, deleteRecipeAction);
     }
 
-    @Override
-    public int getItemCount() {
-        return recipes.size();
-    }
 }

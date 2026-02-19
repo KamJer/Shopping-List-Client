@@ -25,8 +25,7 @@ public class RecipeViewHolder extends RecyclerView.ViewHolder{
         recipeTitle.setText(recipe.getName());
         recipeDesc.setText(recipe.getDescription());
 
-        itemView.setOnClickListener(view -> {
-            passActiveRecipe.passActiveRecipe(recipe);
-        });
+        itemView.setOnClickListener(
+                view -> passActiveRecipe.passActiveRecipe(recipe));
     }
 }

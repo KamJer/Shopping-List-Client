@@ -5,20 +5,21 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
+import androidx.paging.PagingDataAdapter;
+import androidx.recyclerview.widget.DiffUtil;
 
-import java.util.List;
-
-import lombok.AllArgsConstructor;
 import pl.kamjer.shoppinglist.R;
 import pl.kamjer.shoppinglist.model.recipe.Recipe;
 import pl.kamjer.shoppinglist.util.funcinterface.PassActiveRecipe;
 
-@AllArgsConstructor
-public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeViewHolder> {
+public class RecipeRecyclerViewAdapter extends PagingDataAdapter<Recipe, RecipeViewHolder> {
 
-    private List<Recipe> recipes;
     private PassActiveRecipe passActiveRecipe;
+
+    public RecipeRecyclerViewAdapter(@NonNull DiffUtil.ItemCallback<Recipe> diffCallback, PassActiveRecipe passActiveRecipe) {
+        super(diffCallback);
+        this.passActiveRecipe = passActiveRecipe;
+    }
 
     @NonNull
     @Override
@@ -30,11 +31,23 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeViewHo
 
     @Override
     public void onBindViewHolder(@NonNull RecipeViewHolder holder, int position) {
-        holder.bind(recipes.get(position), passActiveRecipe);
+        if (getItem(position) != null) {
+            holder.bind(getItem(position), passActiveRecipe);
+        }
     }
 
-    @Override
-    public int getItemCount() {
-        return recipes.size();
+    public static class RecipeComparator extends DiffUtil.ItemCallback<Recipe> {
+
+        @Override
+        public boolean areItemsTheSame(@NonNull Recipe oldItem, @NonNull Recipe newItem) {
+            return oldItem.equals(newItem);
+
+        }
+
+        @Override
+        public boolean areContentsTheSame(@NonNull Recipe oldItem, @NonNull Recipe newItem) {
+            return oldItem.equals(newItem);
+
+        }
     }
 }
