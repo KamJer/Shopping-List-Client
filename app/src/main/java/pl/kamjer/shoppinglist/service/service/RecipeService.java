@@ -35,6 +35,9 @@ public interface RecipeService {
     @POST("/recipe/products")
     Call<Page<RecipeDto>> getRecipeByProducts(@Body RecipeRequestDto recipeRequestDto, @Query("page") int page, @Query("size") int size);
 
+    @POST("/recipe/products/required")
+    Call<Page<RecipeDto>> getRecipeByProductsReq(@Body RecipeRequestDto recipeRequestDto, @Query("page") int page, @Query("size") int size);
+
     @GET("/recipe/name/{query}")
     Call<Page<RecipeDto>> getRecipeByQuery(
             @Path("query") String query,

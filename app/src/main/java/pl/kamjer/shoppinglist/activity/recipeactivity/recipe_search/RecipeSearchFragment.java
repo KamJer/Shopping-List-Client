@@ -6,20 +6,27 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.PopupMenu;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.paging.LoadState;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.stream.Collectors;
+
 import pl.kamjer.shoppinglist.R;
 import pl.kamjer.shoppinglist.activity.recipeactivity.recyclerview.RecipeRecyclerViewAdapter;
+import pl.kamjer.shoppinglist.model.shopping_list.ShoppingItem;
 import pl.kamjer.shoppinglist.viewmodel.RecipeViewModel;
 
 /**
@@ -67,6 +74,23 @@ public class RecipeSearchFragment extends Fragment {
 
     private RecipeRecyclerViewAdapter recipeRecyclerViewAdapter;
 
+    private TextView emptyView;
+
+    private ProgressBar loadingDataProgressData;
+
+    private ImageButton importIngredientsButton;
+
+    View.OnClickListener onImportIngredientsClickListener = view -> {
+        recipeSearchViewModel.removeBoughtLiveDataObserver(getViewLifecycleOwner());
+        recipeSearchViewModel.setBoughtShoppingItemsLiveDataObservers(getViewLifecycleOwner(), shoppingItems -> {
+            String[] searchMode = getResources().getStringArray(R.array.search_modes);
+            int ingredientsSearchModeIndex = 1;
+            if (spinnerSearchMode.getSelectedItem().equals(searchMode[ingredientsSearchModeIndex])) {
+                performSearch(shoppingItems.stream().map(ShoppingItem::toString).collect(Collectors.joining(", ")));
+            }
+        });
+    };
+
     /**
      * Initializes the activity and sets up all UI components and functionality.
      * This method is called during the activity creation lifecycle.
@@ -93,8 +117,6 @@ public class RecipeSearchFragment extends Fragment {
         // Setup click listeners for UI elements
         setupClickListeners();
 
-//        loadInitialData();
-
         return view;
     }
 
@@ -107,10 +129,6 @@ public class RecipeSearchFragment extends Fragment {
         recipeSearchViewModel.initialize();
     }
 
-//    private void loadInitialData() {
-//        recipeSearchViewModel.getAllRecipes(0);
-//    }
-
     /**
      * Initializes all UI view references by finding them in the layout.
      * This method assigns each UI element to its corresponding instance variable.
@@ -121,6 +139,9 @@ public class RecipeSearchFragment extends Fragment {
         imageButtonSearch = view.findViewById(R.id.imageButtonSearch);
         recipeMenuButton = view.findViewById(R.id.recipe_menu_button);
         recyclerViewRecipes = view.findViewById(R.id.recyclerViewRecipes);
+        this.emptyView = view.findViewById(R.id.emptyView);
+        this.loadingDataProgressData = view.findViewById(R.id.loadingDataProgressBar);
+        this.importIngredientsButton = view.findViewById(R.id.importIngredientsButton);
     }
 
     private void setupRecyclerView() {
@@ -133,13 +154,28 @@ public class RecipeSearchFragment extends Fragment {
         recyclerViewRecipes.setAdapter(recipeRecyclerViewAdapter);
         recyclerViewRecipes.setLayoutManager(new LinearLayoutManager(getContext()));
 
+        recipeRecyclerViewAdapter.addLoadStateListener(combinedLoadStates -> {
+            if (combinedLoadStates.getRefresh() instanceof LoadState.NotLoading && recipeRecyclerViewAdapter.getItemCount() == 0) {
+                loadingDataProgressData.setVisibility(View.GONE);
+                emptyView.setVisibility(View.VISIBLE);
+            } else if (combinedLoadStates.getRefresh() instanceof LoadState.NotLoading) {
+                loadingDataProgressData.setVisibility(View.GONE);
+                emptyView.setVisibility(View.GONE);
+            } else if (combinedLoadStates.getRefresh() instanceof LoadState.Loading) {
+                loadingDataProgressData.setVisibility(View.VISIBLE);
+                emptyView.setVisibility(View.GONE);
+            }
+            return null;
+        });
+
         setUpObservers();
     }
 
     private void setUpObservers() {
-        recipeSearchViewModel.setRecipesLiveDataObserver(this, recipes -> {
-            recipeRecyclerViewAdapter.submitData(getViewLifecycleOwner().getLifecycle(), recipes);
-        });
+        recipeSearchViewModel.setRecipesLiveDataObserver(this, recipes ->
+                recipeRecyclerViewAdapter.submitData(getViewLifecycleOwner().getLifecycle(), recipes));
+
+
     }
 
     /**
@@ -147,8 +183,26 @@ public class RecipeSearchFragment extends Fragment {
      * Initializes the search mode spinner to its first option.
      */
     private void setupSpinner() {
+        spinnerSearchMode.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                String[] ingredients = getResources().getStringArray(R.array.search_modes);
+                int ingredientsSearchModeIndex = 1;
+                if (spinnerSearchMode.getSelectedItem().equals(ingredients[ingredientsSearchModeIndex])) {
+                    importIngredientsButton.setVisibility(View.VISIBLE);
+                } else {
+                    importIngredientsButton.setVisibility(View.GONE);
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
         spinnerSearchMode.setSelection(0);
     }
+
 
     /**
      * Sets up click listeners for all interactive UI elements.
@@ -156,27 +210,31 @@ public class RecipeSearchFragment extends Fragment {
      */
     private void setupClickListeners() {
         // Set click listener for search button
-        imageButtonSearch.setOnClickListener(v -> performSearch());
+        imageButtonSearch.setOnClickListener(view -> performSearch(getQuery()));
 
         // Set click listener for menu button
-        recipeMenuButton.setOnClickListener(v -> showMenu());
+        recipeMenuButton.setOnClickListener(showMenu);
+
+        importIngredientsButton.setOnClickListener(onImportIngredientsClickListener);
+    }
+
+    private String getQuery() {
+        return editTextSearch.getText().toString().trim();
     }
 
     /**
      * Performs the recipe search operation based on user input.
      * Retrieves search text and mode, then executes the search through the ViewModel.
      */
-    private void performSearch() {
-        // Get search text from the input field
-        String searchText = editTextSearch.getText().toString().trim();
+    private void performSearch(String query) {
 
         // Get selected search mode from spinner
         RecipeViewModel.SearchMode searchMode = RecipeViewModel.SearchMode.getModeBySelection(getContext(), spinnerSearchMode.getSelectedItem().toString());
 
-        if (searchText.isEmpty()) searchMode = RecipeViewModel.SearchMode.NONE;
+        if (query.isEmpty()) searchMode = RecipeViewModel.SearchMode.NONE;
         // Execute the search operation through the ViewModel
-        recipeSearchViewModel.recipesLiveData.removeObservers(getViewLifecycleOwner());
-        recipeSearchViewModel.performSearch(searchMode, searchText);
+        recipeSearchViewModel.removeRecipesLiveDataObserver(getViewLifecycleOwner());
+        recipeSearchViewModel.performSearch(searchMode, query);
         setUpObservers();
     }
 
@@ -184,7 +242,7 @@ public class RecipeSearchFragment extends Fragment {
      * Displays the recipe menu popup.
      * Shows a context menu with additional recipe-related options.
      */
-    private void showMenu() {
+    View.OnClickListener showMenu = view -> {
         // Create popup menu anchored to the menu button
         PopupMenu popupMenu = new PopupMenu(getContext(), recipeMenuButton);
         // Inflate the menu resource file
@@ -201,7 +259,7 @@ public class RecipeSearchFragment extends Fragment {
         });
         // Display the popup menu
         popupMenu.show();
-    }
+    };
 
     private void startUserRecipeFragment() {
         findNavController(this).navigate(R.id.action_search_to_user_recipes);

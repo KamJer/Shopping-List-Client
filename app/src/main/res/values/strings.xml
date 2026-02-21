@@ -76,4 +76,5 @@
     <string name="author_recipe_label_text">Autor:</string>
     <string name="recipe_source_label_text_view">Źródło:</string>
     <string name="recipe_published_text_label">Opublikowane</string>
+    <string name="no_elements_in_list_msg_text">Brak elelemtów w liście</string>
 </resources>

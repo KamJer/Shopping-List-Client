@@ -121,32 +121,9 @@ public class CustomViewModel extends ViewModel {
     }
 
     protected void synchronizeData(User user, AllDto responseAllDto) {
-//        Map<ModifyState, List<AmountType>> amountTypeListFiltered = Optional.ofNullable(responseAllDto.getAmountTypeDtoList()).orElse(new ArrayList<>())
-//                .stream()
-//                .collect(Collectors.groupingBy(
-//                        AmountTypeDto::getModifyState,
-//                        Collectors.mapping(dto -> ServiceUtil.amountTypeDtoToAmountType(user, dto), Collectors.toList())));
-//
-//        Map<ModifyState, List<Category>> categoryListFiltered = Optional.ofNullable(responseAllDto.getCategoryDtoList()).orElse(new ArrayList<>())
-//                .stream()
-//                .collect(Collectors.groupingBy(
-//                        CategoryDto::getModifyState,
-//                        Collectors.mapping(dto -> ServiceUtil.categoryDtoToCategory(user, dto), Collectors.toList())));
-//
-//        Map<ModifyState, List<ShoppingItem>> shoppingItemListFiltered = Optional.ofNullable(responseAllDto.getShoppingItemDtoList()).orElse(new ArrayList<>())
-//                .stream()
-//                .collect(Collectors.groupingBy(
-//                        ShoppingItemDto::getModifyState,
-//                        Collectors.mapping(dto -> ServiceUtil.shoppingItemDtoToShoppingItem(user, dto), Collectors.toList())));
-
         shoppingRepository.synchronizeData(
-//                amountTypeListFiltered,
-//                categoryListFiltered,
-//                shoppingItemListFiltered,
                 user,
                 responseAllDto);
-//                responseAllDto.getSavedTime(),
-//                responseAllDto.getDirty());
     }
 
     protected String decodeErrorMassage(Response<?> response) {

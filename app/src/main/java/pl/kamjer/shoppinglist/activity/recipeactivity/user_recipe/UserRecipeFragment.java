@@ -7,11 +7,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.paging.LoadState;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -28,6 +31,10 @@ public class UserRecipeFragment extends Fragment {
     private RecipeViewModel recipeViewModel;
     private UserRecipeAdapter userRecipeAdapter;
     private ImageButton addRecipeBtn;
+    private TextView emptyView;
+    private ProgressBar loadingDataProgressData;
+
+
 
     @Nullable
     @Override
@@ -55,6 +62,8 @@ public class UserRecipeFragment extends Fragment {
     private void findViews(View view) {
         userRecipeRecyclerView = view.findViewById(R.id.recycler_view_user_recipes);
         addRecipeBtn = view.findViewById(R.id.add_recipe_button);
+        emptyView = view.findViewById(R.id.emptyView);
+        loadingDataProgressData = view.findViewById(R.id.loadingDataProgressBar);
     }
 
     private void setBtnAction() {
@@ -73,6 +82,20 @@ public class UserRecipeFragment extends Fragment {
         userRecipeRecyclerView.setAdapter(userRecipeAdapter);
         recipeViewModel.setUserRecipeLiveDataObserver(this.getViewLifecycleOwner(), recipes -> {
             userRecipeAdapter.submitData(getLifecycle(), recipes);
+        });
+
+        userRecipeAdapter.addLoadStateListener(combinedLoadStates -> {
+            if (combinedLoadStates.getRefresh() instanceof LoadState.NotLoading && userRecipeAdapter.getItemCount() == 0) {
+                loadingDataProgressData.setVisibility(View.GONE);
+                emptyView.setVisibility(View.VISIBLE);
+            } else if (combinedLoadStates.getRefresh() instanceof LoadState.NotLoading) {
+                loadingDataProgressData.setVisibility(View.GONE);
+                emptyView.setVisibility(View.GONE);
+            } else if (combinedLoadStates.getRefresh() instanceof LoadState.Loading) {
+                loadingDataProgressData.setVisibility(View.VISIBLE);
+                emptyView.setVisibility(View.GONE);
+            }
+            return null;
         });
 //                recipes -> userRecipeRecyclerView.setAdapter(new UserRecipeAdapter(recipes.getContent(),
 //                        recipe -> {

@@ -19,6 +19,8 @@ public class RecipeRecyclerViewAdapter extends PagingDataAdapter<Recipe, RecipeV
     public RecipeRecyclerViewAdapter(@NonNull DiffUtil.ItemCallback<Recipe> diffCallback, PassActiveRecipe passActiveRecipe) {
         super(diffCallback);
         this.passActiveRecipe = passActiveRecipe;
+
+
     }
 
     @NonNull

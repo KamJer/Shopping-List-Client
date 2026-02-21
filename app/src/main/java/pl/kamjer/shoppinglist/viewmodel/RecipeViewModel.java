@@ -15,12 +15,14 @@ import androidx.paging.PagingConfig;
 import androidx.paging.PagingData;
 import androidx.paging.PagingLiveData;
 
+import java.util.List;
 import java.util.Optional;
 
 import pl.kamjer.shoppinglist.R;
 import pl.kamjer.shoppinglist.activity.recipeactivity.recyclerview.RecipePagingSource;
 import pl.kamjer.shoppinglist.activity.recipeactivity.user_recipe.UserRecipePagingSource;
 import pl.kamjer.shoppinglist.model.recipe.Recipe;
+import pl.kamjer.shoppinglist.model.shopping_list.ShoppingItem;
 import pl.kamjer.shoppinglist.repository.SharedRepository;
 import pl.kamjer.shoppinglist.repository.ShoppingRepository;
 import pl.kamjer.shoppinglist.repository.ShoppingServiceRepository;
@@ -28,12 +30,53 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+/**
+ * ViewModel for managing recipe data and search functionality.
+ * This ViewModel handles loading, searching, and displaying recipes using pagination.
+ */
 public class RecipeViewModel extends CustomViewModel {
 
+    /**
+     * LiveData for storing the list of recipes from the API.
+     */
+    private LiveData<PagingData<Recipe>> recipesLiveData;
+
+    /**
+     * MutableLiveData for storing the currently active recipe.
+     */
+    private MutableLiveData<Recipe> activeRecipeLiveData;
+
+    /**
+     * LiveData for storing the list of user-specific recipes.
+     */
+    private LiveData<PagingData<Recipe>> userRecipeLiveData;
+
+    private LiveData<List<ShoppingItem>> boughtShoppingItems;
+
+    /**
+     * Returns the current value of the active recipe LiveData wrapped in an Optional.
+     *
+     * @return Optional containing the active recipe or empty if no recipe is active
+     */
     public Optional<Recipe> getActiveRecipeLiveDataValue() {
         return Optional.ofNullable(activeRecipeLiveData.getValue());
     }
 
+    public void setBoughtShoppingItemsLiveDataObservers(LifecycleOwner owner, Observer<List<ShoppingItem>> observer) {
+        boughtShoppingItems.observe(owner, observer);
+    }
+
+    public void removeRecipesLiveDataObserver(LifecycleOwner owner) {
+        recipesLiveData.removeObservers(owner);
+    }
+
+    public void removeBoughtLiveDataObserver(LifecycleOwner owner) {
+        boughtShoppingItems.removeObservers(owner);
+    }
+
+    /**
+     * Enum representing different search modes for recipe filtering.
+     */
     public enum SearchMode {
         NAME,
         INGREDIENTS,
@@ -41,6 +84,13 @@ public class RecipeViewModel extends CustomViewModel {
         TAGS_REQUIRED,
         NONE;
 
+        /**
+         * Converts a string selection to the corresponding SearchMode enum.
+         *
+         * @param context The context for accessing string resources
+         * @param selection The string representation of the search mode
+         * @return The corresponding SearchMode enum value
+         */
         public static SearchMode getModeBySelection(Context context, String selection) {
             if (context.getString(R.string.with_name_search_menu_txt).equals(selection)) {
                 return NAME;
@@ -55,16 +105,22 @@ public class RecipeViewModel extends CustomViewModel {
         }
     }
 
-    public LiveData<PagingData<Recipe>> recipesLiveData;
-    public MutableLiveData<Recipe> activeRecipeLiveData;
-    public LiveData<PagingData<Recipe>> userRecipeLiveData;
-
+    /**
+     * Constructor for RecipeViewModel.
+     *
+     * @param shoppingRepository Repository for shopping data
+     * @param shoppingServiceRepository Repository for shopping service data
+     * @param sharedRepository Repository for shared preferences
+     */
     public RecipeViewModel(ShoppingRepository shoppingRepository,
                            ShoppingServiceRepository shoppingServiceRepository,
                            SharedRepository sharedRepository) {
         super(shoppingRepository, shoppingServiceRepository, sharedRepository);
     }
 
+    /**
+     * ViewModel initializer for creating RecipeViewModel instances.
+     */
     public static final ViewModelInitializer<RecipeViewModel> initializer =
             new ViewModelInitializer<>(RecipeViewModel.class,
                     creationExtras -> new RecipeViewModel(
@@ -73,31 +129,64 @@ public class RecipeViewModel extends CustomViewModel {
                             SharedRepository.getSharedRepository()
                     ));
 
-
+    /**
+     * Initializes the ViewModel by setting up LiveData objects if they haven't been initialized yet.
+     */
     public void initialize() {
+        loadUser();
+
         if (recipesLiveData == null) recipesLiveData = getRecipesLiveData(new RecipePagingSource(shoppingServiceRepository));
         if (activeRecipeLiveData == null) activeRecipeLiveData = new MutableLiveData<>();
         if (userRecipeLiveData == null)
             userRecipeLiveData = getRecipesForUserLiveData(new UserRecipePagingSource(shoppingServiceRepository));
-        loadUser();
+        if (boughtShoppingItems == null) boughtShoppingItems = shoppingRepository.loadBoughtShoppingItem(getUserValue());
     }
 
+    /**
+     * Sets up an observer for the user recipe LiveData.
+     *
+     * @param owner The LifecycleOwner that will observe the LiveData
+     * @param recipeObserver The observer that will receive updates
+     */
     public void setUserRecipeLiveDataObserver(LifecycleOwner owner, Observer<PagingData<Recipe>> recipeObserver) {
         userRecipeLiveData.observe(owner, recipeObserver);
     }
 
+    /**
+     * Sets up an observer for the recipes LiveData.
+     *
+     * @param owner The LifecycleOwner that will observe the LiveData
+     * @param recipesObserver The observer that will receive updates
+     */
     public void setRecipesLiveDataObserver(LifecycleOwner owner, Observer<PagingData<Recipe>> recipesObserver) {
         recipesLiveData.observe(owner, recipesObserver);
     }
 
+    /**
+     * Sets up an observer for the active recipe LiveData.
+     *
+     * @param owner The LifecycleOwner that will observe the LiveData
+     * @param recipesObserver The observer that will receive updates
+     */
     public void setActiveRecipeLiveDataObserver(LifecycleOwner owner, Observer<Recipe> recipesObserver) {
         activeRecipeLiveData.observe(owner, recipesObserver);
     }
 
+    /**
+     * Sets the active recipe in the MutableLiveData.
+     *
+     * @param recipe The recipe to set as active
+     */
     public void setActiveRecipe(Recipe recipe) {
         activeRecipeLiveData.postValue(recipe);
     }
 
+    /**
+     * Creates LiveData for recipes using the provided RecipePagingSource.
+     *
+     * @param recipePagingSource The paging source for recipes
+     * @return LiveData containing the paginated recipe data
+     */
     private LiveData<PagingData<Recipe>> getRecipesLiveData(RecipePagingSource recipePagingSource) {
         Pager<Integer, Recipe> pager = new Pager<>(
                 new PagingConfig(ShoppingServiceRepository.PAGE_SIZE),
@@ -108,10 +197,22 @@ public class RecipeViewModel extends CustomViewModel {
                 getViewModelScope(this));
     }
 
+    /**
+     * Performs a search with the specified search mode and query.
+     *
+     * @param searchMode The mode to search by (NAME, INGREDIENTS, etc.)
+     * @param query The search query string
+     */
     public void performSearch(SearchMode searchMode, String query) {
         recipesLiveData = getRecipesLiveData(new RecipePagingSource(shoppingServiceRepository, query, searchMode));
     }
 
+    /**
+     * Creates LiveData for user-specific recipes using the provided UserRecipePagingSource.
+     *
+     * @param recipePagingSource The paging source for user recipes
+     * @return LiveData containing the paginated user recipe data
+     */
     private LiveData<PagingData<Recipe>> getRecipesForUserLiveData(UserRecipePagingSource recipePagingSource) {
         Pager<Integer, Recipe> pager = new Pager<>(
                 new PagingConfig(ShoppingServiceRepository.PAGE_SIZE),
@@ -122,10 +223,18 @@ public class RecipeViewModel extends CustomViewModel {
                 getViewModelScope(this));
     }
 
+    /**
+     * Loads recipes for the current user.
+     */
     public void loadRecipeUser() {
         userRecipeLiveData = getRecipesForUserLiveData(new UserRecipePagingSource(shoppingServiceRepository));
     }
 
+    /**
+     * Deletes a recipe from the server.
+     *
+     * @param recipe The recipe to delete
+     */
     public void deleteRecipe(Recipe recipe) {
         shoppingServiceRepository.deleteRecipe(recipe.getRecipeId(), new Callback<>() {
             @Override
@@ -145,35 +254,4 @@ public class RecipeViewModel extends CustomViewModel {
             }
         });
     }
-
-//    public void getRecipesForUser(int page) {
-//        shoppingServiceRepository.getRecipesForUser(getUserValue().getUserName(), page, new Callback<>() {
-//            @Override
-//            public void onResponse(@NonNull Call<Page<RecipeDto>> call, @NonNull Response<Page<RecipeDto>> response) {
-//                if (response.code() == 200) {
-//                    if (response.body() != null)
-//                        userRecipeLiveData.postValue(response.body().map(Recipe::map));
-//                }
-//            }
-//
-//            @Override
-//            public void onFailure(@NonNull Call<Page<RecipeDto>> call, @NonNull Throwable t) {
-////            TODO: handle failure
-//            }
-//        });
-//    }
-
-//    private Page<Recipe> getUserRecipesLiveDataValue() {
-//        return Optional.ofNullable(userRecipeLiveData.getValue()).orElse(new Page<>());
-//    }
-
-//    private void postUserRecipesLiveDataValue(Page<Recipe> recipes) {
-//        userRecipeLiveData.postValue(recipes);
-//    }
-//
-//    private void deleteRecipeFromLiveData(Recipe recipe) {
-//        Page<Recipe> recipes = getUserRecipesLiveDataValue();
-//        recipes.remove(recipe);
-//        postUserRecipesLiveDataValue(recipes);
-//    }
 }

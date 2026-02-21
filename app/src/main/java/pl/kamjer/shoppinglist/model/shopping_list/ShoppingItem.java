@@ -1,5 +1,6 @@
 package pl.kamjer.shoppinglist.model.shopping_list;
 
+import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
@@ -11,6 +12,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import pl.kamjer.shoppinglist.model.user.User;
 
 @AllArgsConstructor
@@ -51,6 +53,7 @@ public class ShoppingItem implements Serializable {
     @ColumnInfo(name = "local_item_category_id")
     private long localItemCategoryId;
     @ColumnInfo(name = "item_name")
+    @ToString.Include
     private String itemName;
     @ColumnInfo(name = "amount")
     private Double amount;
@@ -65,5 +68,9 @@ public class ShoppingItem implements Serializable {
     @ColumnInfo(name = "deleted")
     private boolean deleted;
 
-
+    @NonNull
+    @Override
+    public String toString() {
+        return itemName;
+    }
 }

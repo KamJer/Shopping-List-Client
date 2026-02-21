@@ -21,17 +21,46 @@ import pl.kamjer.shoppinglist.model.shopping_list.ShoppingItem;
 import pl.kamjer.shoppinglist.util.validation.NewItemDialogDataValidator;
 import pl.kamjer.shoppinglist.viewmodel.NewShoppingItemDialogViewModel;
 
+/**
+ * Activity for creating new shopping items.
+ * This dialog allows users to input item details including name, amount, amount type, and category.
+ */
 public class NewShoppingItemDialog extends GenericActivity {
 
+    /**
+     * Key for passing category data through intent extras.
+     */
     public final static String CATEGORY_FIELD_NAME = "categoryFieldName";
 
+    /**
+     * EditText for entering the shopping item name.
+     */
     protected EditText shoppingItemEditText;
+
+    /**
+     * EditText for entering the shopping item amount.
+     */
     protected EditText amountEditText;
+
+    /**
+     * Spinner for selecting the amount type.
+     */
     protected Spinner amountTypeSpinner;
+
+    /**
+     * Spinner for selecting the category.
+     */
     protected Spinner categorySpinner;
 
+    /**
+     * ViewModel for managing the new shopping item dialog data.
+     */
     protected NewShoppingItemDialogViewModel newShoppingItemDialogViewModel;
 
+    /**
+     * OnClickListener for the create new shopping item button.
+     * Validates input data and creates a new shopping item.
+     */
     private final View.OnClickListener createNewShoppingItemAction = v -> {
         ShoppingItem.ShoppingItemBuilder shoppingItemToInsert = ShoppingItem.builder();
 //        Validating if passed data is correct
@@ -66,10 +95,22 @@ public class NewShoppingItemDialog extends GenericActivity {
         this.finish();
     };
 
+    /**
+     * Processes the created shopping item data.
+     * This method can be overridden by subclasses to customize behavior.
+     *
+     * @param shoppingItem The shopping item to process
+     */
     protected void actOnData(ShoppingItem shoppingItem) {
         newShoppingItemDialogViewModel.insertShoppingItem(shoppingItem);
     }
 
+    /**
+     * Called when the activity is created.
+     * Initializes UI components, sets up data observers, and configures the activity.
+     *
+     * @param savedInstanceState If the activity is being re-initialized after previously being shut down
+     */
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

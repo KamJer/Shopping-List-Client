@@ -94,4 +94,7 @@ public interface ShoppingItemDao {
 
     @Query("Update USER SET saved_time = :savedTime WHERE user_name=:userName")
     void updateUsersSavedTime(LocalDateTime savedTime, String userName);
+
+    @Query("SELECT * FROM SHOPPING_ITEM WHERE bought=1 and user_name=:userName")
+    LiveData<List<ShoppingItem>> findBoughtShoppingItems(String userName);
 }

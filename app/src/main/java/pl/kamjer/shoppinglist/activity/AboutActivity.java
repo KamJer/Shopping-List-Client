@@ -11,7 +11,7 @@ public class AboutActivity extends GenericActivity{
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        inflate(R.layout.about_activity_layout, R.id.shopping_list_activity_id);
+        inflate(R.layout.about_activity_layout, R.id.about_app_activity_id);
 
         createMenuBar(true);
     }
