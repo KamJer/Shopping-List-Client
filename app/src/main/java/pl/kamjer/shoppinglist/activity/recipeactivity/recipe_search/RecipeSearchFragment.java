@@ -30,8 +30,8 @@ import pl.kamjer.shoppinglist.model.shopping_list.ShoppingItem;
 import pl.kamjer.shoppinglist.viewmodel.RecipeViewModel;
 
 /**
- * Activity responsible for searching and displaying recipes.
- * This activity manages the user interface for recipe search functionality,
+ * Fragment responsible for searching and displaying recipes.
+ * This fragment manages the user interface for recipe search functionality,
  * including search input, search mode selection, and recipe display.
  */
 public class RecipeSearchFragment extends Fragment {
@@ -72,14 +72,34 @@ public class RecipeSearchFragment extends Fragment {
      */
     private RecyclerView recyclerViewRecipes;
 
+    /**
+     * Adapter for the recipe RecyclerView.
+     * Handles binding recipe data to the RecyclerView items.
+     */
     private RecipeRecyclerViewAdapter recipeRecyclerViewAdapter;
 
+    /**
+     * TextView for displaying empty state message.
+     * Shows when no recipes are found for the current search.
+     */
     private TextView emptyView;
 
+    /**
+     * ProgressBar for showing loading state.
+     * Displays while recipe data is being fetched and loaded.
+     */
     private ProgressBar loadingDataProgressData;
 
+    /**
+     * ImageButton for importing ingredients from shopping list.
+     * Allows users to import ingredients from their shopping list for search.
+     */
     private ImageButton importIngredientsButton;
 
+    /**
+     * Click listener for the import ingredients button.
+     * Handles the logic for importing shopping items as search query.
+     */
     View.OnClickListener onImportIngredientsClickListener = view -> {
         recipeSearchViewModel.removeBoughtLiveDataObserver(getViewLifecycleOwner());
         recipeSearchViewModel.setBoughtShoppingItemsLiveDataObservers(getViewLifecycleOwner(), shoppingItems -> {
@@ -92,10 +112,13 @@ public class RecipeSearchFragment extends Fragment {
     };
 
     /**
-     * Initializes the activity and sets up all UI components and functionality.
-     * This method is called during the activity creation lifecycle.
+     * Initializes the fragment and sets up all UI components and functionality.
+     * This method is called during the fragment creation lifecycle.
      *
-     * @param savedInstanceState Bundle containing the activity's previously saved state
+     * @param inflater           LayoutInflater used to inflate the fragment layout
+     * @param container          ViewGroup container for the fragment
+     * @param savedInstanceState Bundle containing the fragment's previously saved state
+     * @return View representing the fragment's layout
      */
     @Nullable
     @Override
@@ -103,7 +126,7 @@ public class RecipeSearchFragment extends Fragment {
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
-        // Inflate the layout for this activity and set up the container view
+        // Inflate the layout for this fragment and set up the container view
         View view = inflater.inflate(R.layout.recipe_search_fragment_layout, container, false);
 
         // Initialize the ViewModel with proper factory initialization
@@ -120,6 +143,10 @@ public class RecipeSearchFragment extends Fragment {
         return view;
     }
 
+    /**
+     * Initializes the RecipeViewModel for this fragment.
+     * Creates and configures the ViewModel with proper factory initialization.
+     */
     private void loadViewModel() {
         recipeSearchViewModel = new ViewModelProvider(
                 requireActivity(),
@@ -132,6 +159,8 @@ public class RecipeSearchFragment extends Fragment {
     /**
      * Initializes all UI view references by finding them in the layout.
      * This method assigns each UI element to its corresponding instance variable.
+     *
+     * @param view View containing the UI elements to be initialized
      */
     private void findViews(View view) {
         editTextSearch = view.findViewById(R.id.editTextSearch);
@@ -144,6 +173,10 @@ public class RecipeSearchFragment extends Fragment {
         this.importIngredientsButton = view.findViewById(R.id.importIngredientsButton);
     }
 
+    /**
+     * Sets up the RecyclerView for displaying recipes.
+     * Configures the adapter, layout manager, and load state listeners.
+     */
     private void setupRecyclerView() {
         recipeRecyclerViewAdapter = new RecipeRecyclerViewAdapter(new RecipeRecyclerViewAdapter.RecipeComparator(),
                 recipe -> {
@@ -171,16 +204,18 @@ public class RecipeSearchFragment extends Fragment {
         setUpObservers();
     }
 
+    /**
+     * Sets up observers for the ViewModel data.
+     * Registers observers to listen for recipe data changes and updates the RecyclerView.
+     */
     private void setUpObservers() {
         recipeSearchViewModel.setRecipesLiveDataObserver(this, recipes ->
                 recipeRecyclerViewAdapter.submitData(getViewLifecycleOwner().getLifecycle(), recipes));
-
-
     }
 
     /**
      * Sets up the spinner with default selection.
-     * Initializes the search mode spinner to its first option.
+     * Initializes the search mode spinner to its first option and handles selection changes.
      */
     private void setupSpinner() {
         spinnerSearchMode.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -197,16 +232,15 @@ public class RecipeSearchFragment extends Fragment {
 
             @Override
             public void onNothingSelected(AdapterView<?> adapterView) {
-
+                // No action needed
             }
         });
         spinnerSearchMode.setSelection(0);
     }
 
-
     /**
      * Sets up click listeners for all interactive UI elements.
-     * Configures the behavior for search button and menu button.
+     * Configures the behavior for search button, menu button, and import ingredients button.
      */
     private void setupClickListeners() {
         // Set click listener for search button
@@ -218,6 +252,11 @@ public class RecipeSearchFragment extends Fragment {
         importIngredientsButton.setOnClickListener(onImportIngredientsClickListener);
     }
 
+    /**
+     * Retrieves the current search query from the EditText field.
+     *
+     * @return String containing the search query text
+     */
     private String getQuery() {
         return editTextSearch.getText().toString().trim();
     }
@@ -225,9 +264,10 @@ public class RecipeSearchFragment extends Fragment {
     /**
      * Performs the recipe search operation based on user input.
      * Retrieves search text and mode, then executes the search through the ViewModel.
+     *
+     * @param query Search query string to be used for recipe search
      */
     private void performSearch(String query) {
-
         // Get selected search mode from spinner
         RecipeViewModel.SearchMode searchMode = RecipeViewModel.SearchMode.getModeBySelection(getContext(), spinnerSearchMode.getSelectedItem().toString());
 
@@ -241,6 +281,8 @@ public class RecipeSearchFragment extends Fragment {
     /**
      * Displays the recipe menu popup.
      * Shows a context menu with additional recipe-related options.
+     *
+     * @param view View that triggered the popup menu
      */
     View.OnClickListener showMenu = view -> {
         // Create popup menu anchored to the menu button
@@ -261,6 +303,10 @@ public class RecipeSearchFragment extends Fragment {
         popupMenu.show();
     };
 
+    /**
+     * Navigates to the user recipes fragment.
+     * Handles the navigation to the user recipes screen.
+     */
     private void startUserRecipeFragment() {
         findNavController(this).navigate(R.id.action_search_to_user_recipes);
     }

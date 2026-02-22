@@ -110,9 +110,6 @@ public class CreateRecipeFragment extends Fragment {
         loadViewModel();
         findViews(view);
         recyclerViewSetup();
-//        loadRecipe();
-//        btnAction();
-//        setupActiveRecipeObserver();
 
         return view;
     }
