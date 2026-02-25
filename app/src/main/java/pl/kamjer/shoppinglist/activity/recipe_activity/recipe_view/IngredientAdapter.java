@@ -23,11 +23,15 @@ import pl.kamjer.shoppinglist.util.funcinterface.PassIngredientAction;
 public class IngredientAdapter extends RecyclerView.Adapter<IngredientViewHolder>{
 
     /**
-     * List of Ingredient objects to be displayed in the RecyclerView.
-     * Contains all the ingredients for the recipe being viewed.
+     * List of IngredientDataHolder objects to be displayed in the RecyclerView.
+     * Contains all the ingredients for the recipe being viewed along with their shopping list status.
      */
     private List<IngredientDataHolder> ingredients = new ArrayList<>();
 
+    /**
+     * Action to be performed when an ingredient is clicked.
+     * Typically used to create a new shopping item from the ingredient.
+     */
     private final PassIngredientAction passIngredientAction;
 
     /**
@@ -46,7 +50,7 @@ public class IngredientAdapter extends RecyclerView.Adapter<IngredientViewHolder
     }
 
     /**
-     * Binds data from an Ingredient object to a ViewHolder.
+     * Binds data from an IngredientDataHolder object to a ViewHolder.
      *
      * @param holder   IngredientViewHolder to bind data to
      * @param position Position of the item in the list
@@ -66,11 +70,20 @@ public class IngredientAdapter extends RecyclerView.Adapter<IngredientViewHolder
         return ingredients.size();
     }
 
+    /**
+     * Sets the list of ingredient data holders and notifies the adapter that the data has changed.
+     *
+     * @param ingredientDataHolders List of ingredient data holders to display
+     */
     public void setIngredientDataHolders(List<IngredientDataHolder> ingredientDataHolders) {
         ingredients = ingredientDataHolders;
         notifyDataSetChanged();
     }
 
+    /**
+     * Data holder class for ingredient information and shopping list status.
+     * Contains an ingredient and a boolean indicating whether it's already on the shopping list.
+     */
     public record IngredientDataHolder(Ingredient ingredient, boolean onTheList){
     }
 }

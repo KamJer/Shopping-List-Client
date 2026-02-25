@@ -68,10 +68,19 @@ public class RecipeFragment extends Fragment {
      */
     private RecyclerView tagRecyclerView;
 
+    /**
+     * Adapter for displaying ingredients in the RecyclerView.
+     */
     private IngredientAdapter ingredientAdapter;
 
+    /**
+     * Adapter for displaying steps in the RecyclerView.
+     */
     private StepAdapter stepAdapter;
 
+    /**
+     * Adapter for displaying tags in the RecyclerView.
+     */
     private TagAdapter tagAdapter;
 
     /**
@@ -87,17 +96,24 @@ public class RecipeFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.recipe_fragment_layout, container, false);
 
+        // Load the ViewModel and initialize it
         loadViewModel();
 
+        // Find and initialize all UI elements
         findViews(view);
+
+        // Load and display recipe data
         loadRecipe();
+
         return view;
     }
 
     /**
      * Initializes the ViewModel for recipe data.
+     * This method creates a new instance of RecipeViewModel and initializes it.
      */
     private void loadViewModel() {
         recipeSearchViewModel = new ViewModelProvider(
@@ -123,8 +139,10 @@ public class RecipeFragment extends Fragment {
 
     /**
      * Loads and displays recipe data.
+     * Sets up RecyclerViews with their respective adapters and observes recipe data.
      */
     private void loadRecipe() {
+        // Initialize ingredient adapter with click listener to create new shopping items
         ingredientAdapter = new IngredientAdapter(
                 ingredient -> {
                     Intent createNewShoppingItemIntent = new Intent(requireContext(), NewIngredientToListDialog.class);
@@ -132,33 +150,48 @@ public class RecipeFragment extends Fragment {
                     startActivity(createNewShoppingItemIntent);
                 });
 
+        // Set up ingredient RecyclerView
         ingredientRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         this.ingredientRecyclerView.setAdapter(ingredientAdapter);
 
+        // Initialize step adapter
         stepAdapter = new StepAdapter();
-
         stepRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         this.stepRecyclerView.setAdapter(stepAdapter);
 
+        // Initialize tag adapter
         tagAdapter = new TagAdapter();
         tagRecyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
         tagRecyclerView.setAdapter(tagAdapter);
 
+        // Observe recipe and shopping items data to update UI
         recipeSearchViewModel.setRecipeWithShoppingItemsObserver(getViewLifecycleOwner(), pair -> {
             Recipe recipe = pair.first;
             List<ShoppingItem> shoppingItems = pair.second;
 
+            // Update recipe title and description
             recipeTitle.setText(recipe.getName());
             recipeDesc.setText(recipe.getDescription());
 
+            // Set ingredients data
             setIngredients(recipe, shoppingItems);
+            // Set steps data
             setSteps(recipe);
+            // Set tags data
             setTags(recipe);
 
+            // Update recipe source
             recipeSource.setText(recipe.getSource());
         });
     }
 
+    /**
+     * Sets the ingredients data for the ingredient adapter.
+     * Maps recipe ingredients to ingredient data holders with shopping list status.
+     *
+     * @param recipe        The recipe containing ingredients
+     * @param shoppingItems List of shopping items to check against
+     */
     public void setIngredients(Recipe recipe, List<ShoppingItem> shoppingItems) {
         ingredientAdapter.setIngredientDataHolders(recipe.getIngredients().stream()
                 .map(ingredient -> new IngredientAdapter.IngredientDataHolder(ingredient, isIngredientOnAList(ingredient, shoppingItems))
@@ -166,16 +199,33 @@ public class RecipeFragment extends Fragment {
                 .collect(Collectors.toList()));
     }
 
+    /**
+     * Sets the steps data for the step adapter.
+     * Sorts steps by step number before setting them.
+     *
+     * @param recipe The recipe containing steps
+     */
     public void setSteps(Recipe recipe) {
         stepAdapter.setSteps(recipe.getSteps().stream().sorted(Comparator.comparing(Step::getStepNumber)).collect(Collectors.toList()));
     }
 
+    /**
+     * Sets the tags data for the tag adapter.
+     *
+     * @param recipe The recipe containing tags
+     */
     public void setTags(Recipe recipe) {
         tagAdapter.setTags(new ArrayList<>(recipe.getTags()));
     }
 
+    /**
+     * Checks if an ingredient is already on the shopping list.
+     *
+     * @param ingredient    The ingredient to check
+     * @param shoppingItems List of shopping items to search through
+     * @return true if ingredient is on the list, false otherwise
+     */
     public boolean isIngredientOnAList(Ingredient ingredient, List<ShoppingItem> shoppingItems) {
         return shoppingItems.stream().anyMatch(shoppingItem -> shoppingItem.getItemName().equals(ingredient.getName()));
     }
-
 }

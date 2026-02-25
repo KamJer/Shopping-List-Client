@@ -23,10 +23,21 @@ import pl.kamjer.shoppinglist.viewmodel.InitializerViewModel;
 @Log
 public class InitializerActivity extends GenericActivity {
 
+    /**
+     * ViewModel for managing the initialization process of the application.
+     * Handles user authentication, data synchronization, and connection setup.
+     */
     private InitializerViewModel initializerViewModel;
 
+    /**
+     * TextView component that displays the initialization status messages to the user.
+     */
     private TextView initializertextView;
 
+    /**
+     * Observer for updating the initialization label text.
+     * Updates the UI with the current initialization status message.
+     */
     private final Observer<String> initializerLabelObserver = s -> initializertextView.setText(s);
 
     @Override
@@ -34,12 +45,13 @@ public class InitializerActivity extends GenericActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.initializer_layout);
 
+        // Initialize ViewModel for the initialization process
         initializerViewModel = new ViewModelProvider(
                 this,
                 ViewModelProvider.Factory.from(InitializerViewModel.initializer)
         ).get(InitializerViewModel.class);
 
-//        initialize all of a necessary components of an app
+        // Initialize all necessary components of the app
         try {
             initializerViewModel.initialize(getApplicationContext());
         } catch (InvalidAlgorithmParameterException | NoSuchAlgorithmException |
@@ -48,52 +60,72 @@ public class InitializerActivity extends GenericActivity {
         }
         initializerViewModel.loadUser();
 
+        // Find and initialize the status text view
         initializertextView = findViewById(R.id.initializerLabel);
-//        set observer for a logged user
+
+        // Set observer for the logged user
         initializerViewModel.setUserLiveDataObserver(user -> {
-//            if connection already exist disconnect it
+            // If connection already exists, disconnect it
             initializerViewModel.websocketDisconnect();
             initializerViewModel.setInitializerLabelLiveDataValue(getString(R.string.initializing_connection_to_server_label));
-//            if user is null this means no user data was saved, so it needs to be created and inserted,
+
+            // If user is null, this means no user data was saved, so it needs to be created and inserted
             if (user != null) {
+                // Initialize WebSocket connection with user
                 initializerViewModel.initializeOnMessageAction(user,
                         (webSocket, object) ->
                                 createToast(object),
                         (webSocket, t, response) -> {
                             if (response != null) {
                                 if (response.code() == 401) {
-//                                if logged user does not exists for whatever reason inform user about that and logged them out
+                                    // If logged user does not exist for whatever reason, inform user about that and log them out
                                     initializerViewModel.logUserOff(user);
                                     createToast(getString(R.string.no_such_user_exists_message));
                                 } else {
-//                                inform user about error
+                                    // Inform user about error
                                     createToast(t.getMessage());
                                 }
                             } else {
                                 createToast(t.getMessage());
                             }
                         });
-//                if everything went well start shopping list activity (
+
+                // If everything went well, start shopping list activity
                 actOnSuccessOrOffline(user);
             } else {
-//                force user to log in
+                // Force user to log in if no user data exists
                 startLogDialog();
             }
         });
-//        initialize observer for a label on a screen
+
+        // Initialize observer for the label on the screen
         initializerViewModel.setInitializerLabelLiveDataObserver(this, initializerLabelObserver);
     }
 
+    /**
+     * Starts the login dialog activity to force user authentication.
+     * This is called when no existing user data is found.
+     */
     private void startLogDialog() {
         Intent loginDialogIntent = new Intent(this, LoginDialogForcedLogin.class);
         this.startActivity(loginDialogIntent);
     }
 
+    /**
+     * Starts the shopping list activity after successful initialization.
+     * Reinitializes the shopping service repository with the user and synchronizes data.
+     */
     private void startShoppingListActivity() {
         Intent shoppingListActivity = new Intent(this, ShoppingListActivity.class);
         this.startActivity(shoppingListActivity);
     }
 
+    /**
+     * Handles successful initialization or offline scenarios.
+     * Reinitializes the shopping service repository with the user and synchronizes data.
+     *
+     * @param user The authenticated user object
+     */
     private void actOnSuccessOrOffline(User user) {
         ShoppingServiceRepository.getShoppingServiceRepository().reInitializeWithUser(this.getApplicationContext(), user);
         initializerViewModel.synchronizeData(user);

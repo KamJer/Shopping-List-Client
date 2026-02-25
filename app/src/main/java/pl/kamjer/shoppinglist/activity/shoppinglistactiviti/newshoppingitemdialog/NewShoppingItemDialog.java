@@ -53,9 +53,19 @@ public class NewShoppingItemDialog extends GenericActivity {
      */
     protected Spinner categorySpinner;
 
+    /**
+     * ArrayAdapter for the category spinner.
+     */
     protected ArrayAdapter<Category> categorySpinnerAdapter;
+
+    /**
+     * ArrayAdapter for the amount type spinner.
+     */
     protected ArrayAdapter<AmountType> amountTypeSpinnerAdapter;
 
+    /**
+     * ImageButton for creating a new shopping item.
+     */
     protected ImageButton createNewShoppingItemImageButton;
 
     /**
@@ -118,25 +128,37 @@ public class NewShoppingItemDialog extends GenericActivity {
         });
     }
 
+    /**
+     * Sets up the amount type spinner with the provided list of amount types.
+     *
+     * @param amountTypes List of amount types to display in the spinner
+     */
     protected void setupAmountTypeSpinnerAction(List<AmountType> amountTypes) {
         amountTypeSpinnerAdapter.clear();
         amountTypeSpinnerAdapter.addAll(amountTypes);
     }
 
+    /**
+     * Handles the click listener for creating a new shopping item.
+     * Validates input data and creates a new shopping item if validation passes.
+     */
     protected void setOnclickListener() {
         ShoppingItem.ShoppingItemBuilder shoppingItemToInsert = ShoppingItem.builder();
-//        Validating if passed data is correct
+
+        // Validating if passed data is correct
         if (NewItemDialogDataValidator.isShoppingItemNameValid(shoppingItemEditText.getText().toString())) {
             shoppingItemToInsert.itemName(shoppingItemEditText.getText().toString());
         } else {
             Toast.makeText(this, R.string.shopping_item_name_error_massage, Toast.LENGTH_SHORT).show();
             return;
         }
+
         if (NewItemDialogDataValidator.isShoppingItemAmountValid(amountEditText.getText().toString())) {
             shoppingItemToInsert.amount(Double.parseDouble(amountEditText.getText().toString()));
         } else {
             shoppingItemToInsert.amount(0D);
         }
+
         AmountType amountTypeSelected = (AmountType) amountTypeSpinner.getSelectedItem();
         if (NewItemDialogDataValidator.isShoppingItemAmountTypeValid(amountTypeSelected)) {
             shoppingItemToInsert.localItemAmountTypeId(amountTypeSelected.getLocalAmountTypeId());
@@ -145,6 +167,7 @@ public class NewShoppingItemDialog extends GenericActivity {
             Toast.makeText(this, R.string.shopping_item_amount_type_error_massage, Toast.LENGTH_SHORT).show();
             return;
         }
+
         Category categorySelected = (Category) categorySpinner.getSelectedItem();
         if (NewItemDialogDataValidator.isShoppingItemCategoryValid(categorySelected)) {
             shoppingItemToInsert.localItemCategoryId(categorySelected.getLocalCategoryId());
@@ -153,10 +176,15 @@ public class NewShoppingItemDialog extends GenericActivity {
             Toast.makeText(this, R.string.shopping_item_category_error_massage, Toast.LENGTH_SHORT).show();
             return;
         }
+
         actOnData(shoppingItemToInsert.build());
         this.finish();
     }
 
+    /**
+     * Initializes the ViewModel for the new shopping item dialog.
+     * Loads user data, amount types, and categories.
+     */
     protected void initViewModel() {
         newShoppingItemDialogViewModel = new ViewModelProvider(
                 this,

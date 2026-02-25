@@ -17,6 +17,10 @@ import pl.kamjer.shoppinglist.util.funcinterface.OnFailureAction;
 @Log
 public class GenericActivity extends AppCompatActivity {
 
+    /**
+     * Action to be performed when a connection failure occurs.
+     * Displays a warning log message and shows a toast with the error details.
+     */
     protected OnFailureAction connectionFailedAction =
             (t) -> {
                 String tMassage = Optional.ofNullable(t).map(Throwable::getMessage).orElse(getString(R.string.could_not_find_reason_error_massage));
@@ -24,10 +28,22 @@ public class GenericActivity extends AppCompatActivity {
                 createToast(tMassage);
             };
 
+    /**
+     * Creates and displays a toast message with the provided text.
+     *
+     * @param s The message to display in the toast
+     */
     protected void createToast(String s) {
         Toast.makeText(getApplicationContext(), Optional.ofNullable(s).orElse(""), Toast.LENGTH_LONG).show();
     }
 
+    /**
+     * Inflates a layout and applies window insets to adjust for system UI elements.
+     * Sets the content view and adjusts padding to account for status bar height.
+     *
+     * @param layout   The layout resource ID to inflate
+     * @param layoutId The ID of the root view in the layout
+     */
     protected void inflate(int layout, int layoutId) {
         setContentView(layout);
         final View rootView = findViewById(layoutId);
@@ -41,6 +57,12 @@ public class GenericActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Creates and configures the action bar menu.
+     * Sets up the toolbar and configures display options based on whether the home button should be shown.
+     *
+     * @param displayHomeButton True if the home button should be displayed, false otherwise
+     */
     protected void createMenuBar(boolean displayHomeButton) {
         ShoppingListActionBar shoppingListActionBar = findViewById(R.id.appBar);
         setSupportActionBar(shoppingListActionBar.getToolbar());

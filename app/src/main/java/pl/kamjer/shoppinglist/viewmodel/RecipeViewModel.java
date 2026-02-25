@@ -57,18 +57,39 @@ public class RecipeViewModel extends CustomViewModel {
      */
     private LiveData<PagingData<Recipe>> userRecipeLiveData;
 
+    /**
+     * LiveData for storing bought shopping items.
+     */
     private LiveData<List<ShoppingItem>> boughtShoppingItems;
 
+    /**
+     * LiveData for storing all shopping items for the current user.
+     */
     private LiveData<List<ShoppingItem>> shoppingItemListLiveData;
 
+    /**
+     * MutableLiveData for storing the currently active ingredient.
+     */
     private final MutableLiveData<Ingredient> activeIngredient = new MutableLiveData<>();
 
+    /**
+     * MediatorLiveData for combining recipe and shopping items data.
+     */
     private final MediatorLiveData<Pair<Recipe, List<ShoppingItem>>> recipeWithShoppingItems = new MediatorLiveData<>();
 
+    /**
+     * Current recipe being displayed.
+     */
     private Recipe currentRecipe;
 
+    /**
+     * Current list of shopping items.
+     */
     private List<ShoppingItem> currentShoppingItems;
 
+    /**
+     * Flag to track if the mediator has been initialized.
+     */
     private boolean mediatorInitialized = false;
 
     /**
@@ -80,18 +101,37 @@ public class RecipeViewModel extends CustomViewModel {
         return Optional.ofNullable(activeRecipeLiveData.getValue());
     }
 
+    /**
+     * Sets up observers for bought shopping items LiveData.
+     *
+     * @param owner    The LifecycleOwner that will observe the LiveData
+     * @param observer The observer that will receive updates
+     */
     public void setBoughtShoppingItemsLiveDataObservers(LifecycleOwner owner, Observer<List<ShoppingItem>> observer) {
         boughtShoppingItems.observe(owner, observer);
     }
 
+    /**
+     * Removes observers from recipes LiveData.
+     *
+     * @param owner The LifecycleOwner whose observers should be removed
+     */
     public void removeRecipesLiveDataObserver(LifecycleOwner owner) {
         recipesLiveData.removeObservers(owner);
     }
 
+    /**
+     * Removes observers from bought shopping items LiveData.
+     *
+     * @param owner The LifecycleOwner whose observers should be removed
+     */
     public void removeBoughtLiveDataObserver(LifecycleOwner owner) {
         boughtShoppingItems.removeObservers(owner);
     }
 
+    /**
+     * Refreshes the recipes data by creating new LiveData with updated RecipePagingSource.
+     */
     public void refreshRecipesData() {
         recipesLiveData = getRecipesLiveData(new RecipePagingSource(shoppingServiceRepository));
     }
@@ -158,16 +198,27 @@ public class RecipeViewModel extends CustomViewModel {
     public void initialize() {
         super.initialize();
 
+        // Initialize recipes LiveData if not already done
         if (recipesLiveData == null)
             recipesLiveData = getRecipesLiveData(new RecipePagingSource(shoppingServiceRepository));
-        if (activeRecipeLiveData == null) activeRecipeLiveData = new MutableLiveData<>();
+
+        // Initialize active recipe LiveData if not already done
+        if (activeRecipeLiveData == null)
+            activeRecipeLiveData = new MutableLiveData<>();
+
+        // Initialize user recipe LiveData if not already done
         if (userRecipeLiveData == null)
             userRecipeLiveData = getRecipesForUserLiveData(new UserRecipePagingSource(shoppingServiceRepository));
+
+        // Initialize bought shopping items LiveData if not already done
         if (boughtShoppingItems == null)
             boughtShoppingItems = shoppingRepository.loadBoughtShoppingItem(getUserValue());
+
+        // Initialize shopping item list LiveData if not already done
         if (shoppingItemListLiveData == null)
             shoppingItemListLiveData = shoppingRepository.loadAllShoppingItemForUser(getUserValue());
 
+        // Initialize mediator if not already done
         if (!mediatorInitialized) {
             recipeWithShoppingItems.addSource(activeRecipeLiveData, recipe -> {
                 currentRecipe = recipe;
@@ -222,6 +273,9 @@ public class RecipeViewModel extends CustomViewModel {
         activeRecipeLiveData.postValue(recipe);
     }
 
+    /**
+     * Reloads the active recipe by retrieving it from LiveData and setting it again.
+     */
     public void reloadActiveRecipe() {
         Recipe recipe = getActiveRecipeLiveDataValue().orElse(new Recipe());
         setActiveRecipe(recipe);
@@ -280,6 +334,8 @@ public class RecipeViewModel extends CustomViewModel {
      * Deletes a recipe from the server.
      *
      * @param recipe The recipe to delete
+     * @param onFailureAction Action to perform on failure
+     * @param onSuccessAction Action to perform on success
      */
     public void deleteRecipe(Recipe recipe, OnFailureAction onFailureAction, OnSuccessAction onSuccessAction) {
         shoppingServiceRepository.deleteRecipe(recipe.getRecipeId(), new Callback<>() {
@@ -305,6 +361,9 @@ public class RecipeViewModel extends CustomViewModel {
         });
     }
 
+    /**
+     * Combines current recipe and shopping items data into a Pair and updates the MediatorLiveData.
+     */
     private void combine() {
         if (currentRecipe != null && currentShoppingItems != null) {
             recipeWithShoppingItems.setValue(
@@ -313,14 +372,31 @@ public class RecipeViewModel extends CustomViewModel {
         }
     }
 
+    /**
+     * Sets up an observer for the combined recipe and shopping items LiveData.
+     *
+     * @param owner  The LifecycleOwner that will observe the LiveData
+     * @param observer The observer that will receive updates
+     */
     public void setRecipeWithShoppingItemsObserver(LifecycleOwner owner, Observer<Pair<Recipe, List<ShoppingItem>>> observer) {
         recipeWithShoppingItems.observe(owner, observer);
     }
 
+    /**
+     * Sets the active ingredient in the MutableLiveData.
+     *
+     * @param ingredient The ingredient to set as active
+     */
     public void setActiveIngredientValue(Ingredient ingredient) {
         activeIngredient.postValue(ingredient);
     }
 
+    /**
+     * Sets up an observer for the active ingredient LiveData.
+     *
+     * @param owner  The LifecycleOwner that will observe the LiveData
+     * @param observer The observer that will receive updates
+     */
     public void setUpActiveIngredientObserver(LifecycleOwner owner, Observer<Ingredient> observer) {
         activeIngredient.observe(owner, observer);
     }
