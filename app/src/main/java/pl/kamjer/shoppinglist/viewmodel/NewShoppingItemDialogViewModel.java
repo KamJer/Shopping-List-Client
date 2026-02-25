@@ -30,7 +30,6 @@ public class NewShoppingItemDialogViewModel extends CustomViewModel{
                     ShoppingServiceRepository.getShoppingServiceRepository(),
                     SharedRepository.getSharedRepository()));
 
-
     public void loadAllAmountTypes() {
         amountTypesListLiveData = shoppingRepository.loadAllAmountType(getUserValue());
     }
@@ -51,7 +50,7 @@ public class NewShoppingItemDialogViewModel extends CustomViewModel{
         shoppingRepository.insertShoppingItem(getUserValue(), shoppingItem, () -> insertShoppingItemServer(shoppingItem));
     }
 
-    public void insertShoppingItemServer(ShoppingItem shoppingItem) {
+    private void insertShoppingItemServer(ShoppingItem shoppingItem) {
         shoppingServiceRepository.websocketPutShoppingItem(ServiceUtil.shoppingItemToShoppingItemDto(shoppingItem, ModifyState.INSERT), getUserValue());
     }
 

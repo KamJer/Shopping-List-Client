@@ -211,7 +211,6 @@ public class ShoppingRepository {
         userLiveData.postValue(user);
     }
 
-    //    ShoppingItem
     /**
      * Loads all shopping items with their associated amount types and categories.
      *
@@ -220,6 +219,10 @@ public class ShoppingRepository {
      */
     public LiveData<List<ShoppingItemWithAmountTypeAndCategory>> loadAllShoppingItemsWithAmountTypeAndCategory(User user) {
         return shoppingItemDao.findAllShoppingItemsWithAmountTypeAndCategory(user.getUserName());
+    }
+
+    public LiveData<List<ShoppingItem>> loadAllShoppingItemForUser(User user) {
+        return shoppingItemDao.findAllShoppingItemsForUserLiveData(user.getUserName());
     }
 
     /**

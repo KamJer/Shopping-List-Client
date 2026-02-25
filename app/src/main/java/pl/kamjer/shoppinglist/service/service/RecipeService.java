@@ -23,8 +23,8 @@ public interface RecipeService {
     @POST("/recipe")
     Call<Boolean> postRecipe(@Body RecipeDto recipeDto);
 
-    @DELETE("/recipe")
-    Call<Boolean> deleteRecipe(@Body Long id);
+    @DELETE("/recipe/{id}")
+    Call<Boolean> deleteRecipe(@Path("id") Long id);
 
     @PUT("/recipe/for_user/{recipeId}")
     Call<Boolean> putRecipeForUser(@Path("recipeId") Long recipeId);

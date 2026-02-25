@@ -6,13 +6,11 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.viewmodel.ViewModelInitializer;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import lombok.Getter;
 import lombok.Setter;
-import okhttp3.ResponseBody;
 import pl.kamjer.shoppinglist.model.dto.RecipeDto;
 import pl.kamjer.shoppinglist.model.recipe.Ingredient;
 import pl.kamjer.shoppinglist.model.recipe.Recipe;
@@ -124,7 +122,7 @@ public class CreateRecipeViewModel extends CustomViewModel {
                 if (response.code() == 200) {
                     if (response.body() != null) passActiveRecipe.passActiveRecipe(Recipe.map(response.body()));
                 } else {
-                    onFailureAction.action(new NotOkHttpResponseException(extractErrorMessage(response.errorBody())));
+                    onFailureAction.action(new NotOkHttpResponseException(decodeErrorMassage(response)));
                 }
             }
 
@@ -133,25 +131,6 @@ public class CreateRecipeViewModel extends CustomViewModel {
                 onFailureAction.action(t);
             }
         });
-    }
-
-    /**
-     * Extracts error message from ResponseBody.
-     *
-     * @param responseBody ResponseBody containing error information
-     * @return String containing the extracted error message
-     */
-    private String extractErrorMessage(ResponseBody responseBody) {
-        String errorMessage = "";
-
-        try (ResponseBody errorBody = responseBody){
-            if (errorBody != null) {
-                errorMessage = errorBody.string();
-            }
-        } catch (IOException e) {
-            errorMessage = e.getMessage();
-        }
-        return errorMessage;
     }
 
     /**
@@ -168,9 +147,10 @@ public class CreateRecipeViewModel extends CustomViewModel {
                 if (response.code() == 200) {
                     if (response.body() != null) {
                         onSuccessAction.onSuccess();
+
                     }
                 } else {
-                    onFailureAction.action(new NotOkHttpResponseException(extractErrorMessage(response.errorBody())));
+                    onFailureAction.action(new NotOkHttpResponseException(decodeErrorMassage(response)));
                 }
             }
 

@@ -77,4 +77,12 @@
     <string name="recipe_source_label_text_view">Źródło:</string>
     <string name="recipe_published_text_label">Opublikowane</string>
     <string name="no_elements_in_list_msg_text">Brak elelemtów w liście</string>
+    <string name="recipe_name_label_text">Nazwa przepisu</string>
+    <string name="recipe_description_label_text">Opis przepisu...</string>
+    <string name="wrong_quantity_massage">Podana wartość to nie liczba</string>
+    <string name="ingredient_hint">składnik</string>
+    <string name="amount_hint">ilość</string>
+    <string name="unit_hint">jednostka</string>
+    <string name="ingredient_on_shopping_list_checkbox_label">Produkt na liście</string>
+    <string name="no_selected_unit_exists_mssg">"Taki rodzaj jednostki nie istnieje. Wybierz odpowiednią jednostkę lub stwórz ją. "</string>
 </resources>

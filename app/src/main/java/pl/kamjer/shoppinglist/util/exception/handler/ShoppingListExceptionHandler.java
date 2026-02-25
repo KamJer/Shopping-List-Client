@@ -32,15 +32,17 @@ public class ShoppingListExceptionHandler implements Thread.UncaughtExceptionHan
         new Handler(Looper.getMainLooper()).post(() ->
                 Toast.makeText(context, e.getMessage(), Toast.LENGTH_LONG).show());
         shoppingServiceRepository.sendLog(ServiceUtil.toExceptionDto(e), () -> android.os.Process.killProcess(android.os.Process.myPid()));
-        executorService.shutdown();
-        try {
-            if (!executorService.awaitTermination(10, TimeUnit.SECONDS)) {
+        if (executorService != null) {
+            executorService.shutdown();
+            try {
+                if (!executorService.awaitTermination(10, TimeUnit.SECONDS)) {
+                    executorService.shutdownNow();
+                }
+            } catch (InterruptedException ex) {
                 executorService.shutdownNow();
+                Thread.currentThread().interrupt();
+                android.os.Process.killProcess(android.os.Process.myPid());
             }
-        } catch (InterruptedException ex) {
-            executorService.shutdownNow();
-            Thread.currentThread().interrupt();
-            android.os.Process.killProcess(android.os.Process.myPid());
         }
     }
 }

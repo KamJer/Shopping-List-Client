@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import lombok.RequiredArgsConstructor;
 import pl.kamjer.shoppinglist.model.dto.AllDto;
 import pl.kamjer.shoppinglist.model.dto.AmountTypeDto;
 import pl.kamjer.shoppinglist.model.dto.CategoryDto;
@@ -25,14 +24,20 @@ import pl.kamjer.shoppinglist.util.ServiceUtil;
 import pl.kamjer.shoppinglist.util.exception.NoUserFoundException;
 import retrofit2.Response;
 
-@RequiredArgsConstructor
-public class CustomViewModel extends ViewModel {
+
+public abstract class CustomViewModel extends ViewModel {
 
     protected final ShoppingRepository shoppingRepository;
     protected final ShoppingServiceRepository shoppingServiceRepository;
     protected final SharedRepository sharedRepository;
 
     protected LiveData<User> userLiveData;
+
+    protected CustomViewModel(ShoppingRepository shoppingRepository, ShoppingServiceRepository shoppingServiceRepository, SharedRepository sharedRepository) {
+        this.shoppingRepository = shoppingRepository;
+        this.shoppingServiceRepository = shoppingServiceRepository;
+        this.sharedRepository = sharedRepository;
+    }
 
     public void loadUser() {
         userLiveData = shoppingRepository.loadUser(sharedRepository.loadUser());

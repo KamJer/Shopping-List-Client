@@ -1,7 +1,6 @@
 package pl.kamjer.shoppinglist.activity.shoppinglistactiviti.newshoppingitemdialog;
 
 import android.os.Bundle;
-import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -11,6 +10,8 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModelProvider;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import pl.kamjer.shoppinglist.R;
@@ -52,16 +53,77 @@ public class NewShoppingItemDialog extends GenericActivity {
      */
     protected Spinner categorySpinner;
 
+    protected ArrayAdapter<Category> categorySpinnerAdapter;
+    protected ArrayAdapter<AmountType> amountTypeSpinnerAdapter;
+
+    protected ImageButton createNewShoppingItemImageButton;
+
     /**
      * ViewModel for managing the new shopping item dialog data.
      */
     protected NewShoppingItemDialogViewModel newShoppingItemDialogViewModel;
 
     /**
-     * OnClickListener for the create new shopping item button.
-     * Validates input data and creates a new shopping item.
+     * Processes the created shopping item data.
+     * This method can be overridden by subclasses to customize behavior.
+     *
+     * @param shoppingItem The shopping item to process
      */
-    private final View.OnClickListener createNewShoppingItemAction = v -> {
+    protected void actOnData(ShoppingItem shoppingItem) {
+        newShoppingItemDialogViewModel.insertShoppingItem(shoppingItem);
+    }
+
+    /**
+     * Called when the activity is created.
+     * Initializes UI components, sets up data observers, and configures the activity.
+     *
+     * @param savedInstanceState If the activity is being re-initialized after previously being shut down
+     */
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.new_shopping_item_dialog_layout);
+
+        initViewModel();
+
+        setTitle(R.string.new_item_dialog_title);
+
+        amountTypeSpinner = findViewById(R.id.amountTypeSpinner);
+
+        Category category = (Category) getIntent().getSerializableExtra(CATEGORY_FIELD_NAME);
+
+        shoppingItemEditText = findViewById(R.id.shoppingItemEditText);
+        amountEditText = findViewById(R.id.amountEditText);
+
+        createNewShoppingItemImageButton = findViewById(R.id.acceptNewShoppingItemImageButton);
+        createNewShoppingItemImageButton.setOnClickListener(v -> {
+            setOnclickListener();
+        });
+
+        categorySpinner = findViewById(R.id.categorySpinner);
+
+
+        amountTypeSpinnerAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, new ArrayList<>());
+        amountTypeSpinner.setAdapter(amountTypeSpinnerAdapter);
+        newShoppingItemDialogViewModel.setAmountTypesListLiveDataObserver(this, this::setupAmountTypeSpinnerAction);
+
+        categorySpinnerAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, new ArrayList<>());
+        categorySpinner.setAdapter(categorySpinnerAdapter);
+
+        newShoppingItemDialogViewModel.setCategoryListLiveDataObserver(this, categories -> {
+            categorySpinnerAdapter.clear();
+            categorySpinnerAdapter.addAll(categories);
+            categorySpinnerAdapter.notifyDataSetChanged();
+            categorySpinner.setSelection(Optional.of(categories.indexOf(category)).filter(integer -> integer != -1).orElse(0));
+        });
+    }
+
+    protected void setupAmountTypeSpinnerAction(List<AmountType> amountTypes) {
+        amountTypeSpinnerAdapter.clear();
+        amountTypeSpinnerAdapter.addAll(amountTypes);
+    }
+
+    protected void setOnclickListener() {
         ShoppingItem.ShoppingItemBuilder shoppingItemToInsert = ShoppingItem.builder();
 //        Validating if passed data is correct
         if (NewItemDialogDataValidator.isShoppingItemNameValid(shoppingItemEditText.getText().toString())) {
@@ -93,29 +155,9 @@ public class NewShoppingItemDialog extends GenericActivity {
         }
         actOnData(shoppingItemToInsert.build());
         this.finish();
-    };
-
-    /**
-     * Processes the created shopping item data.
-     * This method can be overridden by subclasses to customize behavior.
-     *
-     * @param shoppingItem The shopping item to process
-     */
-    protected void actOnData(ShoppingItem shoppingItem) {
-        newShoppingItemDialogViewModel.insertShoppingItem(shoppingItem);
     }
 
-    /**
-     * Called when the activity is created.
-     * Initializes UI components, sets up data observers, and configures the activity.
-     *
-     * @param savedInstanceState If the activity is being re-initialized after previously being shut down
-     */
-    @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.new_shopping_item_dialog_layout);
-
+    protected void initViewModel() {
         newShoppingItemDialogViewModel = new ViewModelProvider(
                 this,
                 ViewModelProvider.Factory.from(NewShoppingItemDialogViewModel.initializer)
@@ -124,28 +166,5 @@ public class NewShoppingItemDialog extends GenericActivity {
         newShoppingItemDialogViewModel.loadUser();
         newShoppingItemDialogViewModel.loadAllAmountTypes();
         newShoppingItemDialogViewModel.loadAllCategory();
-
-        setTitle(R.string.new_item_dialog_title);
-
-        amountTypeSpinner = findViewById(R.id.amountTypeSpinner);
-
-        Category category = (Category) getIntent().getSerializableExtra(CATEGORY_FIELD_NAME);
-
-        shoppingItemEditText = findViewById(R.id.shoppingItemEditText);
-        amountEditText = findViewById(R.id.amountEditText);
-
-        ImageButton createNewShoppingItemImageButton = findViewById(R.id.acceptNewShoppingItemImageButton);
-        createNewShoppingItemImageButton.setOnClickListener(createNewShoppingItemAction);
-
-        categorySpinner = findViewById(R.id.categorySpinner);
-
-        newShoppingItemDialogViewModel.setAmountTypesListLiveDataObserver(this, amountTypes -> {
-            amountTypeSpinner.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, amountTypes));
-        });
-
-        newShoppingItemDialogViewModel.setCategoryListLiveDataObserver(this, categories -> {
-            categorySpinner.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, categories));
-            categorySpinner.setSelection(Optional.of(categories.indexOf(category)).filter(integer -> integer != -1).orElse(0));
-        });
     }
 }

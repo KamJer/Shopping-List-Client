@@ -72,7 +72,7 @@
             android:exported="false"
             android:parentActivityName=".activity.shoppinglistactiviti.ShoppingListActivity" />
         <activity
-            android:name=".activity.recipeactivity.RecipeActivity"
+            android:name=".activity.recipe_activity.RecipeActivity"
             android:exported="false"
             android:parentActivityName=".activity.shoppinglistactiviti.ShoppingListActivity"
             />
@@ -80,6 +80,12 @@
             android:name=".activity.AboutActivity"
             android:exported="false"
             android:parentActivityName=".activity.shoppinglistactiviti.ShoppingListActivity"
+            />
+        <activity
+            android:name=".activity.recipe_activity.recipe_view.NewIngredientToListDialog"
+            android:theme="@style/Theme.AppCompat.Dialog"
+            android:exported="false"
+            android:parentActivityName=".activity.recipe_activity.RecipeActivity"
             />
     </application>
 
