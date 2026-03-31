@@ -1,4 +1,4 @@
-package pl.kamjer.shoppinglist.activity.recipe_activity.recipe_create;
+package pl.kamjer.shoppinglist.activity.recipe_activity.recipe_create.recycler_views;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -56,7 +56,7 @@ public class CreateStepAdapter extends RecyclerView.Adapter<CreateStepViewHolder
     public void onBindViewHolder(@NonNull CreateStepViewHolder holder, int position) {
         holder.bind(steps.get(position), position, view -> {
             steps.remove(position);
-            notifyItemRemoved(position);
+            notifyDataSetChanged();
         });
     }
 
@@ -77,6 +77,11 @@ public class CreateStepAdapter extends RecyclerView.Adapter<CreateStepViewHolder
      */
     public void setData(List<Step> steps) {
         this.steps = steps;
+        notifyDataSetChanged();
+    }
+
+    public void addEmptyStep() {
+        steps.add(new Step());
         notifyDataSetChanged();
     }
 }

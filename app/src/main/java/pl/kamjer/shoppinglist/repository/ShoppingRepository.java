@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -163,7 +164,7 @@ public class ShoppingRepository {
      * @param userName The username to search for
      * @return LiveData containing the user data
      */
-    public LiveData<User> loadUser(@NonNull String userName) {
+    public MutableLiveData<User> loadUser(@NonNull String userName) {
 //        loading user data from database based on what was passed from caller
         if (userLiveData.getValue() == null || !userName.equals(userLiveData.getValue().getUserName())) {
             LiveData<User> userRoomLifeData = userDao.findUserByUserName(userName);
@@ -197,6 +198,7 @@ public class ShoppingRepository {
             Optional<User> optionalUser = Optional.ofNullable(userDao.findUserByUserNameBlock(user.getUserName()));
             if (!optionalUser.isPresent()) {
                 userDao.insertUser(user);
+                return;
             }
             setLoggedUser(user);
         });
@@ -208,7 +210,9 @@ public class ShoppingRepository {
      * @param user The user to set as logged in
      */
     public void setLoggedUser(User user) {
-        userLiveData.postValue(user);
+        if (!Objects.equals(userLiveData.getValue(), user)) {
+            userLiveData.postValue(user);
+        }
     }
 
     /**
@@ -228,14 +232,14 @@ public class ShoppingRepository {
     /**
      * Inserts a shopping item into the database.
      *
-     * @param user   The user who owns the item
+     * @param user         The user who owns the item
      * @param shoppingItem The shopping item to insert
-     * @param action The action to perform after insertion
+     * @param action       The action to perform after insertion
      */
     public void insertShoppingItem(User user, ShoppingItem shoppingItem, LoadToServerAction action) {
         executorService.execute(() -> {
             shoppingItem.setUserName(user.getUserName());
-            shoppingItem.setLocalShoppingItemId(shoppingItemDao.insertShoppingItem(shoppingItem));
+            shoppingItemDao.insertShoppingItemSmart(shoppingItem, user);
             action.action();
         });
     }
@@ -309,8 +313,9 @@ public class ShoppingRepository {
      * @param user            The user who owns the item
      */
     public void updateShoppingItemFinal(ShoppingItemDto shoppingItemDto, User user) {
-        executorService.execute(() ->
-                shoppingItemDao.updateShoppingItemAndSavedTime(ServiceUtil.shoppingItemDtoToShoppingItem(user, shoppingItemDto), shoppingItemDto.getSavedTime()));
+        executorService.execute(() -> {
+            shoppingItemDao.updateShoppingItemAndSavedTime(ServiceUtil.shoppingItemDtoToShoppingItem(user, shoppingItemDto), shoppingItemDto.getSavedTime());
+        });
     }
 
     /**
@@ -325,6 +330,7 @@ public class ShoppingRepository {
     }
 
     //    category
+
     /**
      * Loads all categories for a user.
      *
@@ -338,9 +344,9 @@ public class ShoppingRepository {
     /**
      * Inserts a category into the database.
      *
-     * @param user   The user who owns the category
+     * @param user     The user who owns the category
      * @param category The category to insert
-     * @param action The action to perform after insertion
+     * @param action   The action to perform after insertion
      */
     public void insertCategory(User user, Category category, LoadToServerAction action) {
         executorService.execute(() -> {
@@ -409,6 +415,7 @@ public class ShoppingRepository {
     }
 
     //    amountType
+
     /**
      * Loads all amount types for a user.
      *
@@ -422,7 +429,7 @@ public class ShoppingRepository {
     /**
      * Inserts an amount type into the database.
      *
-     * @param user      The user who owns the amount type
+     * @param user       The user who owns the amount type
      * @param amountType The amount type to insert
      * @param action     The action to perform after insertion
      */
@@ -483,6 +490,7 @@ public class ShoppingRepository {
     }
 
     //util
+
     /**
      * Gets all data and performs an action with it.
      *
@@ -500,12 +508,12 @@ public class ShoppingRepository {
     /**
      * Synchronizes data with the database.
      *
-     * @param amountTypes The amount types to synchronize
-     * @param categories  The categories to synchronize
+     * @param amountTypes   The amount types to synchronize
+     * @param categories    The categories to synchronize
      * @param shoppingItems The shopping items to synchronize
-     * @param user        The user for whom to synchronize
-     * @param savedTime   The saved time of the data
-     * @param dirty       Whether the data is dirty
+     * @param user          The user for whom to synchronize
+     * @param savedTime     The saved time of the data
+     * @param dirty         Whether the data is dirty
      */
     public void synchronizeData(Map<ModifyState, List<AmountType>> amountTypes,
                                 Map<ModifyState, List<Category>> categories,
@@ -516,10 +524,14 @@ public class ShoppingRepository {
         executorService.execute(() -> utilDao.synchronizeData(amountTypes, categories, shoppingItems, user, savedTime, dirty));
     }
 
+    public void updateRefreshToken(User user) {
+        executorService.execute(() -> userDao.updateUserRefreshToken(user.getUserName(), user.getPassword()));
+    }
+
     /**
      * Synchronizes data from a DTO response.
      *
-     * @param user   The user for whom to synchronize
+     * @param user           The user for whom to synchronize
      * @param responseAllDto The DTO containing the synchronization data
      */
     public void synchronizeData(User user, AllDto responseAllDto) {
@@ -574,7 +586,7 @@ public class ShoppingRepository {
     /**
      * Loads shopping items for a specific amount type.
      *
-     * @param user      The user for whom to load items
+     * @param user       The user for whom to load items
      * @param amountType The amount type to filter by
      * @return LiveData containing the shopping items
      */
@@ -591,4 +603,6 @@ public class ShoppingRepository {
     public LiveData<List<ShoppingItem>> loadBoughtShoppingItem(User user) {
         return shoppingItemDao.findBoughtShoppingItems(user.getUserName());
     }
+
+
 }

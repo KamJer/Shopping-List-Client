@@ -40,6 +40,8 @@ public class IngredientViewHolder extends RecyclerView.ViewHolder {
 
     private CheckBox importedToTheListCheckBox;
 
+    private CheckBox importedToBoughtTheListCheckBox;
+
     private ImageButton importToTheListimageButton;
 
     /**
@@ -52,6 +54,7 @@ public class IngredientViewHolder extends RecyclerView.ViewHolder {
         tvName = itemView.findViewById(R.id.tvName);
         tvQuantity = itemView.findViewById(R.id.et_ingredient_quantity);
         tvUnit = itemView.findViewById(R.id.et_ingredient_unit);
+        importedToBoughtTheListCheckBox = itemView.findViewById(R.id.OnListBoughtCheckBox);
         importedToTheListCheckBox = itemView.findViewById(R.id.OnListCheckBox);
         importToTheListimageButton = itemView.findViewById(R.id.exportIngredientToList);
     }
@@ -65,7 +68,8 @@ public class IngredientViewHolder extends RecyclerView.ViewHolder {
         tvName.setText(ingredient.ingredient().getName());
         tvQuantity.setText(String.format(Locale.getDefault(), Optional.ofNullable(ingredient.ingredient().getQuantity()).orElse(0.0).toString()));
         tvUnit.setText(ingredient.ingredient().getUnit());
-        importedToTheListCheckBox.setChecked(ingredient.onTheList());
+        importedToBoughtTheListCheckBox.setChecked(ingredient.onTheListBought());
+        importedToTheListCheckBox.setChecked(ingredient.onTheListToBuy());
         importToTheListimageButton.setOnClickListener(view -> action.action(ingredient.ingredient()));
     }
 }

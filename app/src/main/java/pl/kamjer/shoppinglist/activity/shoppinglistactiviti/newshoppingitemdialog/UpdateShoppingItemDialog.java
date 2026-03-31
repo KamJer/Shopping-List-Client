@@ -42,7 +42,7 @@ public class UpdateShoppingItemDialog extends NewShoppingItemDialog{
 
             // Populate the UI with existing item data
             shoppingItemEditText.setText(shoppingItem.getItemName());
-            amountEditText.setText(String.valueOf(shoppingItem.getAmount()));
+            amountEditText.setText(convertDoubleToString(shoppingItem.getAmount()));
 
             // Set up the amount type spinner with existing item's amount type
             newShoppingItemDialogViewModel.setAmountTypesListLiveDataObserver(this, amountTypes -> {
@@ -50,6 +50,10 @@ public class UpdateShoppingItemDialog extends NewShoppingItemDialog{
                 amountTypeSpinner.setSelection(findIndex(amountTypes, shoppingItemToUpdate.getLocalItemAmountTypeId()).orElseThrow(IllegalStateException::new));
             });
         });
+    }
+
+    public String convertDoubleToString(double number) {
+        return String.valueOf(number).replaceAll("\\.?0+$", "");
     }
 
     /**

@@ -13,6 +13,7 @@ import java.security.NoSuchProviderException;
 
 import lombok.extern.java.Log;
 import pl.kamjer.shoppinglist.R;
+import pl.kamjer.shoppinglist.model.dto.TokenDto;
 import pl.kamjer.shoppinglist.model.user.User;
 import pl.kamjer.shoppinglist.repository.SharedRepository;
 import pl.kamjer.shoppinglist.repository.ShoppingRepository;
@@ -21,6 +22,7 @@ import pl.kamjer.shoppinglist.util.exception.handler.ShoppingListExceptionHandle
 import pl.kamjer.shoppinglist.util.loadManager.ServerMessageCoordinator;
 import pl.kamjer.shoppinglist.websocketconnect.funcIntarface.OnFailureAction;
 import pl.kamjer.shoppinglist.websocketconnect.funcIntarface.OnMessageAction;
+import retrofit2.Callback;
 
 @Log
 public class InitializerViewModel extends CustomViewModel {
@@ -73,7 +75,7 @@ public class InitializerViewModel extends CustomViewModel {
 
         // Set initialization progress label to connection initialization
         setInitializerLabelLiveDataValue(appContext.getString(R.string.initializing_connection_to_server_label));
-        shoppingServiceRepository.initialize(appContext);
+        shoppingServiceRepository.initialize();
 
         // Set initialization progress label to inner files initialization
         setInitializerLabelLiveDataValue(appContext.getString(R.string.initializing_inner_files_label));
@@ -92,6 +94,7 @@ public class InitializerViewModel extends CustomViewModel {
      */
     public void setUserLiveDataObserver(Observer<User> observer) {
         userLiveData.observeForever(observer);
+        userLiveData.postValue(userLiveData.getValue());
     }
 
     /**
@@ -138,5 +141,39 @@ public class InitializerViewModel extends CustomViewModel {
      */
     public void websocketDisconnect() {
         shoppingServiceRepository.disconnect();
+    }
+
+    /**
+     * Checks if a user's credentials are correct by making a network call to the server.
+     * The result is returned through the callback.
+     *
+     * @param user     The user whose credentials need to be verified
+     * @param callback The callback to receive the result
+     */
+    public void loginUser(User user, Callback<TokenDto> callback) {
+        shoppingServiceRepository.loginUser(user, callback);
+    }
+
+    public void refreshUser(Callback<TokenDto> callback) {
+        shoppingServiceRepository.refreshUser(callback);
+    }
+
+    /**
+     * Inserts a user into both shared preferences and the local database.
+     * This method should be called after successfully logging user on the server.
+     *
+     * @param user The user to be inserted locally
+     */
+    public void insertUser(User user) {
+        sharedRepository.insertUser(user);
+        shoppingRepository.insertUser(user);
+    }
+
+    public void updateRefreshToken(User user) {
+        shoppingRepository.updateRefreshToken(user);
+    }
+
+    public void initializeWebsocketConnection(Context context, User user) {
+        shoppingServiceRepository.initializeWebSocket(context, user);
     }
 }

@@ -1,4 +1,4 @@
-package pl.kamjer.shoppinglist.activity.recipe_activity.recipe_create;
+package pl.kamjer.shoppinglist.activity.recipe_activity.recipe_create.recycler_views;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -55,8 +55,10 @@ public class CreateIngredientAdapter extends RecyclerView.Adapter<CreateIngredie
     @Override
     public void onBindViewHolder(@NonNull CreateIngredientViewHolder holder, int position) {
         holder.bind(ingredients.get(position), view -> {
-            ingredients.remove(position);
-            notifyItemRemoved(position);
+            if (ingredients.size() != position) {
+                ingredients.remove(position);
+                notifyDataSetChanged();
+            }
         });
     }
 
@@ -79,6 +81,11 @@ public class CreateIngredientAdapter extends RecyclerView.Adapter<CreateIngredie
      */
     public void setData(List<Ingredient> ingredients) {
         this.ingredients = ingredients;
+        notifyDataSetChanged();
+    }
+
+    public void addEmptyIngredient() {
+        ingredients.add(new Ingredient());
         notifyDataSetChanged();
     }
 }

@@ -1,4 +1,4 @@
-package pl.kamjer.shoppinglist.activity.recipe_activity.recipe_create;
+package pl.kamjer.shoppinglist.activity.recipe_activity.recipe_create.recycler_views;
 
 import android.view.View;
 import android.widget.Button;

@@ -23,7 +23,7 @@
         android:id="@+id/etDescription"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Opis"
+        android:hint="@string/desc_text_hint"
         android:minLines="3"
         android:gravity="top"
         android:inputType="textMultiLine"
@@ -52,11 +52,17 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <EditText
-        android:id="@+id/etTags"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/tagRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:hint="Tagi (oddzielone przecinkami)" />
+        />
+
+    <Button
+        android:id="@+id/create_tag_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/create_tag_button_text"
+        />
 
 </LinearLayout>

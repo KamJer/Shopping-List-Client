@@ -21,6 +21,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import pl.kamjer.shoppinglist.R;
 import pl.kamjer.shoppinglist.activity.recipe_activity.recipe_recycler_view.RecipeComparator;
+import pl.kamjer.shoppinglist.model.recipe.Recipe;
 import pl.kamjer.shoppinglist.util.funcinterface.DeleteRecipeAction;
 import pl.kamjer.shoppinglist.util.funcinterface.EditRecipeAction;
 import pl.kamjer.shoppinglist.util.funcinterface.PassActiveRecipe;
@@ -69,7 +70,7 @@ public class UserRecipeFragment extends Fragment {
 
     private void setBtnAction() {
         addRecipeBtn.setOnClickListener(v -> {
-            recipeViewModel.setActiveRecipe(null);
+            recipeViewModel.setActiveRecipe(new Recipe());
             findNavController(UserRecipeFragment.this).navigate(R.id.action_user_recipe_to_create_user_recipe);
         });
     }

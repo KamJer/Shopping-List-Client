@@ -1,5 +1,7 @@
 package pl.kamjer.shoppinglist.model.recipe;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -9,12 +11,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import pl.kamjer.shoppinglist.model.dto.RecipeDto;
 
 @AllArgsConstructor
-@NoArgsConstructor
 @Builder
 @Getter
 @Setter
@@ -28,6 +28,16 @@ public class Recipe {
     private Set<Tag> tags;
     private String source;
     private Boolean published;
+
+    public Recipe() {
+        name = "";
+        description = "";
+        ingredients = new ArrayList<>();
+        steps = new ArrayList<>();
+        tags = new HashSet<>();
+        source = "";
+        published = false;
+    }
 
     public static Recipe map(RecipeDto recipeDto) {
         return Recipe.builder()

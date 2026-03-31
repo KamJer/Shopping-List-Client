@@ -82,8 +82,8 @@ public class IngredientAdapter extends RecyclerView.Adapter<IngredientViewHolder
 
     /**
      * Data holder class for ingredient information and shopping list status.
-     * Contains an ingredient and a boolean indicating whether it's already on the shopping list.
+     * Contains an ingredient and a booleans indicating whether it's already on the shopping list.
      */
-    public record IngredientDataHolder(Ingredient ingredient, boolean onTheList){
+    public record IngredientDataHolder(Ingredient ingredient, boolean onTheListBought, boolean onTheListToBuy){
     }
 }

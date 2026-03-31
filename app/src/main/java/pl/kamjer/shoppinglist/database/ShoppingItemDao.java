@@ -10,10 +10,12 @@ import androidx.room.Update;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import pl.kamjer.shoppinglist.model.shopping_list.AmountType;
 import pl.kamjer.shoppinglist.model.shopping_list.ShoppingItem;
 import pl.kamjer.shoppinglist.model.shopping_list.ShoppingItemWithAmountTypeAndCategory;
+import pl.kamjer.shoppinglist.model.user.User;
 
 @Dao
 public interface ShoppingItemDao {
@@ -77,6 +79,17 @@ public interface ShoppingItemDao {
         updateAmountType(amountTypeToDelete);
     }
 
+    @Transaction
+    default void insertShoppingItemSmart(ShoppingItem shoppingItem, User user) {
+        List<ShoppingItem> shoppingItems = loadAllShoppingItemsForUser(user.getUserName());
+        Optional<ShoppingItem> opShoppingItem = shoppingItems.stream().filter(shoppingItem1 -> shoppingItem1.equals(shoppingItem)).findFirst();
+        if (opShoppingItem.isPresent()) {
+            opShoppingItem.get().setAmount(opShoppingItem.get().getAmount() + shoppingItem.getAmount());
+            updateShoppingItemFlag(opShoppingItem.get());
+        } else {
+            shoppingItem.setLocalShoppingItemId(insertShoppingItem(shoppingItem));
+        }
+    }
 
     @Transaction
     @Query("SELECT * FROM SHOPPING_ITEM WHERE deleted=0 AND user_name=:userName")
@@ -89,7 +102,7 @@ public interface ShoppingItemDao {
     LiveData<List<ShoppingItem>> findAllShoppingItemsForUserLiveData(String userName);
 
     @Query("SELECT * FROM SHOPPING_ITEM WHERE user_name=:userName")
-    LiveData<List<ShoppingItem>> loadAllShoppingItemsForUser(String userName);
+    List<ShoppingItem> loadAllShoppingItemsForUser(String userName);
 
     @Transaction
     @Query("SELECT * FROM SHOPPING_ITEM WHERE deleted=0 AND user_name=:userName AND local_item_amount_type_id=:localAmountTypeId")

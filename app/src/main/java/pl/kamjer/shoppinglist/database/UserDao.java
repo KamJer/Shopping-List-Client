@@ -30,4 +30,7 @@ public interface UserDao {
 
     @Query("Update USER SET saved_time = :savedTime WHERE user_name=:userName")
     void updateUsersSavedTime(LocalDateTime savedTime, String userName);
+
+    @Query("Update USER SET password = :token WHERE user_name=:username")
+    void updateUserRefreshToken(String username, String token);
 }

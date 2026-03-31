@@ -10,6 +10,7 @@ import java.io.Serializable;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -38,6 +39,7 @@ import pl.kamjer.shoppinglist.model.user.User;
                         onDelete = ForeignKey.CASCADE)
         }
 )
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class ShoppingItem implements Serializable {
     @ColumnInfo(name = "local_shopping_item_id")
     @PrimaryKey(autoGenerate = true)
@@ -49,15 +51,18 @@ public class ShoppingItem implements Serializable {
     @ColumnInfo(name = "item_category_id")
     private long itemCategoryId;
     @ColumnInfo(name = "local_item_amount_type_id")
+    @EqualsAndHashCode.Include
     private long localItemAmountTypeId;
     @ColumnInfo(name = "local_item_category_id")
     private long localItemCategoryId;
     @ColumnInfo(name = "item_name")
     @ToString.Include
+    @EqualsAndHashCode.Include
     private String itemName;
     @ColumnInfo(name = "amount")
     private Double amount;
     @ColumnInfo(name = "bought")
+    @EqualsAndHashCode.Include
     private boolean bought;
     @ColumnInfo(name = "moved_to_bought")
     private boolean movedToBought;

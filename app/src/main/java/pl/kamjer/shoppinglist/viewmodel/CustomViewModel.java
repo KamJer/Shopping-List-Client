@@ -1,6 +1,6 @@
 package pl.kamjer.shoppinglist.viewmodel;
 
-import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import java.io.IOException;
@@ -49,7 +49,7 @@ public abstract class CustomViewModel extends ViewModel {
     /**
      * LiveData containing the current user data.
      */
-    protected LiveData<User> userLiveData;
+    protected MutableLiveData<User> userLiveData;
 
     /**
      * Constructor for CustomViewModel.

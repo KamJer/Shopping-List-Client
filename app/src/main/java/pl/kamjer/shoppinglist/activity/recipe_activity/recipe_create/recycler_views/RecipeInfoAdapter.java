@@ -1,4 +1,4 @@
-package pl.kamjer.shoppinglist.activity.recipe_activity.recipe_create;
+package pl.kamjer.shoppinglist.activity.recipe_activity.recipe_create.recycler_views;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -7,11 +7,16 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import pl.kamjer.shoppinglist.R;
+import pl.kamjer.shoppinglist.model.recipe.Tag;
 
 /**
  * RecyclerView adapter for managing recipe information fields.
@@ -24,7 +29,7 @@ public class RecipeInfoAdapter extends RecyclerView.Adapter<RecipeInfoViewHolder
      * Data holder object that maintains the current state of recipe information.
      * Serves as the central data repository for all recipe metadata fields.
      */
-    private DataHolder dataHolder = new DataHolder();
+    private final DataHolder dataHolder = new DataHolder();
 
     /**
      * Creates a new ViewHolder instance for the recipe information card.
@@ -73,15 +78,18 @@ public class RecipeInfoAdapter extends RecyclerView.Adapter<RecipeInfoViewHolder
      * @param source The source of the recipe
      * @param description The description of the recipe
      * @param published The publication status of the recipe
-     * @param tags The tags associated with the recipe
      */
-    public void setData(String recipeName, String source, String description, boolean published, String tags) {
+    public void setData(String recipeName, String source, String description, boolean published, Set<Tag> tags) {
         dataHolder.recipeName = recipeName;
         dataHolder.source = source;
         dataHolder.description = description;
         dataHolder.published = published;
-        dataHolder.tags = tags;
+        dataHolder.updateTags(tags);
         notifyItemChanged(0);
+    }
+
+    public void setTagsHint(Set<Tag> tagsHints) {
+        dataHolder.updateTagsHints(tagsHints);
     }
 
     /**
@@ -103,7 +111,7 @@ public class RecipeInfoAdapter extends RecyclerView.Adapter<RecipeInfoViewHolder
     @Setter
     @AllArgsConstructor
     @NoArgsConstructor
-    public class DataHolder {
+    public static class DataHolder {
         /**
          * The name/title of the recipe.
          */
@@ -124,9 +132,21 @@ public class RecipeInfoAdapter extends RecyclerView.Adapter<RecipeInfoViewHolder
          */
         private boolean published;
 
-        /**
-         * Tags associated with the recipe for categorization and filtering.
-         */
-        private String tags;
+        private List<Tag> tags;
+
+        private List<Tag> tagHints;
+
+        private void updateTags(Set<Tag> tags) {
+            if (this.tags == null) this.tags = new ArrayList<>();
+            this.tags.clear();
+            this.tags.addAll(tags);
+        }
+
+        private void updateTagsHints(Set<Tag> tagsHints) {
+            if (this.tagHints == null) this.tagHints = new ArrayList<>();
+            this.tagHints.clear();
+            this.tagHints.addAll(tagsHints);
+            tagHints.sort((tag, t1) -> tag.getTag().compareToIgnoreCase(t1.getTag()));
+        }
     }
 }

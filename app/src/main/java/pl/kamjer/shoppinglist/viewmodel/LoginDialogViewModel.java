@@ -1,7 +1,5 @@
 package pl.kamjer.shoppinglist.viewmodel;
 
-import android.content.Context;
-
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.LiveData;
@@ -11,6 +9,7 @@ import androidx.lifecycle.viewmodel.ViewModelInitializer;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import pl.kamjer.shoppinglist.model.dto.TokenDto;
 import pl.kamjer.shoppinglist.model.user.User;
 import pl.kamjer.shoppinglist.repository.SharedRepository;
 import pl.kamjer.shoppinglist.repository.ShoppingRepository;
@@ -127,10 +126,9 @@ public class LoginDialogViewModel extends CustomViewModel {
      * Initializes the shopping service repository with the application context.
      * This method should be called before making any network calls.
      *
-     * @param applicationContext The application context
      */
-    public void initializeShoppingServiceRepository(Context applicationContext) {
-        shoppingServiceRepository.initialize(applicationContext);
+    public void initializeShoppingServiceRepository() {
+        shoppingServiceRepository.initialize();
     }
 
     /**
@@ -140,7 +138,7 @@ public class LoginDialogViewModel extends CustomViewModel {
      * @param user     The user whose credentials need to be verified
      * @param callback The callback to receive the result
      */
-    public void isUserCorrect(User user, Callback<Boolean> callback) {
-        shoppingServiceRepository.isUserCorrect(user, callback);
+    public void loginUser(User user, Callback<TokenDto> callback) {
+        shoppingServiceRepository.loginUser(user, callback);
     }
 }

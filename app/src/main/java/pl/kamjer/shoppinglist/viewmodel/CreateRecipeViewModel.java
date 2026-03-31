@@ -6,15 +6,14 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.viewmodel.ViewModelInitializer;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import lombok.Getter;
 import lombok.Setter;
 import pl.kamjer.shoppinglist.model.dto.RecipeDto;
-import pl.kamjer.shoppinglist.model.recipe.Ingredient;
 import pl.kamjer.shoppinglist.model.recipe.Recipe;
-import pl.kamjer.shoppinglist.model.recipe.Step;
+import pl.kamjer.shoppinglist.model.recipe.Tag;
 import pl.kamjer.shoppinglist.repository.SharedRepository;
 import pl.kamjer.shoppinglist.repository.ShoppingRepository;
 import pl.kamjer.shoppinglist.repository.ShoppingServiceRepository;
@@ -34,23 +33,7 @@ import retrofit2.Response;
 @Setter
 public class CreateRecipeViewModel extends CustomViewModel {
 
-    /**
-     * MutableLiveData for holding the list of ingredients.
-     * Observers can listen for changes to the ingredients list.
-     */
-    private MutableLiveData<List<Ingredient>> ingredientsLiveData;
-
-    /**
-     * MutableLiveData for holding the list of steps.
-     * Observers can listen for changes to the steps list.
-     */
-    private MutableLiveData<List<Step>> stepsLiveData;
-
-    /**
-     * MutableLiveData for holding the active recipe.
-     * Observers can listen for changes to the active recipe.
-     */
-    private MutableLiveData<Recipe> activeRecipeLiveData;
+    private MutableLiveData<Set<Tag>> tagsLiveData;
 
     /**
      * Constructor for CreateRecipeViewModel.
@@ -78,34 +61,11 @@ public class CreateRecipeViewModel extends CustomViewModel {
 
     /**
      * Initializes the ViewModel.
-     * Sets up the MutableLiveData objects if they haven't been initialized yet.
      */
     @Override
     public void initialize() {
         super.initialize();
-        if (ingredientsLiveData == null) ingredientsLiveData = new MutableLiveData<>(new ArrayList<>());
-        if (stepsLiveData == null) stepsLiveData = new MutableLiveData<>(new ArrayList<>());
-        if (activeRecipeLiveData == null) activeRecipeLiveData = new MutableLiveData<>();
-    }
-
-    /**
-     * Sets up an observer for the ingredients LiveData.
-     *
-     * @param owner           LifecycleOwner to observe the LiveData
-     * @param ingredientObserver Observer to be notified of changes to ingredients
-     */
-    public void setIngredientLiveDataObserver(LifecycleOwner owner, Observer<List<Ingredient>> ingredientObserver) {
-        ingredientsLiveData.observe(owner, ingredientObserver);
-    }
-
-    /**
-     * Sets up an observer for the steps LiveData.
-     *
-     * @param owner        LifecycleOwner to observe the LiveData
-     * @param stepObserver Observer to be notified of changes to steps
-     */
-    public void setStepLiveDataObserver(LifecycleOwner owner, Observer<List<Step>> stepObserver) {
-        stepsLiveData.observe(owner, stepObserver);
+        if (tagsLiveData == null) tagsLiveData = new MutableLiveData<>(new HashSet<>());
     }
 
     /**
@@ -161,21 +121,28 @@ public class CreateRecipeViewModel extends CustomViewModel {
         });
     }
 
-    /**
-     * Sets the value of ingredients LiveData.
-     *
-     * @param ingredients List of ingredients to set
-     */
-    public void setIngredientLiveDataValue(List<Ingredient> ingredients) {
-        ingredientsLiveData.postValue(ingredients);
+    public void loadAllTags(OnFailureAction onFailureAction) {
+        shoppingServiceRepository.getAllTags(new Callback<>() {
+
+            @Override
+            public void onResponse(Call<Set<Tag>> call, Response<Set<Tag>> response) {
+                if (response.code() == 200) {
+                    if (response.body() != null) {
+                        tagsLiveData.setValue(response.body());
+                    }
+                } else {
+                    onFailureAction.action(new NotOkHttpResponseException(decodeErrorMassage(response)));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Set<Tag>> call, Throwable t) {
+                onFailureAction.action(t);
+            }
+        });
     }
 
-    /**
-     * Sets the value of steps LiveData.
-     *
-     * @param steps List of steps to set
-     */
-    public void setStepsLiveDataValue(List<Step> steps) {
-        stepsLiveData.postValue(steps);
+    public void setTagsLiveDataObserver(LifecycleOwner owner, Observer<Set<Tag>> observer) {
+        tagsLiveData.observe(owner, observer);
     }
 }

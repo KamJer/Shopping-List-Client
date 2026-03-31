@@ -22,7 +22,7 @@
     <string name="wrong_user_name_or_password_label">Nazwa użytkownika i/lub hasło są nie poprawne, spróbuj ponownie</string>
     <string name="could_not_find_reason_error_massage">Nie można znaleźć powodu błędu</string>
     <string name="no_category_found_massage">Nie można znaleźć kategorii</string>
-    <string name="amount_type_delete_conflict_desc_message">Wykryto, że do typa, który próbujesz usunąć przypisane są przedmioty, co chcesz z nimi zrobić?</string>
+    <string name="amount_type_delete_conflict_desc_message">Wykryto, że do typu, który próbujesz usunąć przypisane są przedmioty, co chcesz z nimi zrobić?</string>
     <string name="delete_label_button">Usuń przedmioty</string>
     <string name="accept_new_amount_type_label_button">Nadaj nowy typ i usuń</string>
     <string name="cancel_label_button">Anuluj</string>
@@ -46,7 +46,7 @@
     <string name="bought_activity_tutorial_exp">Przenosi do listy zakupionych przedmiotów</string>
     <string name="connector_indicator_tutorial_exp">Indykator połączenia z internetem, kolor czerwony oznacza brak połaczenia, kliknji by spróbować nawiązać połączenie</string>
     <string name="indicator_green_tutorial_exp">Kolor zielony oznacza że wszystko w porzadku z połączeniem</string>
-    <string name="password_encryption_error_info">Nie udało się załadowac bazy danych, skontaktuj się z administratorem aplikacji </string>
+    <string name="password_encryption_error_info">Nie udało się załadowac bazy danych, skontaktuj się z administratorem aplikacji</string>
     <string name="delete_category">Usuń kategorię</string>
     <string name="edit_category">Edytuj kategorię</string>
     <string name="collapse_category">Zwiń kategorię</string>
@@ -65,12 +65,12 @@
     <string name="about_app">O aplikacji</string>
     <string name="recipe_picture">Zdjęcie przepisu</string>
     <string name="recipe_name">Tytuł przepisu</string>
-    <string name="recipe_desc">Dłuższy opis przepisu, który może zajmować więcej miejsca...</string>
+    <string name="recipe_desc">Dłuższy opis przepisu, który może zajmować więcej miejsca…</string>
     <string name="step_number_hint">nr. kroku</string>
     <string name="step_desc_hint">Opis kroku</string>
     <string name="steps_recipe_layout_text">Kroki</string>
     <string name="ingredients_recipe_layout_text">Składniki</string>
-    <string name="tags_recipe_layout_text">Tagi</string>
+    <string name="tags_recipe_layout_text">Wprowadź tutaj tag</string>
     <string name="tag_hint_layout">tag</string>
     <string name="my_recipes_menu_item_txt">Moje przepisy</string>
     <string name="author_recipe_label_text">Autor:</string>
@@ -83,6 +83,11 @@
     <string name="ingredient_hint">składnik</string>
     <string name="amount_hint">ilość</string>
     <string name="unit_hint">jednostka</string>
-    <string name="ingredient_on_shopping_list_checkbox_label">Produkt na liście</string>
+    <string name="ingredient_on_bought_shopping_list_checkbox_label">Zakupiony</string>
     <string name="no_selected_unit_exists_mssg">"Taki rodzaj jednostki nie istnieje. Wybierz odpowiednią jednostkę lub stwórz ją. "</string>
+    <string name="recipe_req_validation_message">Przepis wymaga nazwy</string>
+    <string name="create_tag_button_text">stwórz tag</string>
+    <string name="add_step_button_text">Dodaj krok</string>
+    <string name="desc_text_hint">Opis</string>
+    <string name="ingredient_on_shopping_list_checkbox_label">Do kupienia</string>
 </resources>

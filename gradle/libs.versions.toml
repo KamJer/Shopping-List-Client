@@ -10,7 +10,6 @@ room = "2.8.4"
 retrofit = "2.9.0"
 androidx-recyclerView = "1.4.0"
 zetetic = "4.13.0"
-jackson = "2.17.2"
 navigationFragment = "2.9.7"
 navigationUi = "2.9.7"
 pagingRuntime = "3.4.1"
@@ -27,6 +26,7 @@ room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "
 room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
 retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
 retrofit-converter = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "retrofit" }
+retrofit-scalar = {group = "com.squareup.retrofit2", name = "converter-scalars", version.ref = "retrofit" }
 androidx-recyclerView = {group ="androidx.recyclerview", name = "recyclerview", version.ref = "androidx-recyclerView"}
 zetetic-security = {group="net.zetetic", name="sqlcipher-android", version.ref="zetetic"}
 androidx-navigation-fragment = { group = "androidx.navigation", name = "navigation-fragment", version.ref = "navigationFragment" }

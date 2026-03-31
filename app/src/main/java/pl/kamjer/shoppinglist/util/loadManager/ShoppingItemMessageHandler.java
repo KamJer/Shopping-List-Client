@@ -8,7 +8,6 @@ public class ShoppingItemMessageHandler {
     private final ShoppingRepository shoppingRepository;
     private final ShoppingServiceRepository shoppingServiceRepository;
 
-
     public ShoppingItemMessageHandler(ShoppingRepository shoppingRepository, ShoppingServiceRepository shoppingServiceRepository) {
         this.shoppingRepository = shoppingRepository;
         this.shoppingServiceRepository = shoppingServiceRepository;

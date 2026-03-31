@@ -224,6 +224,7 @@ public class WebSocket {
      * @param subscribeUrl - url of a topic
      * @param type - type of a field topic will return
      * @param onMassageAction - action on a message
+     * @param parameters - parameters for url with paramters
      * @return websocket
      */
     public WebSocket subscribe(Gson gson, String subscribeUrl, Type type, OnMessageAction<?> onMassageAction, String... parameters) {

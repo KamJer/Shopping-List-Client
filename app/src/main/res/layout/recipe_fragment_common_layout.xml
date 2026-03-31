@@ -23,7 +23,16 @@
         android:text="@string/recipe_description_label_text"
         android:textSize="16sp" />
 
+    <CheckBox
+        android:id="@+id/isPublic"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Publiczny"
+        android:enabled="false"
+        />
+
     <TextView
+        android:id="@+id/tvIngredients"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingBottom="8dp"
@@ -39,6 +48,7 @@
         android:paddingBottom="16dp" />
 
     <TextView
+        android:id="@+id/tvSteps"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingBottom="8dp"

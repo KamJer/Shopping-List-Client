@@ -3,6 +3,7 @@ package pl.kamjer.shoppinglist.model.user;
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 import java.time.LocalDateTime;
@@ -11,9 +12,11 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @AllArgsConstructor
+@NoArgsConstructor
 @Builder
 @Setter
 @Getter
@@ -31,4 +34,7 @@ public class User {
     private String password;
     @ColumnInfo(name = "saved_time")
     private LocalDateTime savedTime;
+
+    @Ignore
+    private String AccessToken;
 }

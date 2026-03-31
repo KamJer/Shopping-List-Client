@@ -6,6 +6,7 @@ import pl.kamjer.shoppinglist.model.dto.Page;
 import pl.kamjer.shoppinglist.model.dto.RecipeDto;
 import pl.kamjer.shoppinglist.model.dto.RecipeRequestDto;
 import pl.kamjer.shoppinglist.model.dto.TagDto;
+import pl.kamjer.shoppinglist.model.recipe.Tag;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
@@ -55,5 +56,8 @@ public interface RecipeService {
 
     @GET("/recipe")
     Call<Page<RecipeDto>> getAllRecipes(@Query("page") int page, @Query("size") int size);
+
+    @GET("/tags")
+    Call<Set<Tag>> getAllTags();
 }
 

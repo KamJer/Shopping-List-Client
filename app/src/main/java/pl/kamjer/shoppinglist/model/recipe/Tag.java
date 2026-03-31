@@ -1,8 +1,6 @@
 package pl.kamjer.shoppinglist.model.recipe;
 
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import androidx.annotation.NonNull;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -25,11 +23,9 @@ public class Tag {
                 .build();
     }
 
-    public static Set<Tag> normalizeTags(String tags) {
-        return Stream.of(tags.trim().split(",")).map(s -> Tag.builder().tag(s).build()).collect(Collectors.toSet());
-    }
-
-    public static String denormalizeTags(Set<Tag> tags) {
-        return tags.stream().map(Tag::getTag).collect(Collectors.joining(", "));
+    @NonNull
+    @Override
+    public String toString() {
+        return tag;
     }
 }

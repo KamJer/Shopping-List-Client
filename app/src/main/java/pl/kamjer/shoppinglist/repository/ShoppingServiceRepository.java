@@ -10,6 +10,7 @@ import com.google.gson.GsonBuilder;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -24,9 +25,12 @@ import pl.kamjer.shoppinglist.model.dto.CategoryDto;
 import pl.kamjer.shoppinglist.model.dto.ExceptionDto;
 import pl.kamjer.shoppinglist.model.dto.RecipeDto;
 import pl.kamjer.shoppinglist.model.dto.ShoppingItemDto;
+import pl.kamjer.shoppinglist.model.dto.TokenDto;
+import pl.kamjer.shoppinglist.model.recipe.Tag;
 import pl.kamjer.shoppinglist.model.user.User;
-import pl.kamjer.shoppinglist.service.BasicAuthInterceptor;
+import pl.kamjer.shoppinglist.service.JwtTokenInterceptor;
 import pl.kamjer.shoppinglist.service.SSLUtil;
+import pl.kamjer.shoppinglist.service.TokenAuthenticator;
 import pl.kamjer.shoppinglist.service.service.RecipeService;
 import pl.kamjer.shoppinglist.service.service.UserService;
 import pl.kamjer.shoppinglist.service.service.UtilService;
@@ -42,6 +46,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 @Log
 public class ShoppingServiceRepository {
@@ -95,6 +100,8 @@ public class ShoppingServiceRepository {
 
     private final List<OnConnectChangeAction> onConnectChangeAction = new ArrayList<>();
 
+    private TokenAuthenticator tokenAuthenticator = new TokenAuthenticator();
+
     @Getter
     @Setter
     private boolean initializedWithUser;
@@ -117,13 +124,10 @@ public class ShoppingServiceRepository {
         }
     }
 
-    public void initialize(Context appContext) {
+    public void initialize() {
         shoppingListDomain = BuildConfig.SHOPPING_URL;
-//    appContext.getResources().getString(R.string.shopping_list_address);
         userDomain = BuildConfig.USER_URL;
-//                appContext.getResources().getString(R.string.user_address);
         recipeDomain = BuildConfig.RECIPE_URL;
-//                appContext.getResources().getString(R.string.recipe_address);
 
         Gson gson = new GsonBuilder()
                 .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeSerializer())
@@ -133,14 +137,14 @@ public class ShoppingServiceRepository {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(BASE_URL + userDomain)
                 .client(okHttpClientUser)
+                .addConverterFactory(ScalarsConverterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .build();
         userService = retrofit.create(UserService.class);
         initializedWithUser = false;
     }
 
-    public void reInitializeWithUser(Context appContext, User user) {
-
+    public void reInitializeWithUser(User user) {
         gson = new GsonBuilder()
                 .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeSerializer())
                 .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeDeserializer())
@@ -149,7 +153,31 @@ public class ShoppingServiceRepository {
         OkHttpClient okHttpClientUser = createClient(user);
         okHttpClientRecipe = createClient(user);
 
-        webSocket = new WebSocket(WEBSOCKET_BASE_URL + shoppingListDomain + "/ws")
+        Retrofit retrofitUser = new Retrofit.Builder()
+                .baseUrl(BASE_URL + userDomain)
+                .client(okHttpClientUser)
+                .addConverterFactory(GsonConverterFactory.create(gson))
+                .build();
+        Retrofit retrofitShoppingList = new Retrofit.Builder()
+                .baseUrl(BASE_URL + shoppingListDomain)
+                .client(okHttpClientShopping)
+                .addConverterFactory(GsonConverterFactory.create(gson))
+                .build();
+        Retrofit retrofitRecipe = new Retrofit.Builder()
+                .baseUrl(BASE_URL + recipeDomain)
+                .client(okHttpClientRecipe)
+                .addConverterFactory(GsonConverterFactory.create(gson))
+                .build();
+        userService = retrofitUser.create(UserService.class);
+        utilService = retrofitShoppingList.create(UtilService.class);
+        recipeService = retrofitRecipe.create(RecipeService.class);
+        tokenAuthenticator.setUser(user);
+        tokenAuthenticator.setAuthApi(userService);
+        initializedWithUser = true;
+    }
+
+    public void initializeWebSocket(Context appContext, User user) {
+        webSocket = new WebSocket(WEBSOCKET_BASE_URL + shoppingListDomain + "/ws?token=" + user.getAccessToken())
                 .basicWebsocketHeader()
                 .onConnectAction((connected) -> onConnectChangeAction.forEach(onConnectChangeAction1 -> onConnectChangeAction1.action(connected)))
                 .onFailure((webSocket1, t, response) -> onFailureAction.action(webSocket1, t, response))
@@ -169,26 +197,6 @@ public class ShoppingServiceRepository {
                 .subscribe(gson, "/{userName}/putShoppingItem", ShoppingItemDto.class, onMessageActionAddShoppingItem, user.getUserName())
                 .subscribe(gson, "/{userName}/postShoppingItem", ShoppingItemDto.class, onMessageActionUpdateShoppingItem, user.getUserName())
                 .subscribe(gson, "/{userName}/deleteShoppingItem", ShoppingItemDto.class, onMessageActionDeleteShoppingItem, user.getUserName());
-        Retrofit retrofitUser = new Retrofit.Builder()
-                .baseUrl(BASE_URL + userDomain)
-                .client(okHttpClientUser)
-                .addConverterFactory(GsonConverterFactory.create(gson))
-                .build();
-        Retrofit retrofitShoppingList = new Retrofit.Builder()
-                .baseUrl(BASE_URL + shoppingListDomain)
-                .client(okHttpClientShopping)
-                .addConverterFactory(GsonConverterFactory.create(gson))
-                .build();
-        Retrofit retrofitRecipe = new Retrofit.Builder()
-                .baseUrl(BASE_URL + recipeDomain)
-                .client(okHttpClientRecipe)
-                .addConverterFactory(GsonConverterFactory.create(gson))
-                .build();
-        userService = retrofitUser.create(UserService.class);
-        utilService = retrofitShoppingList.create(UtilService.class);
-        recipeService = retrofitRecipe.create(RecipeService.class);
-        initializedWithUser = true;
-
         NetworkReceiver.register(appContext,
                 network -> {
                     log.info("connected");
@@ -278,12 +286,12 @@ public class ShoppingServiceRepository {
     private OkHttpClient createClientWithOutUser() {
         OkHttpClient.Builder okHttpClientBuilder = SSLUtil.getSSLContext();
         return okHttpClientBuilder.build();
-
     }
 
     private OkHttpClient createClient(User user) {
         OkHttpClient.Builder okHttpClientBuilder = SSLUtil.getSSLContext();
-        okHttpClientBuilder.addInterceptor(new BasicAuthInterceptor(user));
+        okHttpClientBuilder.addInterceptor(new JwtTokenInterceptor(user));
+        okHttpClientBuilder.authenticator(tokenAuthenticator);
         return okHttpClientBuilder.build();
     }
 
@@ -316,8 +324,13 @@ public class ShoppingServiceRepository {
         onConnectChangeAction.add(action);
     }
 
-    public void isUserCorrect(User user, Callback<Boolean> callback) {
-        Call<Boolean> call = userService.logUser(ServiceUtil.userToUserDto(user));
+    public void loginUser(User user, Callback<TokenDto> callback) {
+        Call<TokenDto> call = userService.loginUser(ServiceUtil.userToUserDto(user));
+        call.enqueue(callback);
+    }
+
+    public void refreshUser(Callback<TokenDto> callback) {
+        Call<TokenDto> call = userService.refreshUser();
         call.enqueue(callback);
     }
 
@@ -333,6 +346,11 @@ public class ShoppingServiceRepository {
 
     public void deleteRecipe(Long id, Callback<Boolean> callback) {
         Call<Boolean> call = recipeService.deleteRecipe(id);
+        call.enqueue(callback);
+    }
+
+    public void getAllTags(Callback<Set<Tag>> callback) {
+        Call<Set<Tag>> call = recipeService.getAllTags();
         call.enqueue(callback);
     }
 }

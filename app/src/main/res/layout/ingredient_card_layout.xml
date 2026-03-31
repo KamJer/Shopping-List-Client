@@ -93,8 +93,23 @@
             android:enabled="false"
             android:text="@string/ingredient_on_shopping_list_checkbox_label"
             app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/OnListBoughtCheckBox"
+            app:layout_constraintStart_toEndOf="@+id/exportIngredientToList"
+            app:layout_constraintTop_toTopOf="parent" />
+        <CheckBox
+            android:id="@+id/OnListBoughtCheckBox"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:checked="false"
+            android:enabled="false"
+            android:text="@string/ingredient_on_bought_shopping_list_checkbox_label"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/guideline2"
             app:layout_constraintTop_toTopOf="parent" />
+
+
 
 
 

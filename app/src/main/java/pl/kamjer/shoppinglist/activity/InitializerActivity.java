@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
@@ -11,14 +12,19 @@ import androidx.lifecycle.ViewModelProvider;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
+import java.util.Optional;
 
 import lombok.extern.java.Log;
 import pl.kamjer.shoppinglist.R;
 import pl.kamjer.shoppinglist.activity.logindialog.LoginDialogForcedLogin;
 import pl.kamjer.shoppinglist.activity.shoppinglistactiviti.ShoppingListActivity;
+import pl.kamjer.shoppinglist.model.dto.TokenDto;
 import pl.kamjer.shoppinglist.model.user.User;
 import pl.kamjer.shoppinglist.repository.ShoppingServiceRepository;
 import pl.kamjer.shoppinglist.viewmodel.InitializerViewModel;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 @Log
 public class InitializerActivity extends GenericActivity {
@@ -33,6 +39,8 @@ public class InitializerActivity extends GenericActivity {
      * TextView component that displays the initialization status messages to the user.
      */
     private TextView initializertextView;
+
+    private boolean failedToLog;
 
     /**
      * Observer for updating the initialization label text.
@@ -71,6 +79,28 @@ public class InitializerActivity extends GenericActivity {
 
             // If user is null, this means no user data was saved, so it needs to be created and inserted
             if (user != null) {
+                initializeUserConnection(user);
+                initializerViewModel.refreshUser(new Callback<>() {
+                    @Override
+                    public void onResponse(@NonNull Call<TokenDto> call, @NonNull Response<TokenDto> response) {
+                        Optional.ofNullable(response.body())
+                                .ifPresent(token -> {
+                                    if (token.getRefreshToken() != null && token.getAccessToken() != null) {
+                                        user.setPassword(token.getRefreshToken());
+                                        user.setAccessToken(token.getAccessToken());
+                                        logUserInAndInitialize(user);
+                                    } else {
+                                        createToast(getString(R.string.no_such_user_exists_message));
+                                    }
+                                });
+                    }
+
+                    @Override
+                    public void onFailure(@NonNull Call<TokenDto> call, @NonNull Throwable t) {
+                        createToast(t.getMessage());
+                    }
+                });
+
                 // Initialize WebSocket connection with user
                 initializerViewModel.initializeOnMessageAction(user,
                         (webSocket, object) ->
@@ -122,13 +152,27 @@ public class InitializerActivity extends GenericActivity {
 
     /**
      * Handles successful initialization or offline scenarios.
-     * Reinitializes the shopping service repository with the user and synchronizes data.
-     *
-     * @param user The authenticated user object
      */
     private void actOnSuccessOrOffline(User user) {
-        ShoppingServiceRepository.getShoppingServiceRepository().reInitializeWithUser(this.getApplicationContext(), user);
+        logUserInDevice(user);
+         startShoppingListActivity();
+    }
+
+    protected void logUserInAndInitialize(User user) {
+        initializeWebsocketConnection(user);
         initializerViewModel.synchronizeData(user);
-        startShoppingListActivity();
+        initializerViewModel.updateRefreshToken(user);
+    }
+
+    protected void logUserInDevice(User user) {
+        initializerViewModel.insertUser(user);
+    }
+
+    protected void initializeUserConnection(User user) {
+        ShoppingServiceRepository.getShoppingServiceRepository().reInitializeWithUser(user);
+    }
+
+    protected void initializeWebsocketConnection(User user) {
+        initializerViewModel.initializeWebsocketConnection(this.getApplicationContext(), user);
     }
 }

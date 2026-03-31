@@ -19,6 +19,7 @@ import pl.kamjer.shoppinglist.R;
 import pl.kamjer.shoppinglist.activity.GenericActivity;
 import pl.kamjer.shoppinglist.activity.ShoppingListActionBar;
 import pl.kamjer.shoppinglist.activity.logindialog.usersrecyclerview.UsersRecyclerViewAdapter;
+import pl.kamjer.shoppinglist.model.dto.TokenDto;
 import pl.kamjer.shoppinglist.model.user.User;
 import pl.kamjer.shoppinglist.util.funcinterface.DeleteUserAction;
 import pl.kamjer.shoppinglist.util.validation.UserValidator;
@@ -51,21 +52,24 @@ public class LoginDialogOptionalLogin extends GenericActivity {
             return;
         }
 
-        loginDialogViewModel.isUserCorrect(user, new Callback<>() {
+        loginDialogViewModel.loginUser(user, new Callback<>() {
             @Override
-            public void onResponse(@NonNull Call<Boolean> call, @NonNull Response<Boolean> response) {
-                Optional.of(response).ifPresent(booleanResponse -> {
-                    if (Boolean.TRUE.equals(booleanResponse.body())) {
-                        logUserInAndInitialize(user);
-                    } else {
-                        actOnErrorLogin();
-                    }
-                });
+            public void onResponse(@NonNull Call<TokenDto> call, @NonNull Response<TokenDto> response) {
+                Optional.ofNullable(response.body())
+                        .ifPresent(tokenDto -> {
+                            if (tokenDto.getRefreshToken() != null && tokenDto.getAccessToken() != null) {
+                                user.setPassword(tokenDto.getRefreshToken());
+                                user.setAccessToken(tokenDto.getAccessToken());
+                                logUserInAndInitialize(user);
+                            } else {
+                                actOnErrorLogin();
+                            }
+                        });
             }
 
             @Override
-            public void onFailure(@NonNull Call<Boolean> call, @NonNull Throwable t) {
-                actOnErrorLogin();
+            public void onFailure(@NonNull Call<TokenDto> call, @NonNull Throwable t) {
+                createToast(t.getMessage());
             }
         });
     };
@@ -81,7 +85,7 @@ public class LoginDialogOptionalLogin extends GenericActivity {
             createToast(getString(R.string.user_name_can_not_be_empty_message));
             return;
         }
-        loginDialogViewModel.initializeShoppingServiceRepository(getApplicationContext());
+        loginDialogViewModel.initializeShoppingServiceRepository();
         loginDialogViewModel.insertUser(
                 user,
                 connectionFailedAction);
@@ -99,7 +103,6 @@ public class LoginDialogOptionalLogin extends GenericActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         inflate(R.layout.login_dialog_layout, R.id.login_dialog_id);
-//        setContentView(R.layout.login_dialog_layout);
 
         loginDialogViewModel = new ViewModelProvider(
                 this,

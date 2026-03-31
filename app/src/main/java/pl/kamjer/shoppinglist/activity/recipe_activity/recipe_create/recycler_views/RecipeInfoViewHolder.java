@@ -1,12 +1,14 @@
-package pl.kamjer.shoppinglist.activity.recipe_activity.recipe_create;
+package pl.kamjer.shoppinglist.activity.recipe_activity.recipe_create.recycler_views;
 
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.SwitchCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import pl.kamjer.shoppinglist.R;
@@ -43,16 +45,14 @@ public class RecipeInfoViewHolder extends RecyclerView.ViewHolder {
     private final SwitchCompat switchPublished;
 
     /**
-     * EditText field for entering recipe tags.
-     * Allows categorization and filtering of recipes through keyword tags.
-     */
-    private final EditText etTags;
-
-    /**
      * Data holder object that maintains the current state of recipe information.
      * Serves as the intermediary between UI components and the underlying data model.
      */
-    private RecipeInfoAdapter.DataHolder dataHolder;
+    private final RecipeInfoAdapter.DataHolder dataHolder;
+
+    private final CreateTagAdapter createTagAdapter;
+
+    private final Button btnCreateTag;
 
     /**
      * Constructor for the ViewHolder.
@@ -68,7 +68,16 @@ public class RecipeInfoViewHolder extends RecyclerView.ViewHolder {
         etSource = itemView.findViewById(R.id.etSource);
         etDescription = itemView.findViewById(R.id.etDescription);
         switchPublished = itemView.findViewById(R.id.switchPublished);
-        etTags = itemView.findViewById(R.id.etTags);
+        RecyclerView tagRecyclerView = itemView.findViewById(R.id.tagRecyclerView);
+        this.createTagAdapter = new CreateTagAdapter(dataHolder.getTags(), dataHolder.getTagHints());
+        tagRecyclerView.setLayoutManager(new LinearLayoutManager(
+                itemView.getContext(),
+                LinearLayoutManager.HORIZONTAL,
+                false
+        ));
+        tagRecyclerView.setAdapter(createTagAdapter);
+
+        this.btnCreateTag = itemView.findViewById(R.id.create_tag_button);
 
         this.dataHolder = dataHolder;
 
@@ -84,7 +93,8 @@ public class RecipeInfoViewHolder extends RecyclerView.ViewHolder {
         etSource.setText(dataHolder.getSource());
         etDescription.setText(dataHolder.getDescription());
         switchPublished.setChecked(dataHolder.isPublished());
-        etTags.setText(dataHolder.getTags());
+
+        btnCreateTag.setOnClickListener(view -> createTagAdapter.addEmptyTag());
     }
 
     /**
@@ -118,13 +128,5 @@ public class RecipeInfoViewHolder extends RecyclerView.ViewHolder {
         });
 
         switchPublished.setOnCheckedChangeListener((buttonView, isChecked) -> dataHolder.setPublished(isChecked));
-
-        etTags.addTextChangedListener(new TextWatcher() {
-            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
-            @Override public void afterTextChanged(Editable s) {
-                dataHolder.setTags(s.toString());
-            }
-        });
     }
 }

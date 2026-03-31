@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -53,15 +54,21 @@ public class RecipeFragment extends Fragment {
      */
     private TextView recipeSource;
 
+    private TextView ingredientTextView;
+
     /**
      * RecyclerView for displaying ingredients.
      */
     private RecyclerView ingredientRecyclerView;
 
+    private TextView stepTextView;
+
     /**
      * RecyclerView for displaying steps.
      */
     private RecyclerView stepRecyclerView;
+
+    private TextView tagTextView;
 
     /**
      * RecyclerView for displaying tags.
@@ -82,6 +89,8 @@ public class RecipeFragment extends Fragment {
      * Adapter for displaying tags in the RecyclerView.
      */
     private TagAdapter tagAdapter;
+
+    private CheckBox isPublished;
 
     /**
      * Creates the view for the fragment.
@@ -133,8 +142,12 @@ public class RecipeFragment extends Fragment {
         this.recipeDesc = view.findViewById(R.id.tvRecipeDescription);
         this.ingredientRecyclerView = view.findViewById(R.id.rvIngredients);
         this.stepRecyclerView = view.findViewById(R.id.rvSteps);
+        this.tagTextView = view.findViewById(R.id.tvTags);
         this.tagRecyclerView = view.findViewById(R.id.rvTags);
         this.recipeSource = view.findViewById(R.id.source_text_view);
+        this.isPublished = view.findViewById(R.id.isPublic);
+        this.ingredientTextView  = view.findViewById(R.id.tvIngredients);
+        this.stepTextView = view.findViewById(R.id.tvSteps);
     }
 
     /**
@@ -171,14 +184,37 @@ public class RecipeFragment extends Fragment {
 
             // Update recipe title and description
             recipeTitle.setText(recipe.getName());
-            recipeDesc.setText(recipe.getDescription());
+
+            if (recipe.getDescription().isEmpty()) {
+                recipeDesc.setVisibility(View.GONE);
+            } else {
+                recipeDesc.setVisibility(View.VISIBLE);
+                recipeDesc.setText(recipe.getDescription());
+            }
+
+            isPublished.setChecked(recipe.getPublished());
 
             // Set ingredients data
             setIngredients(recipe, shoppingItems);
+            if (recipe.getIngredients().isEmpty()) {
+                ingredientTextView.setVisibility(View.GONE);
+            } else {
+                ingredientTextView.setVisibility(View.VISIBLE);
+            }
             // Set steps data
             setSteps(recipe);
+            if (recipe.getSteps().isEmpty()) {
+                stepTextView.setVisibility(View.GONE);
+            } else {
+                stepTextView.setVisibility(View.VISIBLE);
+            }
             // Set tags data
             setTags(recipe);
+            if (recipe.getTags().isEmpty()) {
+                tagTextView.setVisibility(View.GONE);
+            } else {
+                tagTextView.setVisibility(View.VISIBLE);
+            }
 
             // Update recipe source
             recipeSource.setText(recipe.getSource());
@@ -194,7 +230,10 @@ public class RecipeFragment extends Fragment {
      */
     public void setIngredients(Recipe recipe, List<ShoppingItem> shoppingItems) {
         ingredientAdapter.setIngredientDataHolders(recipe.getIngredients().stream()
-                .map(ingredient -> new IngredientAdapter.IngredientDataHolder(ingredient, isIngredientOnAList(ingredient, shoppingItems))
+                .map(ingredient -> new IngredientAdapter.IngredientDataHolder(
+                        ingredient,
+                        isIngredientOnAListBought(ingredient, shoppingItems),
+                        isIngredientOnAListToBuy(ingredient, shoppingItems))
                 )
                 .collect(Collectors.toList()));
     }
@@ -225,7 +264,11 @@ public class RecipeFragment extends Fragment {
      * @param shoppingItems List of shopping items to search through
      * @return true if ingredient is on the list, false otherwise
      */
-    public boolean isIngredientOnAList(Ingredient ingredient, List<ShoppingItem> shoppingItems) {
-        return shoppingItems.stream().anyMatch(shoppingItem -> shoppingItem.getItemName().equals(ingredient.getName()));
+    public boolean isIngredientOnAListBought(Ingredient ingredient, List<ShoppingItem> shoppingItems) {
+        return shoppingItems.stream().anyMatch(shoppingItem -> shoppingItem.getItemName().equals(ingredient.getName()) && shoppingItem.isBought());
+    }
+
+    public boolean isIngredientOnAListToBuy(Ingredient ingredient, List<ShoppingItem> shoppingItems) {
+        return shoppingItems.stream().anyMatch(shoppingItem -> shoppingItem.getItemName().equals(ingredient.getName()) && !shoppingItem.isBought());
     }
 }

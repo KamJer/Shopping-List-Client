@@ -16,16 +16,19 @@ import androidx.recyclerview.widget.ConcatAdapter;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.util.List;
+import java.util.ArrayList;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import pl.kamjer.shoppinglist.R;
+import pl.kamjer.shoppinglist.activity.recipe_activity.recipe_create.recycler_views.CreateIngredientAdapter;
+import pl.kamjer.shoppinglist.activity.recipe_activity.recipe_create.recycler_views.CreateIngredientButtonAdapter;
+import pl.kamjer.shoppinglist.activity.recipe_activity.recipe_create.recycler_views.CreateStepAdapter;
+import pl.kamjer.shoppinglist.activity.recipe_activity.recipe_create.recycler_views.CreateStepButtonAdapter;
+import pl.kamjer.shoppinglist.activity.recipe_activity.recipe_create.recycler_views.RecipeInfoAdapter;
+import pl.kamjer.shoppinglist.activity.recipe_activity.recipe_create.recycler_views.SaveRecipeButtonAdapter;
 import pl.kamjer.shoppinglist.model.dto.RecipeDto;
-import pl.kamjer.shoppinglist.model.recipe.Ingredient;
 import pl.kamjer.shoppinglist.model.recipe.Recipe;
-import pl.kamjer.shoppinglist.model.recipe.Step;
-import pl.kamjer.shoppinglist.model.recipe.Tag;
 import pl.kamjer.shoppinglist.viewmodel.CreateRecipeViewModel;
 import pl.kamjer.shoppinglist.viewmodel.RecipeViewModel;
 
@@ -90,15 +93,6 @@ public class CreateRecipeFragment extends Fragment {
      */
     private SaveRecipeButtonAdapter saveRecipeButtonAdapter;
 
-    /**
-     * Initializes the fragment view and sets up the RecyclerView with all component adapters.
-     * This method is called during the fragment's creation lifecycle.
-     *
-     * @param inflater The LayoutInflater object that can be used to inflate any views in the fragment
-     * @param container If non-null, this is the parent view that the fragment's UI should be attached to
-     * @param savedInstanceState If non-null, this fragment is being re-constructed from a previous saved state
-     * @return The View for the fragment's UI
-     */
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -110,6 +104,8 @@ public class CreateRecipeFragment extends Fragment {
 
         loadViewModel();
         findViews(view);
+        loadData();
+
         recyclerViewSetup();
 
         return view;
@@ -131,15 +127,19 @@ public class CreateRecipeFragment extends Fragment {
      */
     private void loadViewModel() {
         createRecipeViewModel = new ViewModelProvider(
-                getActivity(),
+                requireActivity(),
                 ViewModelProvider.Factory.from(CreateRecipeViewModel.initializer)
         ).get(CreateRecipeViewModel.class);
         createRecipeViewModel.initialize();
         recipeViewModel = new ViewModelProvider(
-                getActivity(),
+                requireActivity(),
                 ViewModelProvider.Factory.from(RecipeViewModel.initializer)
         ).get(RecipeViewModel.class);
         recipeViewModel.initialize();
+    }
+
+    private void loadData() {
+        createRecipeViewModel.loadAllTags(t -> Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_LONG).show());
     }
 
     /**
@@ -167,22 +167,26 @@ public class CreateRecipeFragment extends Fragment {
                         saveRecipeButtonAdapter
                 ));
 
-        createRecipeViewModel.setIngredientLiveDataObserver(this.getViewLifecycleOwner(), ingredients -> {
-            createIngredientAdapter.setData(ingredients);
-        });
+        setUpObservers();
+    }
 
-        createRecipeViewModel.setStepLiveDataObserver(this.getViewLifecycleOwner(), steps -> {
-            createStepAdapter.setData(steps);
-        });
-
+    private void setUpObservers() {
         recipeViewModel.setActiveRecipeLiveDataObserver(this.getViewLifecycleOwner(),
                 recipe -> {
                     if (recipe != null) {
-                        recipeInfoAdapter.setData(recipe.getName(), recipe.getSource(), recipe.getDescription(), recipe.getPublished(), Tag.denormalizeTags(recipe.getTags()));
-                        createIngredientAdapter.setData(recipe.getIngredients());
-                        createStepAdapter.setData(recipe.getSteps());
+                        recipeInfoAdapter.setData(
+                                Optional.ofNullable(recipe.getName()).orElse(""),
+                                Optional.ofNullable(recipe.getSource()).orElse(""),
+                                Optional.ofNullable(recipe.getDescription()).orElse(""),
+                                Optional.ofNullable(recipe.getPublished()).orElse(false),
+                                recipe.getTags()
+                        );
+                        createIngredientAdapter.setData(Optional.ofNullable(recipe.getIngredients()).orElse(new ArrayList<>()));
+                        createStepAdapter.setData(Optional.ofNullable(recipe.getSteps()).orElse(new ArrayList<>()));
                     }
                 });
+
+        createRecipeViewModel.setTagsLiveDataObserver(this.getViewLifecycleOwner(), tagSet -> recipeInfoAdapter.setTagsHint(tagSet));
     }
 
     // BUTTONS ACTIONS
@@ -201,34 +205,34 @@ public class CreateRecipeFragment extends Fragment {
             recipe.setDescription(recipeInfoAdapter.getData().getDescription());
             recipe.setPublished(recipeInfoAdapter.getData().isPublished());
             recipe.setSource(recipeInfoAdapter.getData().getSource());
-            recipe.setTags(Tag.normalizeTags(recipeInfoAdapter.getData().getTags()));
+            recipe.setTags(recipeInfoAdapter.getData().getTags().stream().filter(tag -> !tag.getTag().isEmpty()).collect(Collectors.toSet()));
             recipe.setIngredients(createIngredientAdapter.getIngredients().stream().filter(ingredient -> !ingredient.getName().isEmpty() || !ingredient.getUnit().isEmpty()).collect(Collectors.toList()));
             recipe.setSteps(createStepAdapter.getSteps());
-            createRecipeViewModel.updateRecipe(RecipeDto.map(recipe),
-                    () -> {
-                        recipeViewModel.setActiveRecipe(recipe);
-                        findNavController(this).navigate(R.id.action_create_user_recipe_to_recipe);
-                    },
-                    throwable -> Toast.makeText(getActivity(), throwable.getMessage(), Toast.LENGTH_LONG).show());
-        } else {
-            Recipe recipeToUpdate = new Recipe();
-            recipeToUpdate.setName(recipeInfoAdapter.getData().getRecipeName());
-            recipeToUpdate.setDescription(recipeInfoAdapter.getData().getDescription());
-            recipeToUpdate.setPublished(recipeInfoAdapter.getData().isPublished());
-            recipeToUpdate.setSource(recipeInfoAdapter.getData().getSource());
-            recipeToUpdate.setTags(Tag.normalizeTags(recipeInfoAdapter.getData().getTags()));
-            recipeToUpdate.setIngredients(createIngredientAdapter.getIngredients());
-            recipeToUpdate.setSteps(createStepAdapter.getSteps());
-            createRecipeViewModel.insertRecipe(RecipeDto.map(recipeToUpdate),
-                    (recipe) -> {
-                        recipeViewModel.setActiveRecipe(recipe);
-                        findNavController(this).navigate(R.id.action_create_user_recipe_to_recipe);
-                    },
-                    throwable -> {
-                        if (getActivity() != null) {
-                            Toast.makeText(getActivity(), throwable.getMessage(), Toast.LENGTH_LONG).show();
-                        }
-                    });
+
+            if (!validateRecipe(recipe)) {
+                Toast.makeText(requireContext(), R.string.recipe_req_validation_message, Toast.LENGTH_LONG).show();
+            } else {
+                if (recipe.getRecipeId() != null) {
+                    createRecipeViewModel.updateRecipe(RecipeDto.map(recipe),
+                            () -> {
+                                recipeViewModel.setActiveRecipe(recipe);
+                                findNavController(this).navigate(R.id.action_create_user_recipe_to_recipe);
+                            },
+                            throwable -> Toast.makeText(getActivity(), throwable.getMessage(), Toast.LENGTH_LONG).show());
+
+                } else {
+                    createRecipeViewModel.insertRecipe(RecipeDto.map(recipe),
+                            (recipeCreated) -> {
+                                recipeViewModel.setActiveRecipe(recipeCreated);
+                                findNavController(this).navigate(R.id.action_create_user_recipe_to_recipe);
+                            },
+                            throwable -> {
+                                if (getActivity() != null) {
+                                    Toast.makeText(getActivity(), throwable.getMessage(), Toast.LENGTH_LONG).show();
+                                }
+                            });
+                }
+            }
         }
     };
 
@@ -237,9 +241,7 @@ public class CreateRecipeFragment extends Fragment {
      * Adds a new empty step to the steps list and updates the LiveData observer.
      */
     private final View.OnClickListener addStepAction = view -> {
-        List<Step> steps = createStepAdapter.getSteps();
-        steps.add(new Step());
-        createRecipeViewModel.setStepsLiveDataValue(steps);
+        createStepAdapter.addEmptyStep();
     };
 
     /**
@@ -247,8 +249,10 @@ public class CreateRecipeFragment extends Fragment {
      * Adds a new empty ingredient to the ingredients list and updates the LiveData observer.
      */
     private final View.OnClickListener addIngredientAction = view -> {
-        List<Ingredient> ingredients = createIngredientAdapter.getIngredients();
-        ingredients.add(new Ingredient());
-        createRecipeViewModel.setIngredientLiveDataValue(ingredients);
+        createIngredientAdapter.addEmptyIngredient();
     };
+
+    private boolean validateRecipe(Recipe recipe) {
+        return recipe.getName() != null && !recipe.getName().isEmpty();
+    }
 }
