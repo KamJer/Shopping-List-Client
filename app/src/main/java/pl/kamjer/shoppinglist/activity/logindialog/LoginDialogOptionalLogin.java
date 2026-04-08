@@ -1,5 +1,6 @@
 package pl.kamjer.shoppinglist.activity.logindialog;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -19,6 +20,7 @@ import pl.kamjer.shoppinglist.R;
 import pl.kamjer.shoppinglist.activity.GenericActivity;
 import pl.kamjer.shoppinglist.activity.ShoppingListActionBar;
 import pl.kamjer.shoppinglist.activity.logindialog.usersrecyclerview.UsersRecyclerViewAdapter;
+import pl.kamjer.shoppinglist.activity.shoppinglistactiviti.ShoppingListActivity;
 import pl.kamjer.shoppinglist.model.dto.TokenDto;
 import pl.kamjer.shoppinglist.model.user.User;
 import pl.kamjer.shoppinglist.util.funcinterface.DeleteUserAction;
@@ -97,6 +99,7 @@ public class LoginDialogOptionalLogin extends GenericActivity {
 
     protected void logUserInAndInitialize(User user) {
         loginDialogViewModel.insertUser(user);
+        startShoppingListActivity();
     }
 
     @Override
@@ -140,5 +143,14 @@ public class LoginDialogOptionalLogin extends GenericActivity {
 
     private void actOnErrorLogin() {
         createToast(getString(R.string.no_such_user_exists_message));
+    }
+
+    /**
+     * Starts the shopping list activity after successful initialization.
+     * Reinitialize the shopping service repository with the user and synchronizes data.
+     */
+    private void startShoppingListActivity() {
+        Intent shoppingListActivity = new Intent(this, ShoppingListActivity.class);
+        this.startActivity(shoppingListActivity);
     }
 }

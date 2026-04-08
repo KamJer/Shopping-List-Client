@@ -40,8 +40,6 @@ public class InitializerActivity extends GenericActivity {
      */
     private TextView initializertextView;
 
-    private boolean failedToLog;
-
     /**
      * Observer for updating the initialization label text.
      * Updates the UI with the current initialization status message.
@@ -120,7 +118,6 @@ public class InitializerActivity extends GenericActivity {
                             }
                         });
 
-                // If everything went well, start shopping list activity
                 actOnSuccessOrOffline(user);
             } else {
                 // Force user to log in if no user data exists
@@ -155,7 +152,7 @@ public class InitializerActivity extends GenericActivity {
      */
     private void actOnSuccessOrOffline(User user) {
         logUserInDevice(user);
-         startShoppingListActivity();
+        startShoppingListActivity();
     }
 
     protected void logUserInAndInitialize(User user) {

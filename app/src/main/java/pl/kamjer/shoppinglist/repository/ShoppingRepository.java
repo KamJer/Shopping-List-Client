@@ -200,8 +200,8 @@ public class ShoppingRepository {
                 userDao.insertUser(user);
                 return;
             }
-            setLoggedUser(user);
         });
+        setLoggedUser(user);
     }
 
     /**
