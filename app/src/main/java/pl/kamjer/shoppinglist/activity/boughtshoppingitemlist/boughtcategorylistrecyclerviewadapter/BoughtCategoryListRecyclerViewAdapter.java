@@ -7,7 +7,10 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.text.Collator;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 import lombok.AllArgsConstructor;
@@ -19,6 +22,8 @@ import pl.kamjer.shoppinglist.util.funcinterface.UpdateShoppingItemActonCheckBox
 
 @AllArgsConstructor
 public class BoughtCategoryListRecyclerViewAdapter extends RecyclerView.Adapter<BoughtCategoryListRecyclerViewHolder>{
+
+    private static final Collator BOUGHT_ITEM_NAME_ORDER = Collator.getInstance(Locale.forLanguageTag("pl-PL"));
 
     private List<Category> categoryList;
     private List<ShoppingItemWithAmountTypeAndCategory> shoppingItemWithAmountTypeAndCategories;
@@ -39,6 +44,9 @@ public class BoughtCategoryListRecyclerViewAdapter extends RecyclerView.Adapter<
         List<ShoppingItemWithAmountTypeAndCategory> shoppingItemWithAmountTypeAndCategories1 = shoppingItemWithAmountTypeAndCategories.stream()
                 .filter(shoppingItemWithAmountTypeAndCategory -> shoppingItemWithAmountTypeAndCategory.getCategory().equals(categoryList.get(position)))
                 .filter(shoppingItemWithAmountTypeAndCategory -> shoppingItemWithAmountTypeAndCategory.getShoppingItem().isBought())
+                .sorted(Comparator.comparing(
+                        s -> s.getShoppingItem().getItemName(),
+                        Comparator.nullsLast(BOUGHT_ITEM_NAME_ORDER)))
                 .collect(Collectors.toList());
         holder.bind(categoryList.get(position),
                 shoppingItemWithAmountTypeAndCategories1,
