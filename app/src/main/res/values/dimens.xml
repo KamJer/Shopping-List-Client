@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="corner_radius_button">16dp</dimen>
+    <dimen name="corner_radius_md">12dp</dimen>
+    <dimen name="corner_radius_sm">8dp</dimen>
+    <dimen name="icon_button_min_size">48dp</dimen>
+    <dimen name="screen_edge_padding">12dp</dimen>
+    <dimen name="card_stroke_width">1dp</dimen>
+    <dimen name="shopping_add_item_bar_height">40dp</dimen>
+    <!-- ~10% larger than 26dp for readability on category header -->
+    <dimen name="shopping_category_bar_action_size">29dp</dimen>
+    <dimen name="shopping_item_action_size">28dp</dimen>
+    <dimen name="dialog_cta_action_height">42dp</dimen>
+    <dimen name="shopping_card_spacing">10dp</dimen>
+    <!-- Padding inside small icon buttons so 24dp vectors scale down with scaleType centerInside -->
+    <dimen name="shopping_icon_padding_tight">3dp</dimen>
+    <dimen name="shopping_category_icon_padding">4dp</dimen>
+</resources>

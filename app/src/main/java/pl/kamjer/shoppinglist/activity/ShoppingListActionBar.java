@@ -188,12 +188,17 @@ public class ShoppingListActionBar extends AppBarLayout {
      * @param connected True if connected, false otherwise
      */
     private void changeColorIndicator(boolean connected) {
-        Drawable drawable = connectionButtonIndicator.getBackground().mutate();
+        Drawable drawable = connectionButtonIndicator.getDrawable();
+        if (drawable == null) {
+            return;
+        }
+        drawable = drawable.mutate();
         if (connected) {
             drawable.setTint(Color.GREEN);
         } else {
             drawable.setTint(Color.RED);
         }
+        connectionButtonIndicator.setImageDrawable(drawable);
     }
 
     /**

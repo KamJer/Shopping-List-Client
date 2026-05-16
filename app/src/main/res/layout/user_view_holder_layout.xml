@@ -17,27 +17,31 @@
 
     <ImageButton
         android:id="@+id/deleteUserButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@drawable/baseline_delete_forever_24"
+        android:layout_width="@dimen/icon_button_min_size"
+        android:layout_height="@dimen/icon_button_min_size"
+        android:layout_marginHorizontal="15dp"
+        android:background="@drawable/ripple_rounded_tonal"
         android:contentDescription="@string/todo"
+        android:padding="10dp"
+        android:src="@drawable/baseline_delete_forever_24"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginHorizontal="15dp"
-        />
+        app:tint="@color/red" />
 
     <ImageButton
         android:id="@+id/logUserInButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@drawable/baseline_login_24"
+        android:layout_width="@dimen/icon_button_min_size"
+        android:layout_height="@dimen/icon_button_min_size"
+        android:layout_marginHorizontal="15dp"
+        android:background="@drawable/ripple_rounded_primary"
         android:contentDescription="@string/todo"
+        android:padding="10dp"
+        android:src="@drawable/baseline_login_24"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/deleteUserButton"
         app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginHorizontal="15dp"
-        />
+        app:tint="?attr/colorOnPrimary" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

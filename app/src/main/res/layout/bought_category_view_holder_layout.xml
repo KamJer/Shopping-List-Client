@@ -2,7 +2,8 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="@dimen/shopping_card_spacing">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -10,11 +11,18 @@
 
         <TextView
             android:id="@+id/boughtCategoryTextView"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:background="@color/category_tag_color"
+            android:layout_marginHorizontal="@dimen/screen_edge_padding"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/bg_shopping_card"
             android:gravity="center"
+            android:letterSpacing="0.04"
+            android:paddingVertical="13dp"
             android:text="@string/todo"
+            android:textColor="@color/shopping_text_primary"
+            android:textSize="16.5sp"
+            android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -23,6 +31,8 @@
             android:id="@+id/boughtShoppingItemsRecyclerView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:clipToPadding="false"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/boughtCategoryTextView" />

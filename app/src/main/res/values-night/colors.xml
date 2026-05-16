@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="category_tag_color">@color/night_category_tag</color>
+    <color name="section_header_background">#FF3D3D3D</color>
+    <color name="section_header_text">@color/night_on_surface</color>
+    <color name="icon_button_tonal_bg">#34383C</color>
+    <color name="shopping_screen_bg">#FF1A1D21</color>
+    <color name="shopping_card_surface">#FF252B32</color>
+    <color name="shopping_card_stroke">#FF3D4654</color>
+    <color name="shopping_text_primary">@color/night_on_surface</color>
+    <color name="dialog_cta_surface">#FF2C323A</color>
+    <color name="dialog_cta_stroke">#FF454D58</color>
+    <color name="dialog_cta_icon">#FFC5CAD3</color>
+</resources>

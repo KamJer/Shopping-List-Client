@@ -74,14 +74,17 @@
 
         <ImageButton
             android:id="@+id/exportIngredientToList"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/baseline_arrow_right_alt_24"
-            android:rotation="90"
+            android:layout_width="@dimen/icon_button_min_size"
+            android:layout_height="@dimen/icon_button_min_size"
+            android:background="@drawable/ripple_rounded_primary"
             android:contentDescription="@string/todo"
+            android:padding="10dp"
+            android:rotation="90"
+            android:src="@drawable/baseline_arrow_right_alt_24"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="@+id/guideline1"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="?attr/colorOnPrimary" />
 
         <CheckBox
             android:id="@+id/OnListCheckBox"

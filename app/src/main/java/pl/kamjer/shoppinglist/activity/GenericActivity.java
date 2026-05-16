@@ -4,6 +4,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
@@ -39,7 +40,7 @@ public class GenericActivity extends AppCompatActivity {
 
     /**
      * Inflates a layout and applies window insets to adjust for system UI elements.
-     * Sets the content view and adjusts padding to account for status bar height.
+     * Sets the content view and pads the root for status and navigation bars (edge-to-edge).
      *
      * @param layout   The layout resource ID to inflate
      * @param layoutId The ID of the root view in the layout
@@ -47,14 +48,20 @@ public class GenericActivity extends AppCompatActivity {
     protected void inflate(int layout, int layoutId) {
         setContentView(layout);
         final View rootView = findViewById(layoutId);
+        final int initialPaddingLeft = rootView.getPaddingLeft();
+        final int initialPaddingTop = rootView.getPaddingTop();
+        final int initialPaddingRight = rootView.getPaddingRight();
+        final int initialPaddingBottom = rootView.getPaddingBottom();
         ViewCompat.setOnApplyWindowInsetsListener(rootView, (view, insets) -> {
-            int statusBarHeight = insets.getInsets(WindowInsetsCompat.Type.statusBars()).top;
-            view.setPadding(view.getPaddingLeft(),
-                    statusBarHeight,
-                    view.getPaddingRight(),
-                    view.getPaddingBottom());
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            view.setPadding(
+                    initialPaddingLeft + systemBars.left,
+                    initialPaddingTop + systemBars.top,
+                    initialPaddingRight + systemBars.right,
+                    initialPaddingBottom + systemBars.bottom);
             return insets;
         });
+        ViewCompat.requestApplyInsets(rootView);
     }
 
     /**

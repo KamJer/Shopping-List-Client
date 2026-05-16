@@ -17,24 +17,30 @@
 
     <ImageButton
         android:id="@+id/deleteAmountTypeButton"
-        android:layout_width="@android:dimen/app_icon_size"
+        android:layout_width="@dimen/icon_button_min_size"
         android:layout_height="0dp"
-        android:contentDescription="@string/todo"
-        android:background="@drawable/baseline_delete_forever_24"
         android:layout_marginHorizontal="15dp"
+        android:background="@drawable/ripple_rounded_tonal"
+        android:contentDescription="@string/todo"
+        android:padding="10dp"
+        android:src="@drawable/baseline_delete_forever_24"
         app:layout_constraintBottom_toBottomOf="@+id/amountTypeTextView"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/amountTypeTextView" />
+        app:layout_constraintTop_toTopOf="@+id/amountTypeTextView"
+        app:tint="@color/red" />
 
     <ImageButton
         android:id="@+id/modifyAmountTypeButton"
-        android:layout_width="@android:dimen/app_icon_size"
+        android:layout_width="@dimen/icon_button_min_size"
         android:layout_height="0dp"
         android:layout_marginHorizontal="15dp"
+        android:background="@drawable/ripple_rounded_tonal"
         android:contentDescription="@string/todo"
-        android:background="@drawable/baseline_mode_24"
+        android:padding="10dp"
+        android:src="@drawable/baseline_mode_24"
         app:layout_constraintBottom_toBottomOf="@+id/amountTypeTextView"
         app:layout_constraintEnd_toStartOf="@+id/deleteAmountTypeButton"
-        app:layout_constraintTop_toTopOf="@+id/amountTypeTextView" />
+        app:layout_constraintTop_toTopOf="@+id/amountTypeTextView"
+        app:tint="?attr/colorOnSurface" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

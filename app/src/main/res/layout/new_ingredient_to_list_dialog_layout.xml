@@ -11,7 +11,7 @@
         android:layout_marginBottom="16dp"
         android:gravity="center"
         android:text="Dodaj nowy element do listy zakupów"
-        android:textColor="@color/black"
+        android:textColor="?android:attr/textColorPrimary"
         android:textSize="24sp"
         android:textStyle="bold" />
 
@@ -20,7 +20,7 @@
         android:layout_height="wrap_content"
         android:text="Wprowadź dane nowego elementu zakupowego"
         android:textSize="14sp"
-        android:textColor="@color/gray"
+        android:textColor="?android:attr/textColorSecondary"
         android:layout_marginBottom="16dp" />
 
         <EditText
@@ -55,9 +55,10 @@
         android:orientation="horizontal"
         android:gravity="end">
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/buttonOk"
-            android:layout_width="wrap_content"
+            style="@style/Widget.ShoppingList.Button.Primary"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="OK" />

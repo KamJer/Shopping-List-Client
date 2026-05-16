@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/shopping_list_activity_id"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/shopping_screen_bg">
 
     <pl.kamjer.shoppinglist.activity.ShoppingListActionBar
         android:id="@+id/appBar"
@@ -16,13 +17,18 @@
     <ImageButton
         android:id="@+id/moveToBoughtImageButton"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="@dimen/icon_button_min_size"
+        android:layout_marginTop="10dp"
         android:layout_weight="1"
+        android:background="@drawable/ripple_shopping_card"
         android:contentDescription="@string/sending_bought_items_to_boght_list_button_desc"
+        android:minHeight="@dimen/icon_button_min_size"
+        android:padding="10dp"
         android:src="@drawable/baseline_arrow_right_alt_24"
         app:layout_constraintEnd_toStartOf="@+id/guideline4"
         app:layout_constraintStart_toStartOf="@+id/guideline3"
-        app:layout_constraintTop_toBottomOf="@+id/appBar" />
+        app:layout_constraintTop_toBottomOf="@+id/appBar"
+        app:tint="@color/shopping_text_primary" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/categoryListRecyclerView"
@@ -46,10 +52,14 @@
         <ImageButton
             android:id="@+id/addCategoryImageButton"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="@dimen/icon_button_min_size"
             android:layout_weight="1"
+            android:background="@drawable/ripple_shopping_card"
             android:contentDescription="@string/adding_category_desc"
-            android:src="@drawable/baseline_add_24" />
+            android:minHeight="@dimen/icon_button_min_size"
+            android:padding="10dp"
+            android:src="@drawable/baseline_add_24"
+            app:tint="@color/shopping_text_primary" />
     </LinearLayout>
 
 

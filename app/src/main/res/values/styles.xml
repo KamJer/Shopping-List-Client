@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Widget.ShoppingList.Button.Primary" parent="Widget.MaterialComponents.Button">
+        <item name="cornerRadius">@dimen/corner_radius_button</item>
+        <item name="android:minHeight">48dp</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="android:textAllCaps">false</item>
+    </style>
+
+    <style name="Widget.ShoppingList.Button.Outlined" parent="Widget.MaterialComponents.Button.OutlinedButton">
+        <item name="cornerRadius">@dimen/corner_radius_button</item>
+        <item name="android:minHeight">48dp</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="android:textAllCaps">false</item>
+    </style>
+
+    <style name="Widget.ShoppingList.Button.Text" parent="Widget.MaterialComponents.Button.TextButton">
+        <item name="cornerRadius">@dimen/corner_radius_button</item>
+        <item name="android:minHeight">48dp</item>
+        <item name="android:textAllCaps">false</item>
+    </style>
+</resources>

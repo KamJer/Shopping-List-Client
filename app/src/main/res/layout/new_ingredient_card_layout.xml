@@ -44,13 +44,14 @@
 
     <ImageButton
         android:id="@+id/ib_delete_ingredient"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@drawable/baseline_delete_forever_24"
-        android:scaleX="0.75"
-        android:scaleY="0.75"
+        android:layout_width="@dimen/icon_button_min_size"
+        android:layout_height="@dimen/icon_button_min_size"
+        android:background="@drawable/ripple_rounded_tonal"
+        android:padding="10dp"
+        android:src="@drawable/baseline_delete_forever_24"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="@color/red" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

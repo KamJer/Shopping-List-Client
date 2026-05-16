@@ -10,8 +10,25 @@
     <color name="red">#FFFF0000</color>
     <color name="dirty_yellow">#fbbc05</color>
     <color name="light_gray">#FFD3D3D3</color>
-    <color name="gray">#FF808080</color>s
+    <color name="gray">#FF808080</color>
     <color name="dark_gray">#FF545454</color>
+    <color name="night_background">#FF121212</color>
+    <color name="night_surface">#FF1E1E1E</color>
+    <color name="night_on_surface">#FFE3E3E3</color>
+    <color name="night_category_tag">#FF3A3A3A</color>
+    <color name="section_header_background">@color/light_gray</color>
+    <color name="section_header_text">@color/black</color>
     <color name="category_tag_color">@color/light_gray</color>
     <color name="green">#FF00FF00</color>
+    <!-- Tonal rounded icon buttons (light) -->
+    <color name="icon_button_tonal_bg">#E3E8EF</color>
+    <!-- Shopping list: airy cards (reference UI) -->
+    <color name="shopping_screen_bg">#F3F4F6</color>
+    <color name="shopping_card_surface">#F8FAFC</color>
+    <color name="shopping_card_stroke">#D1D5DB</color>
+    <color name="shopping_text_primary">#374151</color>
+    <!-- Dialog full-width CTA: light surface + readable but not heavy icon -->
+    <color name="dialog_cta_surface">#FFEEF2F7</color>
+    <color name="dialog_cta_stroke">#FFD8DEE6</color>
+    <color name="dialog_cta_icon">#FF7A8494</color>
 </resources>
