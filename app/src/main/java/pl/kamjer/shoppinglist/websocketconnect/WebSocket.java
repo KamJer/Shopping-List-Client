@@ -38,7 +38,7 @@ public class WebSocket {
     private static final String NO_SUCH_SUBS_EXCEPTION_MESSAGE = "There is no subscription with such id";
 
     private final Request.Builder request;
-    private final String baseUrl;
+    private String baseUrl;
     private final WebSocketConnectorListener webSocketListener;
     private final MutableLiveData<HashMap<String, SubscribeMessage>> subscribeMessagesLiveData;
     private final MutableLiveData<LinkedList<Message>> messageQueueLiveData;
@@ -259,6 +259,12 @@ public class WebSocket {
         }
         headers.put(Header.PARA, parameterBuilder.toString());
         addMessage(new Message(Command.MESSAGE, headers));
+        return this;
+    }
+
+    public WebSocket updateBaseUrl(String baseUrl) {
+        this.baseUrl = baseUrl;
+        request.url(baseUrl);
         return this;
     }
 

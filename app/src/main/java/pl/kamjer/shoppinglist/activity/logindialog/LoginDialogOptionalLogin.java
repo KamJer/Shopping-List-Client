@@ -12,6 +12,9 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.security.InvalidAlgorithmParameterException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.util.ArrayList;
 import java.util.Optional;
 
@@ -23,6 +26,9 @@ import pl.kamjer.shoppinglist.activity.logindialog.usersrecyclerview.UsersRecycl
 import pl.kamjer.shoppinglist.activity.shoppinglistactiviti.ShoppingListActivity;
 import pl.kamjer.shoppinglist.model.dto.TokenDto;
 import pl.kamjer.shoppinglist.model.user.User;
+import pl.kamjer.shoppinglist.repository.SharedRepository;
+import pl.kamjer.shoppinglist.repository.ShoppingRepository;
+import pl.kamjer.shoppinglist.repository.ShoppingServiceRepository;
 import pl.kamjer.shoppinglist.util.funcinterface.DeleteUserAction;
 import pl.kamjer.shoppinglist.util.validation.UserValidator;
 import pl.kamjer.shoppinglist.viewmodel.LoginDialogViewModel;
@@ -99,6 +105,7 @@ public class LoginDialogOptionalLogin extends GenericActivity {
 
     protected void logUserInAndInitialize(User user) {
         loginDialogViewModel.insertUser(user);
+        ShoppingServiceRepository.getShoppingServiceRepository().reInitializeWithUser(user);
         startShoppingListActivity();
     }
 
@@ -106,6 +113,19 @@ public class LoginDialogOptionalLogin extends GenericActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         inflate(R.layout.login_dialog_layout, R.id.login_dialog_id);
+
+        if (ShoppingRepository.getShoppingRepository().getExecutorService() == null) {
+            ShoppingServiceRepository.getShoppingServiceRepository().initialize();
+            SharedRepository.getSharedRepository().initialize(this);
+            try {
+                ShoppingRepository.getShoppingRepository().initialize(
+                        this,
+                        ShoppingServiceRepository.getShoppingServiceRepository());
+            } catch (InvalidAlgorithmParameterException | NoSuchAlgorithmException |
+                     NoSuchProviderException e) {
+                throw new RuntimeException(e);
+            }
+        }
 
         loginDialogViewModel = new ViewModelProvider(
                 this,

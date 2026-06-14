@@ -106,6 +106,9 @@ public class ShoppingServiceRepository {
     @Setter
     private boolean initializedWithUser;
 
+    private User user;
+    private Context appContext;
+
     private OkHttpClient okHttpClientShopping;
     private OkHttpClient okHttpClientRecipe;
 
@@ -145,6 +148,7 @@ public class ShoppingServiceRepository {
     }
 
     public void reInitializeWithUser(User user) {
+        this.user = user;
         gson = new GsonBuilder()
                 .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeSerializer())
                 .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeDeserializer())
@@ -173,10 +177,12 @@ public class ShoppingServiceRepository {
         recipeService = retrofitRecipe.create(RecipeService.class);
         tokenAuthenticator.setUser(user);
         tokenAuthenticator.setAuthApi(userService);
+        tokenAuthenticator.setOnTokenRefreshed(this::reconnectWebsocketWithNewToken);
         initializedWithUser = true;
     }
 
     public void initializeWebSocket(Context appContext, User user) {
+        this.appContext = appContext;
         webSocket = new WebSocket(WEBSOCKET_BASE_URL + shoppingListDomain + "/ws?token=" + user.getAccessToken())
                 .basicWebsocketHeader()
                 .onConnectAction((connected) -> onConnectChangeAction.forEach(onConnectChangeAction1 -> onConnectChangeAction1.action(connected)))
@@ -225,6 +231,16 @@ public class ShoppingServiceRepository {
 
     public void reconnectWebsocket() {
         webSocket.connect(okHttpClientShopping);
+    }
+
+    private void reconnectWebsocketWithNewToken() {
+        if (webSocket != null && user != null) {
+            webSocket.disconnect();
+            String url = WEBSOCKET_BASE_URL + shoppingListDomain + "/ws?token=" + user.getAccessToken();
+            webSocket.updateBaseUrl(url);
+            webSocket.basicWebsocketHeader();
+            webSocket.connect(okHttpClientShopping);
+        }
     }
 
     private void ifDisconnectedConnect() {

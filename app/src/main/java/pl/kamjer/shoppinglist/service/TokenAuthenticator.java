@@ -21,6 +21,7 @@ public class TokenAuthenticator implements Authenticator {
 
     private User user;
     private UserService authApi;
+    private Runnable onTokenRefreshed;
 
     @Nullable
     @Override
@@ -35,12 +36,26 @@ public class TokenAuthenticator implements Authenticator {
         }
 
         synchronized (this) {
-            retrofit2.Response<TokenDto> refreshResponse = authApi.refreshUser("Bearer " + user.getPassword()).execute();
+            if (responseCount(response) >= 2) {
+                return null;
+            }
+
+            String currentRefreshToken = user.getPassword();
+
+            retrofit2.Response<TokenDto> refreshResponse = authApi.refreshUser("Bearer " + currentRefreshToken).execute();
 
             if (refreshResponse.isSuccessful() && refreshResponse.body() != null) {
                 String newAccessToken = refreshResponse.body().getAccessToken();
+                String newRefreshToken = refreshResponse.body().getRefreshToken();
 
                 user.setAccessToken(newAccessToken);
+                if (newRefreshToken != null) {
+                    user.setPassword(newRefreshToken);
+                }
+
+                if (onTokenRefreshed != null) {
+                    onTokenRefreshed.run();
+                }
 
                 return response.request().newBuilder()
                         .header("Authorization", "Bearer " + newAccessToken)
