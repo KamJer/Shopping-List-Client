@@ -70,8 +70,7 @@ public class InitializerViewModel extends CustomViewModel {
         // Set up global exception handler for uncaught exceptions
         Thread.setDefaultUncaughtExceptionHandler(new ShoppingListExceptionHandler(
                 appContext,
-                ShoppingServiceRepository.getShoppingServiceRepository(),
-                ShoppingRepository.getShoppingRepository().getExecutorService()));
+                ShoppingServiceRepository.getShoppingServiceRepository()));
 
         // Set initialization progress label to connection initialization
         setInitializerLabelLiveDataValue(appContext.getString(R.string.initializing_connection_to_server_label));
