@@ -1,24 +1,101 @@
 # ShoppingList
 
-Aplikacja mobilna umożliwiająca tworzenie i zarządzanie listami zakupów.
+Mobile shopping list manager with real-time synchronization and offline support.
+Part of a microservice ecosystem including a backend, auth service, recipe service, and a web frontend.
+
+## Features
+
+- **Shopping list management** – create, update, delete shopping items organized by categories with drag-to-reorder
+- **Measurement units** – define and manage amount types with conflict resolution on delete
+- **Bought items history** – track purchased items with automatic cleanup
+- **Recipes** – browse, search (by name, ingredients, tags with AND/OR logic), create and view recipes with pagination
+- **Add ingredients to shopping list** – directly from any recipe
+- **Offline-first** – fully functional without internet; syncs automatically when connection is restored
+- **Real-time sync** – WebSocket protocol synchronizes data across devices instantly
+- **Multi-user** – multiple local accounts with isolated data
+- **Encrypted local storage** – Room database encrypted with SQLCipher (AES-256, key stored in Android KeyStore)
+- **Dark mode support**
+
+## Architecture
+
+MVVM + Repository pattern.
+
+| Layer | Technology |
+|-------|-----------|
+| Local database | Room + SQLCipher |
+| HTTP client | Retrofit 2 + OkHttp |
+| Real-time | Custom WebSocket protocol |
+| Auth | JWT (access + refresh token) |
+| DI | Manual (singleton repositories) |
+
+JWT tokens are automatically attached to requests via `JwtTokenInterceptor` and refreshed on 401 via `TokenAuthenticator`.
+
+## Ecosystem (microservices)
+
+The app communicates with three backend services and pairs with a web frontend:
+
+```
+                    ┌─────────────────────┐
+                    │  ShoppingSecService  │
+                    │  (auth, port 4443)   │
+                    └──────────┬──────────┘
+                               │
+          ┌────────────────────┼────────────────────┐
+          │ REST               │ REST                │ WS
+          ▼                    ▼                     ▼
+ ┌────────────────┐ ┌──────────────────┐ ┌──────────────────┐
+ │ShoppingListWeb │ │ShoppingList      │ │ShoppingListService│
+ │(Angular 21 SPA)│ │(this Android app)│ │(shopping backend) │
+ │                │ │                  │ │port 5443         │
+ └────────────────┘ └──────────────────┘ └──────────────────┘
+          │                    │
+          └────────REST────────┘
+                               │
+                    ┌──────────┴──────────┐
+                    │ShoppingListRecipes  │
+                    │Servics (port 6443)  │
+                    └─────────────────────┘
+```
+
+## Build variants
+
+Two build flavors with different server URLs:
+
+| Variant | WebSocket | HTTP | Server addresses |
+|---------|-----------|------|-----------------|
+| Debug | `ws://` | `http://` | Local network (192.168.0.13) |
+| Release | `wss://` | `https://` | `*.kamjer.online` |
+
+## Screenshots
+
+![Shopping list](screenshots/Screenshot_20250607_141521.png)
+![Units](screenshots/Screenshot_20250607_143919.png)
+![Bought items](screenshots/Screenshot_20250607_144006.png)
+![Login](screenshots/Screenshot_20250607_144629.png)
+
+## Tech stack
+
+- **Language:** Java 21
+- **Min SDK:** 26 | **Target SDK:** 35
+- **UI:** Material Design 3, RecyclerView, Navigation component
+- **Persistence:** Room, SQLCipher
+- **Networking:** Retrofit 2, OkHttp, Gson
+- **Real-time:** OkHttp WebSocket (custom framed protocol)
+- **Auth:** JWT (JJWT on server side)
+- **Build:** Gradle Kotlin DSL, version catalog
 
 ---
 
-## Polityka prywatności
+## Privacy Policy
 
-Szczegółowe informacje na temat przetwarzania danych znajdziesz tutaj:  
-[Polityka prywatności](https://github.com/KamJer/Shopping-List-Client/blob/main/PRIVACY_POLICY.md)
+Detailed information about data processing can be found here:
+[Privacy Policy](PRIVACY_POLICY.md)
 
----
+## Account Deletion
 
-## Usunięcie konta
+If you want to delete your account and associated data, follow the instructions here:
+[Account Deletion](ACCOUNT_DELETION.md)
 
-Jeśli chcesz usunąć swoje konto i powiązane z nim dane, zapoznaj się z instrukcjami tutaj:  
-[Usunięcie konta](https://github.com/KamJer/Shopping-List-Client/blob/main/ACCOUNT_DELETION.md)
+## Contact
 
----
-
-## Kontakt
-
-W razie pytań lub wątpliwości skontaktuj się z nami pod adresem:  
-[kamjersoft@gmail.com](mailto:kamjersoft@gmail.com)
+For questions or concerns: [kamjersoft@gmail.com](mailto:kamjersoft@gmail.com)
