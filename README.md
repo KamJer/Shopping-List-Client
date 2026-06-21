@@ -6,29 +6,37 @@ Part of a microservice ecosystem including a backend, auth service, recipe servi
 ## Features
 
 - **Shopping list management** – create, update, delete shopping items organized by categories with drag-to-reorder
-- **Measurement units** – define and manage amount types with conflict resolution on delete
-- **Bought items history** – track purchased items with automatic cleanup
+- **Measurement units** – define and manage amount types with conflict resolution on delete (reassign, cascade delete, or cancel)
+- **Bought items history** – track purchased items with sorting and automatic cleanup
 - **Recipes** – browse, search (by name, ingredients, tags with AND/OR logic), create and view recipes with pagination
-- **Add ingredients to shopping list** – directly from any recipe
+- **User recipe collection** – save and remove recipes to/from your personal collection
+- **Add ingredients to shopping list** – directly from any recipe view
+- **Recipe source & publishing** – optional source field and published/unpublished toggle per recipe
 - **Offline-first** – fully functional without internet; syncs automatically when connection is restored
-- **Real-time sync** – WebSocket protocol synchronizes data across devices instantly
-- **Multi-user** – multiple local accounts with isolated data
+- **Real-time sync** – WebSocket protocol synchronizes data across devices instantly; auto-reconnects after token refresh
+- **Multi-user** – multiple local accounts with isolated data; optional or forced login flow
 - **Encrypted local storage** – Room database encrypted with SQLCipher (AES-256, key stored in Android KeyStore)
+- **Interactive tutorial** – overlay guide on first launch
+- **Exception logging** – uncaught exceptions are reported to the backend
 - **Dark mode support**
+- **About screen**
 
 ## Architecture
 
-MVVM + Repository pattern.
+MVVM + Repository pattern with manual dependency injection.
 
 | Layer | Technology |
 |-------|-----------|
 | Local database | Room + SQLCipher |
 | HTTP client | Retrofit 2 + OkHttp |
-| Real-time | Custom WebSocket protocol |
+| Real-time | Custom WebSocket (STOMP-like framed protocol) |
 | Auth | JWT (access + refresh token) |
+| Pagination | Paging 3 (Guava integration) |
+| Navigation | Android Navigation Component (fragments) |
 | DI | Manual (singleton repositories) |
 
 JWT tokens are automatically attached to requests via `JwtTokenInterceptor` and refreshed on 401 via `TokenAuthenticator`.
+WebSocket reconnects with the new token after refresh.
 
 ## Ecosystem (microservices)
 
@@ -45,7 +53,7 @@ The app communicates with three backend services and pairs with a web frontend:
           ▼                    ▼                     ▼
  ┌────────────────┐ ┌──────────────────┐ ┌──────────────────┐
  │ShoppingListWeb │ │ShoppingList      │ │ShoppingListService│
- │(Angular 21 SPA)│ │(this Android app)│ │(shopping backend) │
+ │(Angular 21 SPA)│ │(this Android app)│ │(shopping backend)│
  │                │ │                  │ │port 5443         │
  └────────────────┘ └──────────────────┘ └──────────────────┘
           │                    │
@@ -53,7 +61,7 @@ The app communicates with three backend services and pairs with a web frontend:
                                │
                     ┌──────────┴──────────┐
                     │ShoppingListRecipes  │
-                    │Servics (port 6443)  │
+                    │Service (port 6443)  │
                     └─────────────────────┘
 ```
 
@@ -75,13 +83,15 @@ Two build flavors with different server URLs:
 
 ## Tech stack
 
-- **Language:** Java 21
-- **Min SDK:** 26 | **Target SDK:** 35
-- **UI:** Material Design 3, RecyclerView, Navigation component
+- **Language:** Java 17
+- **Min SDK:** 26 | **Target SDK:** 35 | **Version:** 3.0 (code 31)
+- **UI:** Material Design 3, RecyclerView, Navigation Component (fragments)
 - **Persistence:** Room, SQLCipher
 - **Networking:** Retrofit 2, OkHttp, Gson
-- **Real-time:** OkHttp WebSocket (custom framed protocol)
+- **Pagination:** Paging 3 (runtime + Guava)
+- **Real-time:** OkHttp WebSocket (custom framed STOMP-like protocol)
 - **Auth:** JWT (JJWT on server side)
+- **Boilerplate:** Lombok
 - **Build:** Gradle Kotlin DSL, version catalog
 
 ---
