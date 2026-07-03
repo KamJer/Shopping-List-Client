@@ -174,7 +174,7 @@ public class RecipePagingSource extends ListenableFuturePagingSource<Integer, Re
      * @return Set of TagDto objects parsed from the query
      */
     private Set<TagDto> getTagDtoSetFromQuery(String query) {
-        String[] tags = query.trim().toLowerCase(Locale.ROOT).split(",");
-        return Arrays.stream(tags).sequential().map(s -> TagDto.builder().tag(s).build()).collect(Collectors.toSet());
+        String[] tags = query.trim().split(",");
+        return Arrays.stream(tags).sequential().map(s -> TagDto.builder().tag(s.trim()).build()).collect(Collectors.toSet());
     }
 }
