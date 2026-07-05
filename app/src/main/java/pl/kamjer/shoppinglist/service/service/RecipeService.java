@@ -1,12 +1,11 @@
 package pl.kamjer.shoppinglist.service.service;
 
+import java.util.List;
 import java.util.Set;
 
 import pl.kamjer.shoppinglist.model.dto.Page;
 import pl.kamjer.shoppinglist.model.dto.RecipeDto;
 import pl.kamjer.shoppinglist.model.dto.RecipeRequestDto;
-import pl.kamjer.shoppinglist.model.dto.TagDto;
-import pl.kamjer.shoppinglist.model.recipe.Tag;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
@@ -33,6 +32,9 @@ public interface RecipeService {
     @DELETE("/recipe/for_user/{recipeId}")
     Call<Boolean> deleteRecipeForUser(@Path("recipeId") Long recipeId);
 
+    @POST("/recipe/ingredients")
+    Call<Page<RecipeDto>> getRecipeByIngredients(@Body List<String> ingredients, @Query("page") int page, @Query("size") int size);
+
     @POST("/recipe/products")
     Call<Page<RecipeDto>> getRecipeByProducts(@Body RecipeRequestDto recipeRequestDto, @Query("page") int page, @Query("size") int size);
 
@@ -46,18 +48,18 @@ public interface RecipeService {
             @Query("size") int size);
 
     @POST("/recipe/tag")
-    Call<Page<RecipeDto>> getRecipeByTags(@Body Set<TagDto> tags, @Query("page") int page, @Query("size") int size);
+    Call<Page<RecipeDto>> getRecipeByTags(@Body Set<String> tags, @Query("page") int page, @Query("size") int size);
 
     @GET("/recipe/user")
     Call<Page<RecipeDto>> getRecipeForUser(@Query("page") int page, @Query("size") int size);
 
     @POST("/recipe/tag/required")
-    Call<Page<RecipeDto>> getRecipeByTagsRequired(@Body Set<TagDto> tags, @Query("page") int page, @Query("size") int size);
+    Call<Page<RecipeDto>> getRecipeByTagsRequired(@Body Set<String> tags, @Query("page") int page, @Query("size") int size);
 
     @GET("/recipe")
     Call<Page<RecipeDto>> getAllRecipes(@Query("page") int page, @Query("size") int size);
 
     @GET("/tags")
-    Call<Set<Tag>> getAllTags();
+    Call<Set<String>> getAllTags();
 }
 

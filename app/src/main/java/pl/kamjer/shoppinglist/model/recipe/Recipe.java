@@ -7,6 +7,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import pl.kamjer.shoppinglist.model.recipe.Tag;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -45,7 +47,7 @@ public class Recipe {
                 .description(recipeDto.getDescription())
                 .ingredients(recipeDto.getIngredients().stream().map(Ingredient::map).collect(Collectors.toList()))
                 .steps(recipeDto.getSteps().stream().map(Step::map).collect(Collectors.toList()))
-                .tags(recipeDto.getTags().stream().map(Tag::map).collect(Collectors.toSet()))
+                .tags(recipeDto.getTags().stream().map(t -> Tag.builder().tag(t).build()).collect(Collectors.toSet()))
                 .recipeId(recipeDto.getRecipeId())
                 .source(Optional.ofNullable(recipeDto.getSource()).orElse(""))
                 .published(recipeDto.getPublished())

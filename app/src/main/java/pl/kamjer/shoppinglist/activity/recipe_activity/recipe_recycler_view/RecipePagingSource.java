@@ -8,9 +8,9 @@ import androidx.paging.PagingState;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -21,8 +21,6 @@ import lombok.Getter;
 import lombok.Setter;
 import pl.kamjer.shoppinglist.model.dto.Page;
 import pl.kamjer.shoppinglist.model.dto.RecipeDto;
-import pl.kamjer.shoppinglist.model.dto.RecipeRequestDto;
-import pl.kamjer.shoppinglist.model.dto.TagDto;
 import pl.kamjer.shoppinglist.model.recipe.Recipe;
 import pl.kamjer.shoppinglist.repository.ShoppingServiceRepository;
 import pl.kamjer.shoppinglist.viewmodel.RecipeViewModel;
@@ -92,9 +90,9 @@ public class RecipePagingSource extends ListenableFuturePagingSource<Integer, Re
                     switch (searchMode) {
                         case NAME -> call = shoppingServiceRepository.getRecipeService().getRecipeByQuery(query, page, ShoppingServiceRepository.PAGE_SIZE);
                         case INGREDIENTS -> call = shoppingServiceRepository.getRecipeService()
-                                .getRecipeByProducts(getRequestDtoFromQuery(query, 0), page, ShoppingServiceRepository.PAGE_SIZE);
-                        case TAGS -> call = shoppingServiceRepository.getRecipeService().getRecipeByTags(getTagDtoSetFromQuery(query), page, ShoppingServiceRepository.PAGE_SIZE);
-                        case TAGS_REQUIRED -> call = shoppingServiceRepository.getRecipeService().getRecipeByTagsRequired(getTagDtoSetFromQuery(query), page, ShoppingServiceRepository.PAGE_SIZE);
+                                .getRecipeByIngredients(getIngredientListFromQuery(query), page, ShoppingServiceRepository.PAGE_SIZE);
+                        case TAGS -> call = shoppingServiceRepository.getRecipeService().getRecipeByTags(getTagSetFromQuery(query), page, ShoppingServiceRepository.PAGE_SIZE);
+                        case TAGS_REQUIRED -> call = shoppingServiceRepository.getRecipeService().getRecipeByTagsRequired(getTagSetFromQuery(query), page, ShoppingServiceRepository.PAGE_SIZE);
                     }
                 }
 
@@ -150,31 +148,30 @@ public class RecipePagingSource extends ListenableFuturePagingSource<Integer, Re
     }
 
     /**
-     * Converts a query string into a RecipeRequestDto for ingredient-based searching.
+     * Converts a query string into a list of ingredient names for ingredient-based searching.
      *
-     * @param request Query string containing comma-separated ingredients
-     * @param maxMissing Maximum number of missing ingredients allowed
-     * @return RecipeRequestDto configured with the parsed ingredients
+     * @param query Query string containing comma-separated ingredients
+     * @return List of trimmed ingredient names
      */
-    private RecipeRequestDto getRequestDtoFromQuery(String request, int maxMissing) {
-        String[] products = request.trim().toLowerCase(Locale.ROOT).split(",");
-        for (int i = 0; i < products.length; i++) {
-            products[i] = products[i].trim();
+    private List<String> getIngredientListFromQuery(String query) {
+        List<String> result = new ArrayList<>();
+        for (String part : query.trim().split(",")) {
+            String trimmed = part.trim();
+            if (!trimmed.isEmpty()) {
+                result.add(trimmed);
+            }
         }
-        return RecipeRequestDto.builder()
-                .products(List.of(products))
-                .maxMissing(maxMissing)
-                .build();
+        return result;
     }
 
     /**
-     * Converts a query string into a set of TagDto objects for tag-based searching.
+     * Converts a query string into a set of tag strings for tag-based searching.
      *
      * @param query Query string containing comma-separated tags
-     * @return Set of TagDto objects parsed from the query
+     * @return Set of tag strings parsed from the query
      */
-    private Set<TagDto> getTagDtoSetFromQuery(String query) {
+    private Set<String> getTagSetFromQuery(String query) {
         String[] tags = query.trim().split(",");
-        return Arrays.stream(tags).sequential().map(s -> TagDto.builder().tag(s.trim()).build()).collect(Collectors.toSet());
+        return Arrays.stream(tags).sequential().map(String::trim).collect(Collectors.toSet());
     }
 }

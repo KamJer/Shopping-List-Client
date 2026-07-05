@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import pl.kamjer.shoppinglist.model.recipe.Recipe;
+import pl.kamjer.shoppinglist.model.recipe.Tag;
 
 @AllArgsConstructor
 @Builder
@@ -17,7 +18,7 @@ public class RecipeDto {
     private String description;
     private List<IngredientDto> ingredients;
     private List<StepDto> steps;
-    private List<TagDto> tags;
+    private List<String> tags;
     private String source;
     private Boolean published;
 
@@ -28,7 +29,7 @@ public class RecipeDto {
                 .description(recipe.getDescription())
                 .ingredients(recipe.getIngredients().stream().map(IngredientDto::map).collect(Collectors.toList()))
                 .steps(recipe.getSteps().stream().map(StepDto::map).collect(Collectors.toList()))
-                .tags(recipe.getTags().stream().map(TagDto::map).collect(Collectors.toList()))
+                .tags(recipe.getTags().stream().map(Tag::getTag).collect(Collectors.toList()))
                 .source(recipe.getSource())
                 .published(recipe.getPublished())
                 .build();
