@@ -14,6 +14,7 @@ import java.util.Locale;
 import java.util.stream.Collectors;
 
 import lombok.AllArgsConstructor;
+import lombok.Setter;
 import pl.kamjer.shoppinglist.R;
 import pl.kamjer.shoppinglist.model.shopping_list.Category;
 import pl.kamjer.shoppinglist.model.shopping_list.ShoppingItemWithAmountTypeAndCategory;
@@ -25,7 +26,9 @@ public class BoughtCategoryListRecyclerViewAdapter extends RecyclerView.Adapter<
 
     private static final Collator BOUGHT_ITEM_NAME_ORDER = Collator.getInstance(Locale.forLanguageTag("pl-PL"));
 
+    @Setter
     private List<Category> categoryList;
+    @Setter
     private List<ShoppingItemWithAmountTypeAndCategory> shoppingItemWithAmountTypeAndCategories;
     private UpdateShoppingItemActonCheckBox checkBoxListener;
     private ModifyShoppingItemAction deleteShoppingItemAction;

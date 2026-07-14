@@ -1,5 +1,6 @@
 package pl.kamjer.shoppinglist.activity.boughtshoppingitemlist;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
@@ -13,6 +14,8 @@ import java.util.List;
 import pl.kamjer.shoppinglist.R;
 import pl.kamjer.shoppinglist.activity.GenericActivity;
 import pl.kamjer.shoppinglist.activity.boughtshoppingitemlist.boughtcategorylistrecyclerviewadapter.BoughtCategoryListRecyclerViewAdapter;
+import pl.kamjer.shoppinglist.activity.shoppinglistactiviti.newshoppingitemdialog.NewShoppingItemDialog;
+import pl.kamjer.shoppinglist.activity.shoppinglistactiviti.newshoppingitemdialog.UpdateShoppingItemDialog;
 import pl.kamjer.shoppinglist.model.shopping_list.Category;
 import pl.kamjer.shoppinglist.model.shopping_list.ShoppingItem;
 import pl.kamjer.shoppinglist.model.shopping_list.ShoppingItemWithAmountTypeAndCategory;
@@ -29,11 +32,16 @@ public class BoughtShoppingItemListActivity extends GenericActivity {
     private List<Category> allCategories = new ArrayList<>();
     private List<ShoppingItemWithAmountTypeAndCategory> allShoppingWithAmountTypeAndCategories = new ArrayList<>();
 
+    private BoughtCategoryListRecyclerViewAdapter boughtCategoryListRecyclerViewAdapter;
+
     private final ModifyShoppingItemAction deleteShoppingItemAction = shoppingItemWithAmountTypeAndCategory -> {
         boughtShoppingItemsListViewModel.deleteShoppingItem(shoppingItemWithAmountTypeAndCategory.getShoppingItem());
     };
     private final ModifyShoppingItemAction modifyShoppingItemAction = shoppingItemWithAmountTypeAndCategory -> {
-        boughtShoppingItemsListViewModel.deleteShoppingItem(shoppingItemWithAmountTypeAndCategory.getShoppingItem());
+        Intent updateShoppingItemIntent = new Intent(this, UpdateShoppingItemDialog.class);
+        updateShoppingItemIntent.putExtra(NewShoppingItemDialog.CATEGORY_FIELD_NAME, shoppingItemWithAmountTypeAndCategory.getCategory());
+        updateShoppingItemIntent.putExtra(UpdateShoppingItemDialog.SELECTED_SHOPPING_ITEM, shoppingItemWithAmountTypeAndCategory.getShoppingItem());
+        startActivity(updateShoppingItemIntent);
     };
 
     private final UpdateShoppingItemActonCheckBox checkBoxListener = (isChecked, shoppingItemWithAmountTypeAndCategory) -> {
@@ -62,22 +70,26 @@ public class BoughtShoppingItemListActivity extends GenericActivity {
         boughtShoppingItemsListRecyclerView = findViewById(R.id.boughtShoppingItemsListRecyclerView);
         boughtShoppingItemsListRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
+        boughtCategoryListRecyclerViewAdapter = new BoughtCategoryListRecyclerViewAdapter(allCategories,
+                allShoppingWithAmountTypeAndCategories,
+                checkBoxListener,
+                deleteShoppingItemAction,
+                modifyShoppingItemAction);
+        boughtShoppingItemsListRecyclerView.setAdapter(boughtCategoryListRecyclerViewAdapter);
+
+
         boughtShoppingItemsListViewModel.setAllCategoryLiveDataObserver(this, categories -> {
             allCategories = categories;
-            boughtShoppingItemsListRecyclerView.setAdapter(new BoughtCategoryListRecyclerViewAdapter(allCategories,
-                    allShoppingWithAmountTypeAndCategories,
-                    checkBoxListener,
-                    deleteShoppingItemAction,
-                    modifyShoppingItemAction));
+            boughtCategoryListRecyclerViewAdapter.setCategoryList(allCategories);
+            boughtCategoryListRecyclerViewAdapter.setShoppingItemWithAmountTypeAndCategories(allShoppingWithAmountTypeAndCategories);
+            boughtCategoryListRecyclerViewAdapter.notifyDataSetChanged();
         });
 
         boughtShoppingItemsListViewModel.setShoppingItemWithAmountTypeAndCategoryLiveDataObserver(this, shoppingItemWithAmountTypeAndCategories -> {
             allShoppingWithAmountTypeAndCategories = shoppingItemWithAmountTypeAndCategories;
-            boughtShoppingItemsListRecyclerView.setAdapter(new BoughtCategoryListRecyclerViewAdapter(allCategories,
-                    allShoppingWithAmountTypeAndCategories,
-                    checkBoxListener,
-                    deleteShoppingItemAction,
-                    modifyShoppingItemAction));
+            boughtCategoryListRecyclerViewAdapter.setCategoryList(allCategories);
+            boughtCategoryListRecyclerViewAdapter.setShoppingItemWithAmountTypeAndCategories(allShoppingWithAmountTypeAndCategories);
+            boughtCategoryListRecyclerViewAdapter.notifyDataSetChanged();
         });
     }
 }
