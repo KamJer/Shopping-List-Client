@@ -4,6 +4,7 @@ import android.content.SharedPreferences;
 import android.security.keystore.KeyGenParameterSpec;
 import android.security.keystore.KeyProperties;
 import android.util.Base64;
+import android.util.Log;
 
 import net.zetetic.database.sqlcipher.SupportOpenHelperFactory;
 
@@ -17,6 +18,7 @@ import javax.crypto.spec.GCMParameterSpec;
 
 public class SqlCipherKeyManager {
 
+    private static final String TAG = "SqlCipherKeyManager";
     private static final String KEY_ALIAS = "room_key";
     private static final String PREF_ENCRYPTED_KEY = "encrypted_key";
     private static final String PREF_IV = "encryption_iv";
@@ -128,11 +130,31 @@ public class SqlCipherKeyManager {
         }
     }
 
+    public void resetKeys() {
+        try {
+            keyStore.deleteEntry(KEY_ALIAS);
+        } catch (Exception e) {
+            Log.w(TAG, "Failed to delete Keystore entry: " + e.getMessage());
+        }
+        sharedPreferences.edit()
+                .remove(PREF_ENCRYPTED_KEY)
+                .remove(PREF_IV)
+                .apply();
+    }
+
     public SupportOpenHelperFactory getSupportFactory() {
         String encryptedKey =
                 sharedPreferences.getString(PREF_ENCRYPTED_KEY, "");
         String iv =
                 sharedPreferences.getString(PREF_IV, "");
+
+        if (encryptedKey.isEmpty() || iv.isEmpty()) {
+            resetKeys();
+            generateKeystoreKeyIfNeeded();
+            generateAndEncryptSqlCipherKey();
+            encryptedKey = sharedPreferences.getString(PREF_ENCRYPTED_KEY, "");
+            iv = sharedPreferences.getString(PREF_IV, "");
+        }
 
         byte[] decryptedKey =
                 getDecryptedSqlCipherKey(encryptedKey, iv);

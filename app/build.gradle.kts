@@ -14,7 +14,7 @@ android {
         applicationId = "pl.kamjer.shoppinglist"
         minSdk = 26
         targetSdk = 35
-        versionCode = 31
+        versionCode = 34
         versionName = "3.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -33,9 +33,9 @@ android {
             buildConfigField("String", "HTTP_BASE_URL", "\"https://\"")
         }
         debug {
-            buildConfigField("String", "SHOPPING_URL", "\"192.168.0.13:5443\"")
-            buildConfigField("String", "RECIPE_URL", "\"192.168.0.13:6443\"")
-            buildConfigField("String", "USER_URL", "\"192.168.0.13:4443\"")
+            buildConfigField("String", "SHOPPING_URL", "\"192.168.1.11:5443\"")
+            buildConfigField("String", "RECIPE_URL", "\"192.168.1.11:6443\"")
+            buildConfigField("String", "USER_URL", "\"192.168.1.11:4443\"")
             buildConfigField("String", "WEBSOCKET_BASE_URL", "\"ws://\"")
             buildConfigField("String", "HTTP_BASE_URL", "\"http://\"")
         }

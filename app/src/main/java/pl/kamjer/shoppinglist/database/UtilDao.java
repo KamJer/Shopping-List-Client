@@ -96,11 +96,24 @@ public interface UtilDao {
                         shoppingItem.setLocalItemAmountTypeId(getLocalAmountTypeIdForShoppingItem(amountTypesFromDb, shoppingItem));
                         shoppingItem.setLocalItemCategoryId(getLocalCategoryIdForShoppingItem(categoriesFromDb, shoppingItem));
                         if (!shoppingItemsFromDb.stream().map(ShoppingItem::getShoppingItemId).collect(Collectors.toList()).contains(shoppingItem.getShoppingItemId())) {
-                            shoppingItem.setLocalShoppingItemId(insertShoppingItem(shoppingItem));
+                            smartInsertShoppingItem(shoppingItem, shoppingItemsFromDb);
                         }
                     });
         } finally {
             lock.unlock();
+        }
+    }
+
+    default void smartInsertShoppingItem(ShoppingItem shoppingItem, List<ShoppingItem> shoppingItemsFromDb) {
+        Optional<ShoppingItem> existingItem = shoppingItemsFromDb.stream()
+                .filter(item -> item.equals(shoppingItem))
+                .findFirst();
+        if (existingItem.isPresent()) {
+            existingItem.get().setShoppingItemId(shoppingItem.getShoppingItemId());
+            existingItem.get().setAmount(shoppingItem.getAmount());
+            updateShoppingItem(existingItem.get());
+        } else {
+            shoppingItem.setLocalShoppingItemId(insertShoppingItem(shoppingItem));
         }
     }
 

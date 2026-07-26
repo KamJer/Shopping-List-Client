@@ -66,7 +66,7 @@ public class InitializerViewModel extends CustomViewModel {
      * @throws NoSuchAlgorithmException if cryptographic algorithm is not available
      * @throws NoSuchProviderException if cryptographic provider is not available
      */
-    public void initialize(Context appContext) throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException {
+    public boolean initialize(Context appContext) throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException {
         // Set up global exception handler for uncaught exceptions
         Thread.setDefaultUncaughtExceptionHandler(new ShoppingListExceptionHandler(
                 appContext,
@@ -85,6 +85,8 @@ public class InitializerViewModel extends CustomViewModel {
         shoppingRepository.initialize(
                 appContext,
                 ShoppingServiceRepository.getShoppingServiceRepository());
+
+        return shoppingRepository.isKeyWasReset();
     }
 
     /**

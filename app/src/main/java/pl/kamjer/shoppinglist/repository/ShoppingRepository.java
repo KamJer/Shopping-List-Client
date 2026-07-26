@@ -7,6 +7,9 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 import androidx.room.Room;
 
+import net.zetetic.database.sqlcipher.SupportOpenHelperFactory;
+
+import java.io.File;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
@@ -56,6 +59,8 @@ import pl.kamjer.shoppinglist.util.sqlCipher.SqlCipherKeyManager;
 @RequiredArgsConstructor
 @Log
 public class ShoppingRepository {
+
+    private static final String TAG = "ShoppingRepository";
 
     /**
      * Number of threads to use for database operations.
@@ -109,6 +114,9 @@ public class ShoppingRepository {
     @Getter
     private ExecutorService executorService;
 
+    @Getter
+    private boolean keyWasReset = false;
+
     /**
      * Gets the singleton instance of ShoppingRepository.
      *
@@ -140,12 +148,27 @@ public class ShoppingRepository {
         System.loadLibrary("sqlcipher");
 
         SqlCipherKeyManager sqlCipherKeyManager = new SqlCipherKeyManager(SharedRepository.getSharedRepository().getSharedPref());
+        SupportOpenHelperFactory factory;
+
+        try {
+            factory = sqlCipherKeyManager.getSupportFactory();
+        } catch (RuntimeException e) {
+            android.util.Log.w(TAG, "Encryption key invalid, resetting keys and database", e);
+            sqlCipherKeyManager.resetKeys();
+            File dbFile = appContext.getDatabasePath(ShoppingDatabase.DATABASE_NAME);
+            if (dbFile.exists()) {
+                dbFile.delete();
+            }
+            sqlCipherKeyManager = new SqlCipherKeyManager(SharedRepository.getSharedRepository().getSharedPref());
+            factory = sqlCipherKeyManager.getSupportFactory();
+            keyWasReset = true;
+        }
 
         ShoppingDatabase shoppingDatabase = Room.databaseBuilder(appContext,
                         ShoppingDatabase.class,
                         ShoppingDatabase.DATABASE_NAME)
                 .addMigrations(ShoppingDatabase.MIGRATION_1_2)
-                .openHelperFactory(sqlCipherKeyManager.getSupportFactory())
+                .openHelperFactory(factory)
                 .build();
         shoppingItemDao = shoppingDatabase.getShoppingItemDao();
         categoryDao = shoppingDatabase.getCategoryDao();

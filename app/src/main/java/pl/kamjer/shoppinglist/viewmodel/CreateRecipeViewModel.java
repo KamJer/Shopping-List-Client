@@ -8,6 +8,7 @@ import androidx.lifecycle.viewmodel.ViewModelInitializer;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -125,10 +126,12 @@ public class CreateRecipeViewModel extends CustomViewModel {
         shoppingServiceRepository.getAllTags(new Callback<>() {
 
             @Override
-            public void onResponse(Call<Set<Tag>> call, Response<Set<Tag>> response) {
+            public void onResponse(Call<Set<String>> call, Response<Set<String>> response) {
                 if (response.code() == 200) {
                     if (response.body() != null) {
-                        tagsLiveData.setValue(response.body());
+                        tagsLiveData.setValue(response.body().stream()
+                                .map(t -> Tag.builder().tag(t).build())
+                                .collect(Collectors.toSet()));
                     }
                 } else {
                     onFailureAction.action(new NotOkHttpResponseException(decodeErrorMassage(response)));
@@ -136,7 +139,7 @@ public class CreateRecipeViewModel extends CustomViewModel {
             }
 
             @Override
-            public void onFailure(Call<Set<Tag>> call, Throwable t) {
+            public void onFailure(Call<Set<String>> call, Throwable t) {
                 onFailureAction.action(t);
             }
         });

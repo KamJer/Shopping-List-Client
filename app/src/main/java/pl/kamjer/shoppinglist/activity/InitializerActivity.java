@@ -59,7 +59,10 @@ public class InitializerActivity extends GenericActivity {
 
         // Initialize all necessary components of the app
         try {
-            initializerViewModel.initialize(getApplicationContext());
+            boolean keyWasReset = initializerViewModel.initialize(getApplicationContext());
+            if (keyWasReset) {
+                createToast(getString(R.string.encryption_key_reset_message));
+            }
         } catch (InvalidAlgorithmParameterException | NoSuchAlgorithmException |
                  NoSuchProviderException e) {
             throw new RuntimeException(e);

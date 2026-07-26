@@ -26,7 +26,6 @@ import pl.kamjer.shoppinglist.model.dto.ExceptionDto;
 import pl.kamjer.shoppinglist.model.dto.RecipeDto;
 import pl.kamjer.shoppinglist.model.dto.ShoppingItemDto;
 import pl.kamjer.shoppinglist.model.dto.TokenDto;
-import pl.kamjer.shoppinglist.model.recipe.Tag;
 import pl.kamjer.shoppinglist.model.user.User;
 import pl.kamjer.shoppinglist.service.JwtTokenInterceptor;
 import pl.kamjer.shoppinglist.service.SSLUtil;
@@ -365,8 +364,8 @@ public class ShoppingServiceRepository {
         call.enqueue(callback);
     }
 
-    public void getAllTags(Callback<Set<Tag>> callback) {
-        Call<Set<Tag>> call = recipeService.getAllTags();
+    public void getAllTags(Callback<Set<String>> callback) {
+        Call<Set<String>> call = recipeService.getAllTags();
         call.enqueue(callback);
     }
 }
