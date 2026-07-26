@@ -37,7 +37,9 @@ public class UpdateShoppingItemDialog extends NewShoppingItemDialog{
         setTitle(R.string.modify_item_dialog_title);
 
         // Retrieve the shopping item to update from intent extras
-        Optional.ofNullable((ShoppingItem) getIntent().getSerializableExtra(SELECTED_SHOPPING_ITEM)).ifPresent(shoppingItem -> {
+        @SuppressWarnings("deprecation")
+        Optional<ShoppingItem> shoppingItemOpt = Optional.ofNullable((ShoppingItem) getIntent().getSerializableExtra(SELECTED_SHOPPING_ITEM));
+        shoppingItemOpt.ifPresent(shoppingItem -> {
             shoppingItemToUpdate = shoppingItem;
 
             // Populate the UI with existing item data

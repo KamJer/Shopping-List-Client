@@ -100,6 +100,7 @@ public class NewShoppingItemDialog extends GenericActivity {
 
         amountTypeSpinner = findViewById(R.id.amountTypeSpinner);
 
+        @SuppressWarnings("deprecation")
         Category category = (Category) getIntent().getSerializableExtra(CATEGORY_FIELD_NAME);
 
         shoppingItemEditText = findViewById(R.id.shoppingItemEditText);

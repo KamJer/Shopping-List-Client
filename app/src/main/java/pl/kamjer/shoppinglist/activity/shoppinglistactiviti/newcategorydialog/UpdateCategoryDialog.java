@@ -34,7 +34,9 @@ public class UpdateCategoryDialog extends NewCategoryDialog {
         acceptNewCategoryNameImageButton.setOnClickListener(updateCategoryAction);
 
         try {
-            category = Optional.ofNullable((Category) getIntent().getSerializableExtra(CATEGORY_FIELD_NAME)).orElseThrow(() -> new NoResourceFoundException(getString(R.string.no_category_found_massage)));
+            @SuppressWarnings("deprecation")
+            Category cat = (Category) getIntent().getSerializableExtra(CATEGORY_FIELD_NAME);
+            category = Optional.ofNullable(cat).orElseThrow(() -> new NoResourceFoundException(getString(R.string.no_category_found_massage)));
             newCategoryNameEditText.setText(category.getCategoryName());
         } catch (NoResourceFoundException e) {
             throw new RuntimeException(e);

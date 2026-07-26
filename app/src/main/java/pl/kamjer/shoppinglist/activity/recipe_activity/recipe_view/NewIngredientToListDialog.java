@@ -47,7 +47,9 @@ public class NewIngredientToListDialog extends NewShoppingItemDialog {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Optional.ofNullable((Ingredient) getIntent().getSerializableExtra(INGREDIENT_FIELD_NAME))
+        @SuppressWarnings("deprecation")
+        Optional<Ingredient> ingredientOpt = Optional.ofNullable((Ingredient) getIntent().getSerializableExtra(INGREDIENT_FIELD_NAME));
+        ingredientOpt
                 .ifPresent(ingredient -> {
                     recipeViewModel.setActiveIngredientValue(ingredient);
                     this.ingredient = ingredient;

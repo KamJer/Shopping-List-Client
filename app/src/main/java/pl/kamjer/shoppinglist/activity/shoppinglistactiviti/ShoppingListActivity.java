@@ -8,6 +8,8 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 
+import android.os.Build;
+
 import androidx.activity.OnBackPressedCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -168,10 +170,6 @@ public class ShoppingListActivity extends GenericActivity {
         shoppingListViewModel.updateLocalCategory(oldCategory);
     };
 
-    /**
-     * Callback for handling the back button press.
-     * Moves the task to the background instead of finishing the activity.
-     */
     protected OnBackPressedCallback onBack = new OnBackPressedCallback(true) {
         @Override
         public void handleOnBackPressed() {
@@ -179,12 +177,20 @@ public class ShoppingListActivity extends GenericActivity {
         }
     };
 
+    @SuppressWarnings("deprecation")
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         inflate(R.layout.shopping_list_activity_layout, R.id.shopping_list_activity_id);
 
-        getOnBackPressedDispatcher().addCallback(this, onBack);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            getOnBackInvokedDispatcher().registerOnBackInvokedCallback(
+                    android.window.OnBackInvokedDispatcher.PRIORITY_DEFAULT,
+                    () -> moveTaskToBack(true)
+            );
+        } else {
+            getOnBackPressedDispatcher().addCallback(this, onBack);
+        }
 
         // Initialize ViewModel
         shoppingListViewModel = new ViewModelProvider(
@@ -266,6 +272,7 @@ public class ShoppingListActivity extends GenericActivity {
                 Intent data = result.getData();
                 if (data != null) {
                     try {
+                        @SuppressWarnings("deprecation")
                         Category category = Optional.ofNullable((Category) data.getSerializableExtra(UpdateCategoryDialog.CATEGORY_FIELD_NAME)).orElseThrow(() -> new NoResourceFoundException(getString(R.string.no_category_found_massage)));
                         shoppingListViewModel.updateCategory(category);
                     } catch (NoResourceFoundException e) {

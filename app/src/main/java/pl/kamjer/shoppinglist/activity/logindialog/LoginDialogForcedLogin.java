@@ -1,5 +1,6 @@
 package pl.kamjer.shoppinglist.activity.logindialog;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 
@@ -15,10 +16,18 @@ public class LoginDialogForcedLogin extends LoginDialogOptionalLogin {
         }
     };
 
+    @SuppressWarnings("deprecation")
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getOnBackPressedDispatcher().addCallback(this, onBack);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            getOnBackInvokedDispatcher().registerOnBackInvokedCallback(
+                    android.window.OnBackInvokedDispatcher.PRIORITY_DEFAULT,
+                    () -> moveTaskToBack(true)
+            );
+        } else {
+            getOnBackPressedDispatcher().addCallback(this, onBack);
+        }
         shoppingListActionBar.setVisibility(View.GONE);
     }
 }

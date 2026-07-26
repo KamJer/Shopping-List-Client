@@ -13,8 +13,6 @@
         <item name="colorOnBackground">@color/night_on_surface</item>
         <item name="android:textColorPrimary">@color/night_on_surface</item>
         <item name="android:textColorSecondary">#FFB0B0B0</item>
-        <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
-        <item name="android:navigationBarColor">@color/night_background</item>
         <item name="android:windowLightStatusBar">false</item>
         <item name="materialButtonStyle">@style/Widget.ShoppingList.Button.Primary</item>
     </style>

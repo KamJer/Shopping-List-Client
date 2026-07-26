@@ -1,8 +1,10 @@
 package pl.kamjer.shoppinglist.activity;
 
+import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
 
+import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -17,6 +19,12 @@ import pl.kamjer.shoppinglist.util.funcinterface.OnFailureAction;
 
 @Log
 public class GenericActivity extends AppCompatActivity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        EdgeToEdge.enable(this);
+        super.onCreate(savedInstanceState);
+    }
 
     /**
      * Action to be performed when a connection failure occurs.

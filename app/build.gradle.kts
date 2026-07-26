@@ -4,7 +4,7 @@ plugins {
 
 android {
     namespace = "pl.kamjer.shoppinglist"
-    compileSdk = 35
+    compileSdk = 36
 
     buildFeatures {
         buildConfig = true
@@ -13,7 +13,7 @@ android {
     defaultConfig {
         applicationId = "pl.kamjer.shoppinglist"
         minSdk = 26
-        targetSdk = 35
+        targetSdk = 36
         versionCode = 34
         versionName = "3.0"
 

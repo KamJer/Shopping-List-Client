@@ -15,8 +15,7 @@
         android:roundIcon="@drawable/baseline_shopping_cart_24_logo"
         android:supportsRtl="true"
         android:theme="@style/Theme.ShoppingList"
-        android:usesCleartextTraffic="true"
-        tools:targetApi="35">
+        tools:targetApi="36">
         <activity
             android:name=".activity.InitializerActivity"
             android:exported="true">
@@ -37,26 +36,32 @@
             android:exported="false" />
         <activity
             android:name=".activity.shoppinglistactiviti.newcategorydialog.NewCategoryDialog"
+            android:exported="false"
             android:theme="@style/Theme.AppCompat.Dialog"
             android:windowIsFloating="true" />
         <activity
             android:name=".activity.shoppinglistactiviti.newcategorydialog.UpdateCategoryDialog"
+            android:exported="false"
             android:theme="@style/Theme.AppCompat.Dialog"
             android:windowIsFloating="true" />
         <activity
             android:name=".activity.shoppinglistactiviti.newshoppingitemdialog.NewShoppingItemDialog"
+            android:exported="false"
             android:theme="@style/Theme.AppCompat.Dialog"
             android:windowIsFloating="true" />
         <activity
             android:name=".activity.shoppinglistactiviti.newshoppingitemdialog.UpdateShoppingItemDialog"
+            android:exported="false"
             android:theme="@style/Theme.AppCompat.Dialog"
             android:windowIsFloating="true" />
         <activity
             android:name=".activity.amounttypelist.addnewamounttypedialog.AddNewAmountTypeDialog"
+            android:exported="false"
             android:theme="@style/Theme.AppCompat.Dialog"
             android:windowIsFloating="true" />
         <activity
             android:name=".activity.amounttypelist.UpdateAmountTypeDialog"
+            android:exported="false"
             android:theme="@style/Theme.AppCompat.Dialog"
             android:windowIsFloating="true" />
         <activity
@@ -65,6 +70,7 @@
             android:parentActivityName=".activity.shoppinglistactiviti.ShoppingListActivity" />
         <activity
             android:name=".activity.amounttypelist.AmountTypeDeleteConflictDialog"
+            android:exported="false"
             android:theme="@style/Theme.AppCompat.Dialog"
             android:windowIsFloating="true" />
         <activity
