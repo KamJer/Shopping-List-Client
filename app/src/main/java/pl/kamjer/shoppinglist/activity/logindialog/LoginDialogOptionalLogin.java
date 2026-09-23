@@ -115,7 +115,7 @@ public class LoginDialogOptionalLogin extends GenericActivity {
         inflate(R.layout.login_dialog_layout, R.id.login_dialog_id);
 
         if (ShoppingRepository.getShoppingRepository().getExecutorService() == null) {
-            ShoppingServiceRepository.getShoppingServiceRepository().initialize();
+            ShoppingServiceRepository.getShoppingServiceRepository().initialize(this);
             SharedRepository.getSharedRepository().initialize(this);
             try {
                 ShoppingRepository.getShoppingRepository().initialize(

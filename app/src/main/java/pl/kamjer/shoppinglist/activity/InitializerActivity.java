@@ -12,7 +12,6 @@ import androidx.lifecycle.ViewModelProvider;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
-import java.util.Optional;
 
 import lombok.extern.java.Log;
 import pl.kamjer.shoppinglist.R;
@@ -84,21 +83,32 @@ public class InitializerActivity extends GenericActivity {
                 initializerViewModel.refreshUser(new Callback<>() {
                     @Override
                     public void onResponse(@NonNull Call<TokenDto> call, @NonNull Response<TokenDto> response) {
-                        Optional.ofNullable(response.body())
-                                .ifPresent(token -> {
-                                    if (token.getRefreshToken() != null && token.getAccessToken() != null) {
-                                        user.setPassword(token.getRefreshToken());
-                                        user.setAccessToken(token.getAccessToken());
-                                        logUserInAndInitialize(user);
-                                    } else {
-                                        createToast(getString(R.string.no_such_user_exists_message));
-                                    }
-                                });
+                        if (response.isSuccessful() && response.body() != null) {
+                            TokenDto token = response.body();
+                            if (token.getRefreshToken() != null && token.getAccessToken() != null) {
+                                user.setPassword(token.getRefreshToken());
+                                user.setAccessToken(token.getAccessToken());
+                                logUserInAndInitialize(user);
+                                actOnSuccessOrOffline(user);
+                            } else {
+                                createToast(getString(R.string.no_such_user_exists_message));
+                            }
+                        } else {
+//                            a non-2xx response during startup refresh means the stored refresh token is no longer
+//                            valid (401/403), so the user has to log in again instead of being stuck on this screen
+                            if (response.code() == 401 || response.code() == 403) {
+                                ShoppingServiceRepository.getShoppingServiceRepository().sessionExpired();
+                            } else {
+                                createToast(response.message());
+                                actOnSuccessOrOffline(user);
+                            }
+                        }
                     }
 
                     @Override
                     public void onFailure(@NonNull Call<TokenDto> call, @NonNull Throwable t) {
                         createToast(t.getMessage());
+                        actOnSuccessOrOffline(user);
                     }
                 });
 
@@ -106,22 +116,8 @@ public class InitializerActivity extends GenericActivity {
                 initializerViewModel.initializeOnMessageAction(user,
                         (webSocket, object) ->
                                 createToast(object),
-                        (webSocket, t, response) -> {
-                            if (response != null) {
-                                if (response.code() == 401) {
-                                    // If logged user does not exist for whatever reason, inform user about that and log them out
-                                    initializerViewModel.logUserOff(user);
-                                    createToast(getString(R.string.no_such_user_exists_message));
-                                } else {
-                                    // Inform user about error
-                                    createToast(t.getMessage());
-                                }
-                            } else {
-                                createToast(t.getMessage());
-                            }
-                        });
-
-                actOnSuccessOrOffline(user);
+                        (webSocket, t, response) ->
+                                createToast(t.getMessage()));
             } else {
                 // Force user to log in if no user data exists
                 startLogDialog();

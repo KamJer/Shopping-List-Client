@@ -1,6 +1,9 @@
 package pl.kamjer.shoppinglist.repository;
 
 import android.content.Context;
+import android.content.Intent;
+import android.os.Handler;
+import android.os.Looper;
 
 import androidx.annotation.NonNull;
 
@@ -17,6 +20,7 @@ import lombok.Setter;
 import lombok.extern.java.Log;
 import okhttp3.OkHttpClient;
 import pl.kamjer.shoppinglist.BuildConfig;
+import pl.kamjer.shoppinglist.activity.logindialog.LoginDialogForcedLogin;
 import pl.kamjer.shoppinglist.gsonconverter.LocalDateTimeDeserializer;
 import pl.kamjer.shoppinglist.gsonconverter.LocalDateTimeSerializer;
 import pl.kamjer.shoppinglist.model.dto.AllDto;
@@ -27,6 +31,8 @@ import pl.kamjer.shoppinglist.model.dto.RecipeDto;
 import pl.kamjer.shoppinglist.model.dto.ShoppingItemDto;
 import pl.kamjer.shoppinglist.model.dto.TokenDto;
 import pl.kamjer.shoppinglist.model.user.User;
+import pl.kamjer.shoppinglist.repository.SharedRepository;
+import pl.kamjer.shoppinglist.repository.ShoppingRepository;
 import pl.kamjer.shoppinglist.service.JwtTokenInterceptor;
 import pl.kamjer.shoppinglist.service.SSLUtil;
 import pl.kamjer.shoppinglist.service.TokenAuthenticator;
@@ -146,6 +152,11 @@ public class ShoppingServiceRepository {
         initializedWithUser = false;
     }
 
+    public void initialize(Context appContext) {
+        this.appContext = appContext;
+        initialize();
+    }
+
     public void reInitializeWithUser(User user) {
         this.user = user;
         gson = new GsonBuilder()
@@ -176,7 +187,8 @@ public class ShoppingServiceRepository {
         recipeService = retrofitRecipe.create(RecipeService.class);
         tokenAuthenticator.setUser(user);
         tokenAuthenticator.setAuthApi(userService);
-        tokenAuthenticator.setOnTokenRefreshed(this::reconnectWebsocketWithNewToken);
+        tokenAuthenticator.setOnRefreshTokenPersisted(() -> ShoppingRepository.getShoppingRepository().updateRefreshToken(user));
+        tokenAuthenticator.setOnRefreshFailed(this::sessionExpired);
         initializedWithUser = true;
     }
 
@@ -185,7 +197,13 @@ public class ShoppingServiceRepository {
         webSocket = new WebSocket(WEBSOCKET_BASE_URL + shoppingListDomain + "/ws?token=" + user.getAccessToken())
                 .basicWebsocketHeader()
                 .onConnectAction((connected) -> onConnectChangeAction.forEach(onConnectChangeAction1 -> onConnectChangeAction1.action(connected)))
-                .onFailure((webSocket1, t, response) -> onFailureAction.action(webSocket1, t, response))
+                .onFailure((webSocket1, t, response) -> {
+                    if (response != null && (response.code() == 401 || response.code() == 403)) {
+                        refreshAndReconnect();
+                    } else if (onFailureAction != null) {
+                        onFailureAction.action(webSocket1, t, response);
+                    }
+                })
                 .onError((webSocket1, errorMessage) -> onErrorAction.action(webSocket1, errorMessage))
 //                registering util endpoints
                 .subscribe(gson, "/synchronizeData", AllDto.class, onMessageActionSynchronize)
@@ -240,6 +258,49 @@ public class ShoppingServiceRepository {
             webSocket.basicWebsocketHeader();
             webSocket.connect(okHttpClientShopping);
         }
+    }
+
+    public void refreshAndReconnect() {
+        refreshUser(new Callback<>() {
+            @Override
+            public void onResponse(@NonNull Call<TokenDto> call, @NonNull Response<TokenDto> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    TokenDto tokenDto = response.body();
+                    if (tokenDto.getAccessToken() != null) {
+                        user.setAccessToken(tokenDto.getAccessToken());
+                    }
+                    if (tokenDto.getRefreshToken() != null) {
+                        user.setPassword(tokenDto.getRefreshToken());
+                    }
+                    ShoppingRepository.getShoppingRepository().updateRefreshToken(user);
+                    reconnectWebsocketWithNewToken();
+                } else if (response.code() == 401 || response.code() == 403) {
+                    sessionExpired();
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<TokenDto> call, @NonNull Throwable t) {
+                log.warning("Token refresh failed: " + t.getMessage());
+            }
+        });
+    }
+
+    public void sessionExpired() {
+        new Handler(Looper.getMainLooper()).post(() -> {
+            if (user != null) {
+                ShoppingRepository.getShoppingRepository().setLoggedUser(null);
+                ShoppingRepository.getShoppingRepository().deleteUser(user);
+                user = null;
+            }
+            SharedRepository.getSharedRepository().deleteUser();
+            disconnect();
+            if (appContext != null) {
+                Intent loginDialogIntent = new Intent(appContext, LoginDialogForcedLogin.class);
+                loginDialogIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                appContext.startActivity(loginDialogIntent);
+            }
+        });
     }
 
     private void ifDisconnectedConnect() {
@@ -351,17 +412,69 @@ public class ShoppingServiceRepository {
 
     public void insertRecipe(RecipeDto recipeDto, Callback<RecipeDto> callback) {
         Call<RecipeDto> call = recipeService.putRecipe(recipeDto);
-        call.enqueue(callback);
+        enqueueWithRefreshRetry(call, callback);
     }
 
     public void updateRecipe(RecipeDto recipeDto, Callback<Boolean> callback) {
         Call<Boolean> call = recipeService.postRecipe(recipeDto);
-        call.enqueue(callback);
+        enqueueWithRefreshRetry(call, callback);
     }
 
     public void deleteRecipe(Long id, Callback<Boolean> callback) {
         Call<Boolean> call = recipeService.deleteRecipe(id);
-        call.enqueue(callback);
+        enqueueWithRefreshRetry(call, callback);
+    }
+
+//    If the recipe server responds with 401/403 it usually means the access token has expired and the request
+//    has not been retried by the Authenticator (OkHttp only reacts to 401, and the recipe server returns 403
+//    for unauthenticated requests). Refresh the tokens and retry the call once.
+    private <T> void enqueueWithRefreshRetry(Call<T> call, Callback<T> callback) {
+        call.enqueue(new Callback<>() {
+            private boolean retried = false;
+
+            @Override
+            public void onResponse(@NonNull Call<T> c, @NonNull Response<T> response) {
+                if ((response.code() == 401 || response.code() == 403) && !retried) {
+                    retried = true;
+                    refreshAndRetry(c.clone(), callback, response);
+                } else {
+                    callback.onResponse(c, response);
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<T> c, @NonNull Throwable t) {
+                callback.onFailure(c, t);
+            }
+        });
+    }
+
+    private <T> void refreshAndRetry(Call<T> call, Callback<T> callback, Response<T> originalResponse) {
+        refreshUser(new Callback<>() {
+            @Override
+            public void onResponse(@NonNull Call<TokenDto> c, @NonNull Response<TokenDto> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    TokenDto tokenDto = response.body();
+                    if (tokenDto.getAccessToken() != null) {
+                        user.setAccessToken(tokenDto.getAccessToken());
+                    }
+                    if (tokenDto.getRefreshToken() != null) {
+                        user.setPassword(tokenDto.getRefreshToken());
+                    }
+                    ShoppingRepository.getShoppingRepository().updateRefreshToken(user);
+                    call.enqueue(callback);
+                } else if (response.code() == 401 || response.code() == 403) {
+                    sessionExpired();
+                } else {
+                    callback.onResponse(call, originalResponse);
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<TokenDto> c, @NonNull Throwable t) {
+                callback.onFailure(call, t);
+            }
+        });
     }
 
     public void getAllTags(Callback<Set<String>> callback) {

@@ -10,11 +10,13 @@ android {
         buildConfig = true
     }
 
+    val serverHost = providers.gradleProperty("SERVER_HOST").orElse("192.168.1.11").get()
+
     defaultConfig {
         applicationId = "pl.kamjer.shoppinglist"
         minSdk = 26
         targetSdk = 36
-        versionCode = 34
+        versionCode = 35
         versionName = "3.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -33,9 +35,9 @@ android {
             buildConfigField("String", "HTTP_BASE_URL", "\"https://\"")
         }
         debug {
-            buildConfigField("String", "SHOPPING_URL", "\"192.168.1.11:5443\"")
-            buildConfigField("String", "RECIPE_URL", "\"192.168.1.11:6443\"")
-            buildConfigField("String", "USER_URL", "\"192.168.1.11:4443\"")
+            buildConfigField("String", "SHOPPING_URL", "\"${serverHost}:5443\"")
+            buildConfigField("String", "RECIPE_URL", "\"${serverHost}:6443\"")
+            buildConfigField("String", "USER_URL", "\"${serverHost}:4443\"")
             buildConfigField("String", "WEBSOCKET_BASE_URL", "\"ws://\"")
             buildConfigField("String", "HTTP_BASE_URL", "\"http://\"")
         }

@@ -74,7 +74,7 @@ public class InitializerViewModel extends CustomViewModel {
 
         // Set initialization progress label to connection initialization
         setInitializerLabelLiveDataValue(appContext.getString(R.string.initializing_connection_to_server_label));
-        shoppingServiceRepository.initialize();
+        shoppingServiceRepository.initialize(appContext);
 
         // Set initialization progress label to inner files initialization
         setInitializerLabelLiveDataValue(appContext.getString(R.string.initializing_inner_files_label));
